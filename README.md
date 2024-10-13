@@ -17,8 +17,8 @@ Run a command depending on your OS:
 
 Windows:
 
-```batch
-bin/start.bat
+```
+.\bin\start.bat
 ```
 
 Unix:
