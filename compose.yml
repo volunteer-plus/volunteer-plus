@@ -1,0 +1,15 @@
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - ${FRONTEND_PORT}:${FRONTEND_PORT}
+    volumes:
+      - ./frontend/src:/usr/src/app/src
+      - ./frontend/public:/usr/src/app/public
+    environment:
+      - FRONTEND_PORT=${FRONTEND_PORT}
+    container_name: volunteer-plus-frontend
+
+  backend:
+    build: ./backend
+    container_name: volunteer-plus-backend
