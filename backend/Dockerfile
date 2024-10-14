@@ -1,9 +1,10 @@
-FROM eclipse-temurin:17
+FROM maven:3.8.4-openjdk-17 AS builder
+WORKDIR /backend
+COPY . /backend/.
+RUN mvn -f /backend/pom.xml clean package -Dmaven.test.skip=true
 
-WORKDIR /usr/src/app
-
-COPY . .
-
-RUN javac HelloWorld.java
-
-CMD java HelloWorld
+FROM openjdk:17-jdk-slim
+WORKDIR /backend
+COPY --from=builder /backend/target/*.jar /backend/*.jar
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "/backend/*.jar"]

@@ -10,6 +10,25 @@ services:
       - FRONTEND_PORT=${FRONTEND_PORT}
     container_name: volunteer-plus-frontend
 
+  db_main:
+    image: mariadb:11.0
+    container_name: db_main
+    environment:
+      MARIADB_USER: ${MAIN_DB_USER}
+      MARIADB_ROOT_PASSWORD: ${MAIN_DB_PASSWORD}
+      MARIADB_DATABASE: ${MAIN_DB_NAME}
+    ports:
+      - ${MAIN_DB_PORT}:${MAIN_DB_PORT}
+
   backend:
-    build: ./backend
-    container_name: volunteer-plus-backend
+    build:
+      context: ./backend/
+      dockerfile: Dockerfile
+    container_name: backend
+    ports:
+      - ${BACKEND_PORT}:${BACKEND_PORT}
+    depends_on:
+      - db_main
+    environment:
+      DB_HOST: db_main
+      SPRING_PROFILES_ACTIVE: ${BACKEND_PROFILE}
