@@ -31,4 +31,7 @@ services:
       - db_main
     environment:
       DB_HOST: db_main
-      SPRING_PROFILES_ACTIVE: ${BACKEND_PROFILE}
+      DB_PORT: ${MAIN_DB_PORT}
+      DB_NAME: ${MAIN_DB_NAME}
+      DB_USER: ${MAIN_DB_USER}
+      DB_PASSWORD: ${MAIN_DB_PASSWORD}
