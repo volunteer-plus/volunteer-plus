@@ -40,6 +40,9 @@ public class User extends BaseEntity {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Volunteer volunteer;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private MilitaryPersonnel militaryPersonnel;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Request> requests = new ArrayList<>();
 }
