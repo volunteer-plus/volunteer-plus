@@ -290,18 +290,3 @@ INSERT INTO `brigade_codes` (`code`, `create_date`, `update_date`) VALUES ('А46
 INSERT INTO `brigade_codes` (`code`, `create_date`, `update_date`) VALUES ('А4615', CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP());
 INSERT INTO `brigade_codes` (`code`, `create_date`, `update_date`) VALUES ('А4619', CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP());
 INSERT INTO `brigade_codes` (`code`, `create_date`, `update_date`) VALUES ('А4623', CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP());
-
-
-alter table military_personnel add `user_id` bigint not null;
-alter table military_personnel add constraint `fk__military_personnel__user_id` foreign key (`user_id`) references `user` (`id`)
-
-
-create table if not exists `add_request`
-(
-    `id`              bigint primary key auto_increment,
-    `request_id`      LONGTEXT CHARACTER SET utf8mb4 not null,
-    `executed`        bit not null default 0,
-    `create_date`     datetime default null,
-    `update_date`     datetime default null
-);
-

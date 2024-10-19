@@ -6,6 +6,6 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum ErrorCode {
-    NO_ACTIVE_DATABASE("No active database");
+    ADD_REQUEST_NOT_FOUND("Add request not found");
     private final String data;
 }

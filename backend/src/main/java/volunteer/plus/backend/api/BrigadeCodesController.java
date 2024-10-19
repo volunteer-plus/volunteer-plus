@@ -16,7 +16,7 @@ import java.util.List;
 public class BrigadeCodesController {
     private final BrigadeCodesService brigadeCodesService;
 
-    @GetMapping("/codes")
+    @GetMapping("/brigade/codes")
     @Operation(description = "Retrieve all valid codes in system of military units for further validation")
     public ResponseEntity<List<String>> getCodes() {
         return ResponseEntity.ok(brigadeCodesService.getCodes());
