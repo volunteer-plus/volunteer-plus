@@ -145,16 +145,6 @@ public class MilitaryPersonnelServiceImpl implements MilitaryPersonnelService {
             throw new ApiException(ErrorCode.MILITARY_PERSONNEL_NOT_FOUND);
         }
 
-        final List<Brigade> brigades = mps.stream().map(MilitaryPersonnel::getBrigade).toList();
-        for (final var brigade : brigades) {
-            final var mpsToDelete = brigade.getMilitaryPersonnel()
-                    .stream()
-                    .filter(mp -> ids.contains(mp.getId()))
-                    .toList();
-            mpsToDelete.forEach(brigade::removeMilitaryPersonnel);
-        }
-
-        brigadeRepository.saveAllAndFlush(brigades);
         militaryPersonnelRepository.deleteAll(mps);
     }
 
