@@ -5,16 +5,17 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import volunteer.plus.backend.domain.AddRequest;
-import volunteer.plus.backend.dto.AddRequestResponseDTO;
+import volunteer.plus.backend.domain.entity.AddRequest;
+import volunteer.plus.backend.domain.dto.AddRequestResponseDTO;
 import volunteer.plus.backend.exceptions.ApiException;
 import volunteer.plus.backend.exceptions.ErrorCode;
 import volunteer.plus.backend.repository.AddRequestRepository;
 import volunteer.plus.backend.service.AddRequestService;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.util.*;
+
+import static volunteer.plus.backend.util.HashUtil.SHA_256;
+import static volunteer.plus.backend.util.HashUtil.hashValue;
 
 @Slf4j
 @Service
@@ -45,14 +46,11 @@ public class AddRequestServiceImpl implements AddRequestService {
         final List<AddRequest> addRequests = new ArrayList<>();
         final List<String> keys = new ArrayList<>();
 
-        // Create SHA-256 hash of the UUID
-        final var digest = MessageDigest.getInstance("SHA-256");
-
         for (var i = 0; i < amount; i++) {
             // generate absolute unique key
             final String key = UUID.randomUUID().toString() + System.currentTimeMillis();
             keys.add(key);
-            final var encodedHash = hashKey(digest, key);
+            final var encodedHash = hashValue(SHA_256, key);
 
             addRequests.add(
                     AddRequest.builder()
@@ -65,17 +63,17 @@ public class AddRequestServiceImpl implements AddRequestService {
         final List<AddRequest> savedRequests = addRequestRepository.saveAll(addRequests);
         final List<AddRequestResponseDTO> result = new ArrayList<>();
 
-        populateResult(savedRequests, keys, digest, result);
+        populateResult(savedRequests, keys, result);
 
         return result;
     }
 
     // we need to populate results because we need to return real data without being hashed
     // also we should not call DB to keep high performance
-    private void populateResult(List<AddRequest> savedRequests, List<String> keys, MessageDigest digest, List<AddRequestResponseDTO> result) {
+    private void populateResult(List<AddRequest> savedRequests, List<String> keys, List<AddRequestResponseDTO> result) {
         for (final var request : savedRequests) {
             for (final var key : keys) {
-                final var hashedKey = hashKey(digest, key);
+                final var hashedKey = hashValue(SHA_256, key);
                 if (!Objects.equals(hashedKey, request.getRequestId())) {
                     continue;
                 }
@@ -88,12 +86,6 @@ public class AddRequestServiceImpl implements AddRequestService {
                 );
             }
         }
-    }
-
-    private String hashKey(MessageDigest digest, String key) {
-        byte[] hash = digest.digest(key.getBytes(StandardCharsets.UTF_8));
-        // Encode the hash to Base64 to store in DB as a readable string
-        return Base64.getEncoder().encodeToString(hash);
     }
 
 

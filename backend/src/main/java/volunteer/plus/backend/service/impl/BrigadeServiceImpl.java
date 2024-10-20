@@ -4,11 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import volunteer.plus.backend.domain.Brigade;
-import volunteer.plus.backend.domain.MilitaryPersonnel;
-import volunteer.plus.backend.dto.BrigadeCreationDTO;
-import volunteer.plus.backend.dto.BrigadeCreationRequestDTO;
-import volunteer.plus.backend.dto.BrigadeDTO;
+import volunteer.plus.backend.domain.entity.Brigade;
+import volunteer.plus.backend.domain.dto.BrigadeCreationDTO;
+import volunteer.plus.backend.domain.dto.BrigadeCreationRequestDTO;
+import volunteer.plus.backend.domain.dto.BrigadeDTO;
 import volunteer.plus.backend.exceptions.ApiException;
 import volunteer.plus.backend.exceptions.ErrorCode;
 import volunteer.plus.backend.repository.BrigadeRepository;
@@ -21,6 +20,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static volunteer.plus.backend.domain.dto.BrigadeDTO.MilitaryPersonnelDTO.mapMilitaryPersonnel;
 
 @Slf4j
 @Service
@@ -125,24 +126,6 @@ public class BrigadeServiceImpl implements BrigadeService {
                                 .currentCommander(brigade.getCurrentCommander())
                                 .description(brigade.getDescription())
                                 .militaryPersonnel(brigade.getMilitaryPersonnel() == null ? new ArrayList<>() : mapMilitaryPersonnel(brigade.getMilitaryPersonnel()))
-                                .build()
-                )
-                .toList();
-    }
-
-    private List<BrigadeDTO.MilitaryPersonnelDTO> mapMilitaryPersonnel(final List<MilitaryPersonnel> militaryPersonnel) {
-        return militaryPersonnel.stream()
-                .map(person ->
-                        BrigadeDTO.MilitaryPersonnelDTO.builder()
-                                .id(person.getId())
-                                .createDate(person.getCreateDate())
-                                .updateDate(person.getUpdateDate())
-                                .firstName(person.getFirstName())
-                                .lastName(person.getLastName())
-                                .dateOfBirth(person.getDateOfBirth())
-                                .placeOfBirth(person.getPlaceOfBirth())
-                                .rank(person.getRank())
-                                .status(person.getStatus())
                                 .build()
                 )
                 .toList();

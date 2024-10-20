@@ -6,8 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import volunteer.plus.backend.dto.BrigadeCreationRequestDTO;
-import volunteer.plus.backend.dto.BrigadeDTO;
+import volunteer.plus.backend.domain.dto.BrigadeCreationRequestDTO;
+import volunteer.plus.backend.domain.dto.BrigadeDTO;
 import volunteer.plus.backend.service.BrigadeCodesService;
 import volunteer.plus.backend.service.BrigadeService;
 

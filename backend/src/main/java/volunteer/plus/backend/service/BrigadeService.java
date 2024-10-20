@@ -1,7 +1,7 @@
 package volunteer.plus.backend.service;
 
-import volunteer.plus.backend.dto.BrigadeCreationRequestDTO;
-import volunteer.plus.backend.dto.BrigadeDTO;
+import volunteer.plus.backend.domain.dto.BrigadeCreationRequestDTO;
+import volunteer.plus.backend.domain.dto.BrigadeDTO;
 
 import java.util.List;
 import java.util.Set;

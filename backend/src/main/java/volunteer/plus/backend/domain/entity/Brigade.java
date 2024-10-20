@@ -1,4 +1,4 @@
-package volunteer.plus.backend.domain;
+package volunteer.plus.backend.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@EqualsAndHashCode(callSuper = true, exclude = "militaryPersonnel")
+@EqualsAndHashCode(callSuper = false, exclude = "militaryPersonnel")
 @Entity
 @Table(name = "brigade")
 public class Brigade extends BaseEntity {
@@ -39,4 +39,24 @@ public class Brigade extends BaseEntity {
 
     @OneToMany(mappedBy = "brigade", cascade = CascadeType.ALL)
     private List<MilitaryPersonnel> militaryPersonnel = new ArrayList<>();
+
+    public void setupMilitaryPersonnel(List<MilitaryPersonnel> mps) {
+        if (mps == null) {
+            return;
+        }
+        if (this.militaryPersonnel == null || this.militaryPersonnel.isEmpty()) {
+            this.militaryPersonnel = mps;
+        } else {
+            this.militaryPersonnel.clear();
+            this.militaryPersonnel.addAll(mps);
+        }
+        mps.forEach(mp -> mp.setBrigade(this));
+    }
+
+    public void removeMilitaryPersonnel(MilitaryPersonnel mp) {
+        if (mp != null && this.militaryPersonnel != null && !this.militaryPersonnel.isEmpty()) {
+            this.militaryPersonnel.remove(mp);
+            mp.setBrigade(null);
+        }
+    }
 }

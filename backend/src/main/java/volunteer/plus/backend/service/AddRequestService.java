@@ -1,6 +1,6 @@
 package volunteer.plus.backend.service;
 
-import volunteer.plus.backend.dto.AddRequestResponseDTO;
+import volunteer.plus.backend.domain.dto.AddRequestResponseDTO;
 
 import java.util.List;
 import java.util.Set;

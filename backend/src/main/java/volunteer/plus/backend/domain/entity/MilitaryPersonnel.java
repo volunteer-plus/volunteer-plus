@@ -1,4 +1,4 @@
-package volunteer.plus.backend.domain;
+package volunteer.plus.backend.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -34,10 +34,6 @@ public class MilitaryPersonnel extends BaseEntity {
 
     @Column(length = 100)
     private String status;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "brigade_id", nullable = false)

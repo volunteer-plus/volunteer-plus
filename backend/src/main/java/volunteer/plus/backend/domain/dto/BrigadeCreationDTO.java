@@ -1,4 +1,4 @@
-package volunteer.plus.backend.dto;
+package volunteer.plus.backend.domain.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

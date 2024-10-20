@@ -1,4 +1,4 @@
-package volunteer.plus.backend.dto;
+package volunteer.plus.backend.domain.dto;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;

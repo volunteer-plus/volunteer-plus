@@ -1,4 +1,4 @@
-package volunteer.plus.backend.domain;
+package volunteer.plus.backend.domain.entity;
 
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
