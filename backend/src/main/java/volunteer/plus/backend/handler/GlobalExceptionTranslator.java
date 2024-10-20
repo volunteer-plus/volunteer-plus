@@ -30,6 +30,11 @@ public class GlobalExceptionTranslator {
 
     @Getter
     @Setter
-    public record ErrorDTO(HttpStatus httpStatus, String msg) {
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @EqualsAndHashCode
+    public static final class ErrorDTO {
+        private HttpStatus httpStatus;
+        private String msg;
     }
 }

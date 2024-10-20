@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +15,12 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BrigadeDTO {
+    private Long id;
+
+    private LocalDateTime createDate;
+
+    private LocalDateTime updateDate;
+
     private String regimentCode;
 
     private String branch;
@@ -36,6 +43,12 @@ public class BrigadeDTO {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class MilitaryPersonnelDTO {
+        private Long id;
+
+        private LocalDateTime createDate;
+
+        private LocalDateTime updateDate;
+
         private String firstName;
 
         private String lastName;

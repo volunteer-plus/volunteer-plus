@@ -3,17 +3,148 @@ package volunteer.plus.backend.service.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import volunteer.plus.backend.domain.Brigade;
+import volunteer.plus.backend.domain.MilitaryPersonnel;
+import volunteer.plus.backend.dto.BrigadeCreationDTO;
+import volunteer.plus.backend.dto.BrigadeCreationRequestDTO;
 import volunteer.plus.backend.dto.BrigadeDTO;
+import volunteer.plus.backend.exceptions.ApiException;
+import volunteer.plus.backend.exceptions.ErrorCode;
+import volunteer.plus.backend.repository.BrigadeRepository;
+import volunteer.plus.backend.service.BrigadeCodesService;
 import volunteer.plus.backend.service.BrigadeService;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class BrigadeServiceImpl implements BrigadeService {
+    private final BrigadeRepository brigadeRepository;
+    private final BrigadeCodesService brigadeCodesService;
+
     @Override
-    public List<BrigadeDTO> getAll() {
-        return List.of();
+    public List<BrigadeDTO> getBrigades(Set<Long> ids) {
+        log.info("Retrieve brigades data");
+
+        final List<Brigade> brigades;
+
+       if (ids == null) {
+           brigades = brigadeRepository.findAll();
+       } else {
+           brigades = brigadeRepository.findAllById(ids);
+       }
+
+        return getBrigadeDTOS(brigades);
+    }
+
+    @Override
+    @Transactional
+    public List<BrigadeDTO> createOrUpdate(final BrigadeCreationRequestDTO creationRequestDTO) {
+        if (creationRequestDTO == null || creationRequestDTO.getBrigades() == null || creationRequestDTO.getBrigades().isEmpty() ||
+                creationRequestDTO.getBrigades().stream().anyMatch(b -> b.getRegimentCode() == null)) {
+            throw new ApiException(ErrorCode.EMPTY_BRIGADE_DATA);
+        }
+
+        final var validRegimentCodes = brigadeCodesService.getCodes();
+        final var brigades = creationRequestDTO.getBrigades();
+        final var regimentCodes = brigades.stream().map(BrigadeCreationDTO::getRegimentCode).collect(Collectors.toSet());
+
+        if (regimentCodes.stream().anyMatch(code -> !validRegimentCodes.contains(code))) {
+            throw new ApiException(ErrorCode.NOT_VALID_REGIMENT_CODE);
+        }
+
+        final Map<String, Brigade> mapOfBrigades = brigadeRepository.findAllByRegimentCodeIn(regimentCodes).stream()
+                .collect(Collectors.toMap(Brigade::getRegimentCode, Function.identity()));
+
+        final List<Brigade> brigadesToPersist = new ArrayList<>();
+
+        brigades.forEach(brigade -> {
+           final var brigadeFromDB = mapOfBrigades.get(brigade.getRegimentCode());
+
+           // update brigade
+           if (brigadeFromDB != null) {
+               brigadeFromDB.setBranch(brigade.getBranch());
+               brigadeFromDB.setRole(brigade.getRole());
+               brigadeFromDB.setPartOf(brigade.getPartOf());
+               brigadeFromDB.setWebsiteLink(brigade.getWebsiteLink());
+               brigadeFromDB.setCurrentCommander(brigade.getCurrentCommander());
+               brigadeFromDB.setDescription(brigade.getDescription());
+               brigadesToPersist.add(brigadeFromDB);
+           } else {
+               // create a brigade
+               final var newBrigade = Brigade.builder()
+                       .regimentCode(brigade.getRegimentCode())
+                       .branch(brigade.getBranch())
+                       .role(brigade.getRole())
+                       .partOf(brigade.getPartOf())
+                       .websiteLink(brigade.getWebsiteLink())
+                       .currentCommander(brigade.getCurrentCommander())
+                       .description(brigade.getDescription())
+                       .militaryPersonnel(new ArrayList<>())
+                       .build();
+               brigadesToPersist.add(newBrigade);
+           }
+        });
+
+        final List<Brigade> savedBrigades = brigadeRepository.saveAll(brigadesToPersist);
+
+        return getBrigadeDTOS(savedBrigades);
+    }
+
+    @Override
+    @Transactional
+    public void deleteAll(final Set<Long> ids) {
+        final List<Brigade> brigades = brigadeRepository.findAllById(ids);
+
+        if (brigades.size() != ids.size()) {
+            throw new ApiException(ErrorCode.BRIGADE_NOT_FOUND);
+        }
+
+        brigadeRepository.deleteAll(brigades);
+    }
+
+    private List<BrigadeDTO> getBrigadeDTOS(List<Brigade> savedBrigades) {
+        return savedBrigades.stream()
+                .map(brigade ->
+                        BrigadeDTO.builder()
+                                .id(brigade.getId())
+                                .createDate(brigade.getCreateDate())
+                                .updateDate(brigade.getUpdateDate())
+                                .regimentCode(brigade.getRegimentCode())
+                                .branch(brigade.getBranch())
+                                .role(brigade.getRole())
+                                .partOf(brigade.getPartOf())
+                                .websiteLink(brigade.getWebsiteLink())
+                                .currentCommander(brigade.getCurrentCommander())
+                                .description(brigade.getDescription())
+                                .militaryPersonnel(brigade.getMilitaryPersonnel() == null ? new ArrayList<>() : mapMilitaryPersonnel(brigade.getMilitaryPersonnel()))
+                                .build()
+                )
+                .toList();
+    }
+
+    private List<BrigadeDTO.MilitaryPersonnelDTO> mapMilitaryPersonnel(final List<MilitaryPersonnel> militaryPersonnel) {
+        return militaryPersonnel.stream()
+                .map(person ->
+                        BrigadeDTO.MilitaryPersonnelDTO.builder()
+                                .id(person.getId())
+                                .createDate(person.getCreateDate())
+                                .updateDate(person.getUpdateDate())
+                                .firstName(person.getFirstName())
+                                .lastName(person.getLastName())
+                                .dateOfBirth(person.getDateOfBirth())
+                                .placeOfBirth(person.getPlaceOfBirth())
+                                .rank(person.getRank())
+                                .status(person.getStatus())
+                                .build()
+                )
+                .toList();
     }
 }
