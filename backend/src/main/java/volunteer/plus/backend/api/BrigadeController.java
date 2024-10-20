@@ -22,7 +22,7 @@ public class BrigadeController {
     private final BrigadeCodesService brigadeCodesService;
     private final BrigadeService brigadeService;
 
-    @GetMapping("/brigade/codes")
+    @GetMapping("/brigades-codes")
     @Operation(description = "Retrieve all valid codes in system of military units for further validation")
     public ResponseEntity<List<String>> getCodes() {
         return ResponseEntity.ok(brigadeCodesService.getCodes());
