@@ -51,10 +51,7 @@ public class MilitaryPersonnelServiceImpl implements MilitaryPersonnelService {
     @Override
     @Transactional
     public Map<String, List<BrigadeDTO.MilitaryPersonnelDTO>> createMilitaryPersonnel(final MilitaryPersonnelCreationRequestDTO militaryPersonnelCreationRequestDTO) {
-        if (militaryPersonnelCreationRequestDTO == null || militaryPersonnelCreationRequestDTO.getMilitaryPersonnel() == null ||
-                militaryPersonnelCreationRequestDTO.getMilitaryPersonnel().isEmpty()) {
-            throw new ApiException(ErrorCode.EMPTY_MILITARY_PERSONNEL_DATA);
-        }
+        validatePayload(militaryPersonnelCreationRequestDTO);
 
         final var militaryPersonnelCreationDTOs = militaryPersonnelCreationRequestDTO.getMilitaryPersonnel();
         final var regimentCodes = militaryPersonnelCreationDTOs.stream().map(MilitaryPersonnelCreationDTO::getRegimentCode).collect(Collectors.toSet());
@@ -93,6 +90,50 @@ public class MilitaryPersonnelServiceImpl implements MilitaryPersonnelService {
         final var brigades = brigadeRepository.saveAll(brigadesToUpdate);
 
         return getMilitaryPersonnelResultDTO(brigades);
+    }
+
+    @Override
+    @Transactional
+    public List<BrigadeDTO.MilitaryPersonnelDTO> updateMilitaryPersonnel(final MilitaryPersonnelCreationRequestDTO militaryPersonnelCreationRequestDTO) {
+        validatePayload(militaryPersonnelCreationRequestDTO);
+
+        final List<MilitaryPersonnelCreationDTO> militaryPersonnelCreationDTOList = militaryPersonnelCreationRequestDTO.getMilitaryPersonnel();
+        final Set<MilitaryPersonnelCreationDTO.MilitaryPersonnelDTO> mps = militaryPersonnelCreationDTOList.stream()
+                .flatMap(mpc -> mpc.getMilitaryPersonnel().stream())
+                .filter(mp -> mp.getId() != null)
+                .collect(Collectors.toSet());
+
+        final var ids = mps.stream().map(MilitaryPersonnelCreationDTO.MilitaryPersonnelDTO::getId).collect(Collectors.toSet());
+        final Map<Long, MilitaryPersonnel> mpsFromDB = militaryPersonnelRepository.findAllById(ids).stream()
+                .collect(Collectors.toMap(MilitaryPersonnel::getId, Function.identity()));
+
+        if (mps.size() != mpsFromDB.size()) {
+            throw new ApiException(ErrorCode.MILITARY_PERSONNEL_NOT_FOUND);
+        }
+
+        final List<MilitaryPersonnel> mpToUpdate = new ArrayList<>();
+
+        mps.forEach(mp -> {
+            final var mpFromDB = mpsFromDB.get(mp.getId());
+            mpFromDB.setFirstName(mp.getFirstName());
+            mpFromDB.setLastName(mp.getLastName());
+            mpFromDB.setDateOfBirth(mp.getDateOfBirth());
+            mpFromDB.setPlaceOfBirth(mp.getPlaceOfBirth());
+            mpFromDB.setRank(mp.getRank());
+            mpFromDB.setStatus(mp.getStatus());
+            mpToUpdate.add(mpFromDB);
+        });
+
+        final var savedMps = militaryPersonnelRepository.saveAll(mpToUpdate);
+
+        return mapMilitaryPersonnel(savedMps);
+    }
+
+    private void validatePayload(MilitaryPersonnelCreationRequestDTO militaryPersonnelCreationRequestDTO) {
+        if (militaryPersonnelCreationRequestDTO == null || militaryPersonnelCreationRequestDTO.getMilitaryPersonnel() == null ||
+                militaryPersonnelCreationRequestDTO.getMilitaryPersonnel().isEmpty()) {
+            throw new ApiException(ErrorCode.EMPTY_MILITARY_PERSONNEL_DATA);
+        }
     }
 
     @Override

@@ -12,5 +12,7 @@ public interface MilitaryPersonnelService {
 
     Map<String, List<BrigadeDTO.MilitaryPersonnelDTO>> createMilitaryPersonnel(MilitaryPersonnelCreationRequestDTO militaryPersonnelCreationRequestDTO);
 
+    List<BrigadeDTO.MilitaryPersonnelDTO> updateMilitaryPersonnel(MilitaryPersonnelCreationRequestDTO militaryPersonnelCreationRequestDTO);
+
     void deleteMilitaryPersonnel(Set<Long> ids);
 }

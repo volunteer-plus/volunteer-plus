@@ -26,6 +26,7 @@ public class MilitaryPersonnelCreationDTO {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class MilitaryPersonnelDTO {
+        private Long id;
         private String firstName;
         private String lastName;
         private LocalDate dateOfBirth;
