@@ -29,7 +29,6 @@
     <properties>
         <java.version>17</java.version>
         <springdoc-openapi-starter-webmvc-ui.version>2.0.4</springdoc-openapi-starter-webmvc-ui.version>
-        <mapstruct.version>1.6.2</mapstruct.version>
     </properties>
     <dependencies>
         <dependency>
