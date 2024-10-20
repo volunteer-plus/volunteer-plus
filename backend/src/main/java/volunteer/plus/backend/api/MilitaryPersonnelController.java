@@ -33,7 +33,7 @@ public class MilitaryPersonnelController {
         return ResponseEntity.ok(militaryPersonnelService.createMilitaryPersonnel(militaryPersonnelCreationRequestDTO));
     }
 
-    @PostMapping("/military-personnel/update")
+    @PutMapping("/military-personnel/update")
     @Operation(description = "Update a military personnel of specified brigades")
     public ResponseEntity<List<BrigadeDTO.MilitaryPersonnelDTO>> updateMilitaryPersonnel(@RequestBody @Valid MilitaryPersonnelCreationRequestDTO militaryPersonnelCreationRequestDTO) {
         return ResponseEntity.ok(militaryPersonnelService.updateMilitaryPersonnel(militaryPersonnelCreationRequestDTO));
