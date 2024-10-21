@@ -18,14 +18,6 @@ import java.util.List;
 @Table(name = "request")
 public class Request extends BaseEntity {
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "military_personnel_id")
-    private MilitaryPersonnel militaryPersonnel;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
-
     @Column(columnDefinition = "LONGTEXT", nullable = false)
     private String description;
 
@@ -35,4 +27,12 @@ public class Request extends BaseEntity {
 
     @OneToMany(mappedBy = "request", cascade = CascadeType.ALL)
     private List<Levy> levies = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "military_personnel_id")
+    private MilitaryPersonnel militaryPersonnel;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 }
