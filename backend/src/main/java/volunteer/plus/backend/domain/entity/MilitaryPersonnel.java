@@ -41,4 +41,12 @@ public class MilitaryPersonnel extends BaseEntity {
 
     @OneToMany(mappedBy = "militaryPersonnel", cascade = CascadeType.ALL)
     private List<Request> requests = new ArrayList<>();
+
+    public void addRequest(Request request) {
+        if (this.requests == null) {
+            this.requests = new ArrayList<>();
+        }
+        this.requests.add(request);
+        request.setMilitaryPersonnel(this);
+    }
 }

@@ -12,6 +12,8 @@ public enum ErrorCode {
     NOT_VALID_REGIMENT_CODE("Not valid regiment code"),
     BRIGADE_NOT_FOUND("Brigade not found"),
     ADD_REQUEST_IS_ALREADY_EXECUTED("Add request is already executed"),
-    MILITARY_PERSONNEL_NOT_FOUND("Military personnel not found");
+    MILITARY_PERSONNEL_NOT_FOUND("Military personnel not found"),
+    ONLY_ONE_CREATOR_FOR_REQUESTS("Only one creator for requests is allowed"),
+    USER_NOT_FOUND("User not found");
     private final String data;
 }

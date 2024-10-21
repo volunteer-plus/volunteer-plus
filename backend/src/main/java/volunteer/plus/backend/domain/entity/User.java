@@ -42,4 +42,12 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Request> requests = new ArrayList<>();
+
+    public void addRequest(Request request) {
+        if (this.requests == null) {
+            this.requests = new ArrayList<>();
+        }
+        this.requests.add(request);
+        request.setUser(this);
+    }
 }
