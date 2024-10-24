@@ -51,9 +51,9 @@ public class RequestServiceImpl implements RequestService {
      */
     @Override
     @Transactional
-    public List<RequestDTO> createRequests(final String userEmail,
-                                           final Long militaryPersonnelId,
-                                           final RequestCreationRequestDTO requestCreationRequestDTO) {
+    public List<RequestDTO> createOrUpdateRequests(final String userEmail,
+                                                   final Long militaryPersonnelId,
+                                                   final RequestCreationRequestDTO requestCreationRequestDTO) {
         if ((userEmail == null && militaryPersonnelId == null) || (userEmail != null && militaryPersonnelId != null)) {
             throw new ApiException(ErrorCode.ONLY_ONE_CREATOR_FOR_REQUESTS);
         }

@@ -13,6 +13,9 @@ import lombok.*;
 @Table(name = "attachment")
 public class Attachment extends BaseEntity {
 
+    @Column(name = "filename")
+    private String filename;
+
     @Column(columnDefinition = "LONGTEXT")
     private String filepath;
 

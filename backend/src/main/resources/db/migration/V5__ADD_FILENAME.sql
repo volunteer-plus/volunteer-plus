@@ -1,0 +1,1 @@
+ALTER TABLE attachment ADD filename VARCHAR(255) NOT NULL;

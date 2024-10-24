@@ -10,5 +10,5 @@ import java.util.List;
 public interface RequestService {
     Page<RequestDTO> getRequests(Pageable pageable);
 
-    List<RequestDTO> createRequests(String userEmail, Long militaryPersonnelId, RequestCreationRequestDTO requestCreationRequestDTO);
+    List<RequestDTO> createOrUpdateRequests(String userEmail, Long militaryPersonnelId, RequestCreationRequestDTO requestCreationRequestDTO);
 }
