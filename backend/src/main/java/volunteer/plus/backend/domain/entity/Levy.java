@@ -32,4 +32,12 @@ public class Levy extends BaseEntity {
 
     @OneToOne(mappedBy = "levy", cascade = CascadeType.ALL)
     private Report report;
+
+    public void addVolunteer(Volunteer volunteer) {
+        if (this.volunteers == null) {
+            this.volunteers = new ArrayList<>();
+        }
+        this.volunteers.add(volunteer);
+        volunteer.getLevies().add(this);
+    }
 }

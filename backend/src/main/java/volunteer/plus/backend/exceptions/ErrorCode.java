@@ -14,6 +14,8 @@ public enum ErrorCode {
     ADD_REQUEST_IS_ALREADY_EXECUTED("Add request is already executed"),
     MILITARY_PERSONNEL_NOT_FOUND("Military personnel not found"),
     ONLY_ONE_CREATOR_FOR_REQUESTS("Only one creator for requests is allowed"),
-    USER_NOT_FOUND("User not found");
+    USER_NOT_FOUND("User not found"),
+    LEVY_NOT_FOUND("Levy not found"),
+    VOLUNTEER_NOT_FOUND("Volunteer not found");
     private final String data;
 }
