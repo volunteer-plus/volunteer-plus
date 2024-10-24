@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@EqualsAndHashCode(callSuper = true, exclude = {"levy", "attachments"})
+@EqualsAndHashCode(callSuper = false, exclude = {"levy", "attachments"})
 @Entity
 @Table(name = "report")
 public class Report extends BaseEntity {
@@ -26,4 +26,19 @@ public class Report extends BaseEntity {
 
     @OneToMany(mappedBy = "report", cascade = CascadeType.ALL)
     private List<Attachment> attachments = new ArrayList<>();
+
+    public void addAttachment(Attachment attachment) {
+        if (this.attachments == null) {
+            this.attachments = new ArrayList<>();
+        }
+        this.attachments.add(attachment);
+        attachment.setReport(this);
+    }
+
+    public void removeAttachment(Attachment attachment) {
+        if (this.attachments != null && !this.attachments.isEmpty()) {
+            this.attachments.remove(attachment);
+            attachment.setReport(null);
+        }
+    }
 }
