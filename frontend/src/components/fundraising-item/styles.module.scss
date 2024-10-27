@@ -1,0 +1,12 @@
+.item {
+  box-sizing: border-box;
+
+  width: 300px;
+  max-width: 380px;
+
+  padding: 32px;
+
+  border: 1px solid var(--color-gray-300);
+
+  flex-grow: 1;
+}

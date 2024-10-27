@@ -1,0 +1,19 @@
+@use '@/assets/columns' as columns;
+
+.footer {
+  background: var(--color-gray-700);
+  color: var(--color-white);
+}
+
+.content {
+  padding: 16px columns.get-spacing(1);
+}
+
+.footerOfFooter {
+  background: var(--color-gray-900);
+  padding: 8px columns.get-spacing(1);
+}
+
+.logo {
+  fill: var(--color-white);
+}
