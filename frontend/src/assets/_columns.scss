@@ -1,0 +1,18 @@
+$gutter-width: 20px;
+
+$total-columns-count: 12;
+$total-gutters-count: $total-columns-count - 1;
+
+$column-width: (calc(100vw - ($total-gutters-count * $gutter-width)) / 12);
+
+@function get-spacing($columns-count) {
+  @return calc(
+    ($column-width * $columns-count) + $gutter-width * $columns-count
+  );
+}
+
+@function get-width($columns-count) {
+  @return calc(
+    ($column-width * $columns-count) + $gutter-width * ($columns-count - 1)
+  );
+}

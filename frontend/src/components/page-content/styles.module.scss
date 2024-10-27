@@ -1,0 +1,7 @@
+@use '@/assets/columns' as columns;
+
+.content {
+  padding: 64px columns.get-spacing(1);
+
+  flex-grow: 1;
+}
