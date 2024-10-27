@@ -7,3 +7,4 @@ export * from './page-content';
 export * from './button-base';
 export * from './fundraising-item';
 export * from './fundraising-list';
+export * from './tag';
