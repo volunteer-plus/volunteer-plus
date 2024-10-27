@@ -16,7 +16,7 @@ const FundraisingItem: React.FC<React.ComponentPropsWithoutRef<'div'>> = ({
       <div className={styles.volunteer}>Збирає Васильченеко В. І.</div>
       <div className={styles.actions}>
         <Button>Підтримати</Button>
-        <Button>Про волонтера</Button>
+        <Button variant='outlined'>Про волонтера</Button>
       </div>
     </article>
   );

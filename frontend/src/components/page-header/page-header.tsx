@@ -9,7 +9,9 @@ const PageHeader: React.FC = () => {
     <header className={styles.header}>
       <Logo />
       <div className={styles.actions}>
-        <Button>Увійти</Button>
+        <Button colorSchema='gray' variant='outlined'>
+          Увійти
+        </Button>
         <Button>Створити профіль</Button>
       </div>
     </header>

@@ -36,6 +36,7 @@ const ButtonBase = React.forwardRef<HTMLElement, Props>(
       ref,
       className: classNames(
         elementProps.className,
+        styles.button,
         getClassNameForColorSchema(colorSchema),
         getClassNameForVariant(variant)
       ),

@@ -3,7 +3,12 @@ import { ButtonBaseStyleProps } from '@/types';
 
 type Props = React.ComponentPropsWithoutRef<'button'> & ButtonBaseStyleProps;
 
-const Button: React.FC<Props> = ({ colorSchema, variant, ...props }) => {
+const Button: React.FC<Props> = ({
+  colorSchema,
+  variant,
+  disabled,
+  ...props
+}) => {
   return (
     <ButtonBase
       elementType='button'
@@ -12,7 +17,7 @@ const Button: React.FC<Props> = ({ colorSchema, variant, ...props }) => {
         ...props,
       }}
       colorSchema={colorSchema}
-      variant={variant}
+      variant={disabled ? 'disabled' : variant}
     />
   );
 };

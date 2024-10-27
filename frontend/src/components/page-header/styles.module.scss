@@ -1,13 +1,20 @@
+@use 'sass:map';
 @use '@/assets/columns' as columns;
+@use '@/assets/colors' as colors;
 
 .header {
   padding: 0 columns.get-spacing(1);
   height: 60px;
+  position: sticky;
+  top: 0;
 
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: columns.get-width(1);
+
+  background: rgba(map.get(colors.$definitions, 'white'), 0.6);
+  backdrop-filter: blur(10px);
 
   border-bottom: 1px solid var(--color-gray-300);
 }

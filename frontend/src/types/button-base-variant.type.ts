@@ -1,3 +1,3 @@
-type ButtonBaseVariant = 'outlined' | 'filled';
+type ButtonBaseVariant = 'outlined' | 'filled' | 'disabled';
 
 export type { ButtonBaseVariant };

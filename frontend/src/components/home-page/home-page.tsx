@@ -19,7 +19,9 @@ const HomePage: React.FC = () => {
       <PageContent>
         <div className={styles.fundraisingListTitle}>
           <h2 className={styles.fundraisingListTitleText}>Активні збори</h2>
-          <Button>Більше зборів</Button>
+          <Button colorSchema='gray' variant='outlined'>
+            Більше зборів
+          </Button>
         </div>
         <FundraisingList>
           <FundraisingItem />
