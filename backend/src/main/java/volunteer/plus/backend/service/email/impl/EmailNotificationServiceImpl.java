@@ -5,8 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import volunteer.plus.backend.config.storage.AWSProperties;
 import volunteer.plus.backend.domain.dto.EmailDTO;
+import volunteer.plus.backend.domain.entity.EmailAttachment;
 import volunteer.plus.backend.domain.entity.EmailNotification;
 import volunteer.plus.backend.domain.entity.EmailRecipient;
+import volunteer.plus.backend.domain.enums.EmailStatus;
 import volunteer.plus.backend.exceptions.ApiException;
 import volunteer.plus.backend.exceptions.EmailException;
 import volunteer.plus.backend.repository.EmailNotificationRepository;
@@ -67,6 +69,7 @@ public class EmailNotificationServiceImpl implements EmailNotificationService {
             try {
                 process(emailNotification);
             } catch (EmailException e) {
+                updateEmailNotificationStatus(emailNotification, EmailStatus.ERROR);
                 exceptions.add(e);
             }
         }
@@ -88,7 +91,7 @@ public class EmailNotificationServiceImpl implements EmailNotificationService {
                 .collect(Collectors.toSet());
 
         final Set<EmailDTO.EmailRecipientDTO> emailRecipientDTOS = getEmailRecipientDTOS(recipients);
-        final List<EmailDTO.FileAttachment> fileAttachments = getFileAttachments(emailNotification);
+        final List<EmailDTO.FileAttachment> fileAttachments = getFileAttachments(emailNotification.getId(), emailNotification.getEmailAttachments());
         final String htmlSubject = getHtmlData(template.getSubject(), emailNotification.getSubjectData(), "Cannot process template subject of notification id={}", emailNotification);
         final String htmlBody = getHtmlData(template.getBody(), emailNotification.getTemplateData(), "Cannot process template body of notification id={}", emailNotification);
 
@@ -106,8 +109,14 @@ public class EmailNotificationServiceImpl implements EmailNotificationService {
         }
 
         updateAndSaveRecipientStatus(recipients);
+        updateEmailNotificationStatus(emailNotification, EmailStatus.SENT);
 
         log.info("Email notification id={} successfully processed", emailNotification.getId());
+    }
+
+    private void updateEmailNotificationStatus(EmailNotification emailNotification, EmailStatus sent) {
+        emailNotification.setStatus(sent);
+        emailNotificationRepository.saveAndFlush(emailNotification);
     }
 
     private void updateAndSaveRecipientStatus(final Set<EmailRecipient> recipients) {
@@ -120,9 +129,9 @@ public class EmailNotificationServiceImpl implements EmailNotificationService {
         emailRecipientRepository.updateSentAndSentDateByIds(true, LocalDateTime.now(), ids);
     }
 
-    private List<EmailDTO.FileAttachment> getFileAttachments(final EmailNotification emailNotification) {
+    private List<EmailDTO.FileAttachment> getFileAttachments(final Long id, final List<EmailAttachment> attachments) {
         try {
-            return emailNotification.getEmailAttachments()
+            return attachments
                     .stream()
                     .map(attachment -> {
                         // we will use the same bucket for usage simplicity
@@ -134,7 +143,7 @@ public class EmailNotificationServiceImpl implements EmailNotificationService {
                     })
                     .toList();
         } catch (Exception e) {
-            throw new EmailException("Exception occurred during file attachment retrieving, notification id=" + emailNotification.getId());
+            throw new EmailException("Exception occurred during file attachment retrieving, notification id=" + id + " Error: " + e.getMessage());
         }
     }
 

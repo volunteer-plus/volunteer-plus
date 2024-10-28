@@ -2,8 +2,6 @@ package volunteer.plus.backend.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 import volunteer.plus.backend.domain.enums.EmailStatus;
 
 import java.util.ArrayList;
@@ -38,11 +36,9 @@ public class EmailNotification extends BaseEntity {
     @JoinColumn(name = "email_template_id")
     private EmailTemplate template;
 
-    @OneToMany(mappedBy = "emailNotification", cascade = CascadeType.ALL)
-    @Fetch(FetchMode.SUBSELECT)
+    @OneToMany(mappedBy = "emailNotification", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<EmailRecipient> emailRecipients = new ArrayList<>();
 
-    @OneToMany(mappedBy = "emailNotification", cascade = CascadeType.ALL)
-    @Fetch(FetchMode.SUBSELECT)
+    @OneToMany(mappedBy = "emailNotification", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<EmailAttachment> emailAttachments = new ArrayList<>();
 }

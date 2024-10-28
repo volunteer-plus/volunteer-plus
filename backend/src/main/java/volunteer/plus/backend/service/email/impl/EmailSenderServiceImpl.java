@@ -40,7 +40,7 @@ public class EmailSenderServiceImpl implements EmailSenderService {
         final var helper = new MimeMessageHelper(message, true);
 
         helper.setSubject(emailDTO.getSubject());
-        helper.setText(emailDTO.getBody());
+        helper.setText(emailDTO.getBody(), true);
 
         for (final var recipient : emailDTO.getRecipients()) {
             if (recipient.isToRecipient()) {

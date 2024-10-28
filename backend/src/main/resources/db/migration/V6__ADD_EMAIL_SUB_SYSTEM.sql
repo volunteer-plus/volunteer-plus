@@ -33,9 +33,9 @@ create table if not exists `email_recipient`
     `to_recipient`            bit not null,
     `cc`                      bit not null,
     `bcc`                     bit not null,
-    `email_address`           varchar(255),
+    `email_address`           varchar(255) not null,
     `full_name`               varchar(255),
-    `sent_date`               datetime not null,
+    `sent_date`               datetime,
     constraint `fk__email_recipient_id` foreign key (`email_notification_id`) references `email_notification` (`id`)
 );
 
