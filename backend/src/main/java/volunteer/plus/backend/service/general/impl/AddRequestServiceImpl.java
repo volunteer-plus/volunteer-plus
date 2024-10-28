@@ -1,4 +1,4 @@
-package volunteer.plus.backend.service.impl;
+package volunteer.plus.backend.service.general.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -10,7 +10,7 @@ import volunteer.plus.backend.domain.dto.AddRequestResponseDTO;
 import volunteer.plus.backend.exceptions.ApiException;
 import volunteer.plus.backend.exceptions.ErrorCode;
 import volunteer.plus.backend.repository.AddRequestRepository;
-import volunteer.plus.backend.service.AddRequestService;
+import volunteer.plus.backend.service.general.AddRequestService;
 
 import java.util.*;
 

@@ -1,4 +1,4 @@
-package volunteer.plus.backend.service.impl;
+package volunteer.plus.backend.service.general.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +14,7 @@ import volunteer.plus.backend.exceptions.ErrorCode;
 import volunteer.plus.backend.repository.MilitaryPersonnelRepository;
 import volunteer.plus.backend.repository.RequestRepository;
 import volunteer.plus.backend.repository.UserRepository;
-import volunteer.plus.backend.service.RequestService;
+import volunteer.plus.backend.service.general.RequestService;
 
 import java.util.ArrayList;
 import java.util.List;

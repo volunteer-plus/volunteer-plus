@@ -1,4 +1,4 @@
-package volunteer.plus.backend.service.impl;
+package volunteer.plus.backend.service.general.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,8 +11,8 @@ import volunteer.plus.backend.domain.dto.BrigadeDTO;
 import volunteer.plus.backend.exceptions.ApiException;
 import volunteer.plus.backend.exceptions.ErrorCode;
 import volunteer.plus.backend.repository.BrigadeRepository;
-import volunteer.plus.backend.service.BrigadeCodesService;
-import volunteer.plus.backend.service.BrigadeService;
+import volunteer.plus.backend.service.general.BrigadeCodesService;
+import volunteer.plus.backend.service.general.BrigadeService;
 
 import java.util.ArrayList;
 import java.util.List;

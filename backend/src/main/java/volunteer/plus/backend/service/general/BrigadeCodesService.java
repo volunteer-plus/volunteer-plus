@@ -1,4 +1,4 @@
-package volunteer.plus.backend.service;
+package volunteer.plus.backend.service.general;
 
 import java.util.List;
 

@@ -7,7 +7,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import volunteer.plus.backend.domain.dto.ReportDTO;
-import volunteer.plus.backend.service.ReportService;
+import volunteer.plus.backend.service.general.ReportService;
 
 import java.util.List;
 import java.util.Set;

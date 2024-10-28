@@ -1,4 +1,4 @@
-package volunteer.plus.backend.service.impl;
+package volunteer.plus.backend.service.general.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,8 +16,8 @@ import volunteer.plus.backend.exceptions.ErrorCode;
 import volunteer.plus.backend.repository.AttachmentRepository;
 import volunteer.plus.backend.repository.LevyRepository;
 import volunteer.plus.backend.repository.ReportRepository;
-import volunteer.plus.backend.service.ReportService;
-import volunteer.plus.backend.service.S3Service;
+import volunteer.plus.backend.service.general.ReportService;
+import volunteer.plus.backend.service.general.S3Service;
 
 import java.util.*;
 import java.util.stream.Collectors;

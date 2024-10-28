@@ -23,6 +23,7 @@ public enum ErrorCode {
     EMPTY_FILE("File is empty"),
     ATTACHMENT_NOT_FOUND("Attachment not found"),
     NO_DATA_FOR_REPORT_OPERATION("No data for report operation"),
-    LEVY_ALREADY_HAS_A_REPORT("Levy a;ready has a report");
+    LEVY_ALREADY_HAS_A_REPORT("Levy already has a report"),
+    CANNOT_DESERIALIZE_JSON("Cannot deserialize a json");
     private final String data;
 }

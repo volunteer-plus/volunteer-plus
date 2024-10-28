@@ -1,4 +1,4 @@
-package volunteer.plus.backend.service.impl;
+package volunteer.plus.backend.service.general.impl;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import volunteer.plus.backend.exceptions.ApiException;
 import volunteer.plus.backend.exceptions.ErrorCode;
-import volunteer.plus.backend.service.S3Service;
+import volunteer.plus.backend.service.general.S3Service;
 
 import java.util.Objects;
 
@@ -66,12 +66,6 @@ public class S3ServiceImpl implements S3Service {
         metadata.setContentLength(multipartFile.getSize());
 
         return new PutObjectRequest(s3BucketName, s3Key, multipartFile.getInputStream(), metadata);
-    }
-
-    @Override
-    public String updateFile(String s3BucketName, String s3ObjectKey, MultipartFile multipartFile) {
-        deleteFile(s3BucketName, s3ObjectKey);
-        return uploadFile(s3BucketName, multipartFile);
     }
 
     @Override

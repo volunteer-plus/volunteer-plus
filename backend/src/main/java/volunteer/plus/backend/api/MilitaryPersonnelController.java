@@ -8,7 +8,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import volunteer.plus.backend.domain.dto.BrigadeDTO;
 import volunteer.plus.backend.domain.dto.MilitaryPersonnelCreationRequestDTO;
-import volunteer.plus.backend.service.MilitaryPersonnelService;
+import volunteer.plus.backend.service.general.MilitaryPersonnelService;
 
 import java.util.List;
 import java.util.Map;

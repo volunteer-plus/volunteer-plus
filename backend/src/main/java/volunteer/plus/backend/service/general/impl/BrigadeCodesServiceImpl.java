@@ -1,11 +1,11 @@
-package volunteer.plus.backend.service.impl;
+package volunteer.plus.backend.service.general.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import volunteer.plus.backend.domain.entity.BrigadeCodes;
 import volunteer.plus.backend.repository.BrigadeCodesRepository;
-import volunteer.plus.backend.service.BrigadeCodesService;
+import volunteer.plus.backend.service.general.BrigadeCodesService;
 
 import java.util.List;
 
