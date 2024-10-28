@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import volunteer.plus.backend.domain.dto.AddRequestResponseDTO;
-import volunteer.plus.backend.service.AddRequestService;
+import volunteer.plus.backend.service.general.AddRequestService;
 
 import java.util.List;
 import java.util.Set;

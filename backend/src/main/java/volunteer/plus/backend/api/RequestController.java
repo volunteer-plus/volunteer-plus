@@ -10,7 +10,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import volunteer.plus.backend.domain.dto.RequestCreationRequestDTO;
 import volunteer.plus.backend.domain.dto.RequestDTO;
-import volunteer.plus.backend.service.RequestService;
+import volunteer.plus.backend.service.general.RequestService;
 
 import java.util.List;
 

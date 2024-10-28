@@ -23,14 +23,14 @@ public class EmailRecipient extends BaseEntity {
     @Column(name = "sent_date")
     private LocalDateTime sentDate;
 
-    @Column(name = "cc")
-    private boolean cc;
-
     @Column(name = "to_recipient")
     private boolean toRecipient;
 
+    @Column(name = "cc")
+    private boolean ccRecipient;
+
     @Column(name = "bcc")
-    private boolean bcc;
+    private boolean bccRecipient;
 
     @Column(name = "sent")
     private boolean sent;

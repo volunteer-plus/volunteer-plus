@@ -10,7 +10,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import volunteer.plus.backend.domain.dto.LevyCreationRequestDTO;
 import volunteer.plus.backend.domain.dto.LevyDTO;
-import volunteer.plus.backend.service.LevyService;
+import volunteer.plus.backend.service.general.LevyService;
 
 import java.util.List;
 import java.util.Set;

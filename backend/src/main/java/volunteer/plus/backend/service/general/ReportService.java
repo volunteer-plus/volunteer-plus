@@ -1,4 +1,4 @@
-package volunteer.plus.backend.service;
+package volunteer.plus.backend.service.general;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;

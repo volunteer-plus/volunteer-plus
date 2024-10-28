@@ -8,8 +8,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import volunteer.plus.backend.domain.dto.BrigadeCreationRequestDTO;
 import volunteer.plus.backend.domain.dto.BrigadeDTO;
-import volunteer.plus.backend.service.BrigadeCodesService;
-import volunteer.plus.backend.service.BrigadeService;
+import volunteer.plus.backend.service.general.BrigadeCodesService;
+import volunteer.plus.backend.service.general.BrigadeService;
 
 import java.util.List;
 import java.util.Set;
