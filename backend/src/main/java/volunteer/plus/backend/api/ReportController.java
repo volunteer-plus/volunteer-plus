@@ -59,4 +59,11 @@ public class ReportController {
     public ResponseEntity<byte[]> downloadAttachments(@RequestParam final Long attachmentId) {
         return reportService.downloadAttachment(attachmentId);
     }
+
+    @PostMapping("/report/distribute")
+    @Operation(description = "Distribute emails to users about this report")
+    public ResponseEntity<Void> distribute(@RequestParam final Long reportId) {
+        reportService.distribute(reportId);
+        return ResponseEntity.ok().build();
+    }
 }

@@ -41,4 +41,20 @@ public class EmailNotification extends BaseEntity {
 
     @OneToMany(mappedBy = "emailNotification", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<EmailAttachment> emailAttachments = new ArrayList<>();
+
+    public void addRecipient(EmailRecipient emailRecipient) {
+        if (this.emailRecipients == null) {
+            this.emailRecipients = new ArrayList<>();
+        }
+        this.emailRecipients.add(emailRecipient);
+        emailRecipient.setEmailNotification(this);
+    }
+
+    public void addAttachment(EmailAttachment emailAttachment) {
+        if (this.emailAttachments == null) {
+            this.emailAttachments = new ArrayList<>();
+        }
+        this.emailAttachments.add(emailAttachment);
+        emailAttachment.setEmailNotification(this);
+    }
 }

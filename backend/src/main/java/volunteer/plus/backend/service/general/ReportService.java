@@ -19,4 +19,6 @@ public interface ReportService {
     ReportDTO removeAttachment(Long reportId, Long attachmentId);
 
     ResponseEntity<byte[]> downloadAttachment(Long attachmentId);
+
+    void distribute(Long reportId);
 }
