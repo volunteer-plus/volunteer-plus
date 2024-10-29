@@ -24,4 +24,16 @@ public class JacksonUtil {
             }
         }
     }
+
+    public static String serialize(Object object) {
+        if (object == null) {
+            return null;
+        } else {
+            try {
+                return objectMapper.writeValueAsString(object);
+            } catch (IOException e) {
+                throw new ApiException(ErrorCode.CANNOT_SERIALIZE_JSON);
+            }
+        }
+    }
 }

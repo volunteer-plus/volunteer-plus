@@ -24,6 +24,8 @@ public enum ErrorCode {
     ATTACHMENT_NOT_FOUND("Attachment not found"),
     NO_DATA_FOR_REPORT_OPERATION("No data for report operation"),
     LEVY_ALREADY_HAS_A_REPORT("Levy already has a report"),
-    CANNOT_DESERIALIZE_JSON("Cannot deserialize a json");
+    CANNOT_DESERIALIZE_JSON("Cannot deserialize a json"),
+    EMAIL_TEMPLATE_NOT_FOUND("Email template not found"),
+    CANNOT_SERIALIZE_JSON("Cannot serialize data");
     private final String data;
 }

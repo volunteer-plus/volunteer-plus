@@ -16,6 +16,7 @@ import volunteer.plus.backend.exceptions.ErrorCode;
 import volunteer.plus.backend.repository.AttachmentRepository;
 import volunteer.plus.backend.repository.LevyRepository;
 import volunteer.plus.backend.repository.ReportRepository;
+import volunteer.plus.backend.service.email.EmailNotificationBuilderService;
 import volunteer.plus.backend.service.general.ReportService;
 import volunteer.plus.backend.service.general.S3Service;
 
@@ -31,6 +32,7 @@ public class ReportServiceImpl implements ReportService {
     private final AttachmentRepository attachmentRepository;
     private final S3Service s3Service;
     private final AWSProperties awsProperties;
+    private final EmailNotificationBuilderService emailNotificationBuilderService;
 
     @Override
     public List<ReportDTO> getReports(final Set<Long> levyIds) {
@@ -161,6 +163,13 @@ public class ReportServiceImpl implements ReportService {
                 .header("content-disposition", "attachment; filename=" + attachment.getFilename())
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(bytes);
+    }
+
+    @Override
+    public void distribute(final Long reportId) {
+        final var report = reportRepository.findById(reportId)
+                .orElseThrow(() -> new ApiException(ErrorCode.REPORT_NOT_FOUND));
+        emailNotificationBuilderService.createReportEmails(report);
     }
 
     private ReportDTO getReportDTO(Report report) {

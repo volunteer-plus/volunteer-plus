@@ -108,6 +108,7 @@ public class EmailNotificationServiceImpl implements EmailNotificationService {
             throw new EmailException("Exception occurred during email sending process, notification id=" + emailNotification.getId() + " Errors: " + e.getMessage());
         }
 
+
         updateAndSaveRecipientStatus(recipients);
         updateEmailNotificationStatus(emailNotification, EmailStatus.SENT);
 
@@ -120,13 +121,14 @@ public class EmailNotificationServiceImpl implements EmailNotificationService {
     }
 
     private void updateAndSaveRecipientStatus(final Set<EmailRecipient> recipients) {
-        final Set<Long> ids = recipients.stream()
-                .map(EmailRecipient::getId)
-                .collect(Collectors.toSet());
-
         log.info("Updating recipients sent status and date");
 
-        emailRecipientRepository.updateSentAndSentDateByIds(true, LocalDateTime.now(), ids);
+        recipients.forEach(recipient -> {
+            recipient.setSent(true);
+            recipient.setSentDate(LocalDateTime.now());
+        });
+
+        emailRecipientRepository.saveAllAndFlush(recipients);
     }
 
     private List<EmailDTO.FileAttachment> getFileAttachments(final Long id, final List<EmailAttachment> attachments) {
