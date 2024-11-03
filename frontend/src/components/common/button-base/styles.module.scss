@@ -13,6 +13,8 @@ $transition: 0.2s ease-in-out;
   &:not(:active) {
     transition: background-color $transition, filter $transition;
   }
+
+  text-decoration: none;
 }
 
 .outlinedVariant {

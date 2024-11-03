@@ -1,3 +1,4 @@
+@use 'sass:meta';
 @use '@/assets/colors' as colors;
 
 :root {
@@ -6,7 +7,7 @@
   font-weight: 400;
 
   @each $color-name, $color-shades in colors.$definitions {
-    @if type-of($color-shades) == map {
+    @if meta.type-of($color-shades) == map {
       @each $color-shade-name, $color-shade in $color-shades {
         --color-#{$color-name}-#{$color-shade-name}: #{$color-shade};
       }

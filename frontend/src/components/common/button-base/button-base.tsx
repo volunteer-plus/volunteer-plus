@@ -2,7 +2,7 @@ import {
   ButtonBaseColorSchema,
   ButtonBaseStyleProps,
   ButtonBaseVariant,
-} from '@/types';
+} from '@/types/common';
 import classNames from 'classnames';
 import React from 'react';
 import styles from './styles.module.scss';

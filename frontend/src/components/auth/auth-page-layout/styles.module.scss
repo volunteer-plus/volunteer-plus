@@ -1,0 +1,22 @@
+.root {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.main {
+  padding: 32px;
+
+  border-radius: 4px;
+  border: 1px solid var(--color-gray-300);
+}
+
+.logo {
+  margin-bottom: 24px;
+}
+
+.logoWrapper {
+  display: flex;
+  justify-content: center;
+}

@@ -1,5 +1,5 @@
-import { ButtonBase } from '@/components';
-import { ButtonBaseStyleProps } from '@/types';
+import { ButtonBase } from '@/components/common';
+import { ButtonBaseStyleProps } from '@/types/common';
 
 type Props = React.ComponentPropsWithoutRef<'button'> & ButtonBaseStyleProps;
 

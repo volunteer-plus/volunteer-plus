@@ -1,4 +1,4 @@
-import { ButtonBaseColorSchema, ButtonBaseVariant } from '@/types';
+import { ButtonBaseColorSchema, ButtonBaseVariant } from '@/types/common';
 
 interface ButtonBaseStyleProps {
   colorSchema?: ButtonBaseColorSchema;

@@ -1,6 +1,6 @@
 import classNames from 'classnames';
 
-import { Button, Tag } from '@/components';
+import { Button, Tag } from '@/components/common';
 import styles from './styles.module.scss';
 
 const FundraisingItem: React.FC<React.ComponentPropsWithoutRef<'div'>> = ({

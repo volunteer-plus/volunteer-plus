@@ -2,13 +2,12 @@ import React from 'react';
 
 import {
   Button,
-  FundraisingItem,
-  FundraisingList,
   PageContent,
   PageFooter,
   PageHeader,
   PageLayout,
-} from '@/components';
+} from '@/components/common';
+import { FundraisingItem, FundraisingList } from '@/components/fundraising';
 
 import styles from './styles.module.scss';
 
