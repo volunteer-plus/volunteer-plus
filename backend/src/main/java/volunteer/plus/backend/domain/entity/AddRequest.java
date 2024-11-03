@@ -14,6 +14,9 @@ import lombok.*;
 @Entity
 @Table(name = "add_request")
 public class AddRequest extends BaseEntity {
+    @Column(name = "regiment_code")
+    private String regimentCode;
+
     @ToString.Exclude
     @Column(name = "request_id")
     private String requestId;

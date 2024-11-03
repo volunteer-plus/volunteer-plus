@@ -8,8 +8,9 @@ import java.util.Set;
 public interface AddRequestService {
     List<AddRequestResponseDTO> getRequests();
 
-    List<AddRequestResponseDTO> generate(Long amount);
+    List<AddRequestResponseDTO> generate(String regimentCode, Long amount);
+
+    void validateCode(String code);
 
     void deleteAll(Set<Long> ids);
-
 }

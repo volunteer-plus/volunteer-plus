@@ -54,9 +54,27 @@ public class MilitaryPersonnelServiceImpl implements MilitaryPersonnelService {
         validatePayload(militaryPersonnelCreationRequestDTO);
 
         final var militaryPersonnelCreationDTOs = militaryPersonnelCreationRequestDTO.getMilitaryPersonnel();
-        final var regimentCodes = militaryPersonnelCreationDTOs.stream().map(MilitaryPersonnelCreationDTO::getRegimentCode).collect(Collectors.toSet());
 
-        final Map<String, Brigade> mapOfBrigades = brigadeRepository.findAllByRegimentCodeIn(regimentCodes).stream()
+        final var addRequestIds = militaryPersonnelCreationDTOs.stream()
+                .map(MilitaryPersonnelCreationDTO::getAddRequestId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        final var hashedRequests = addRequestIds.stream()
+                .map(val -> hashValue(SHA_256, val))
+                .collect(Collectors.toSet());
+
+        final var addRequestsMap = addRequestRepository.findByRequestIdIn(hashedRequests)
+                .stream()
+                .collect(Collectors.toMap(AddRequest::getRequestId, Function.identity()));
+
+        final var regimentCodes = addRequestsMap.values()
+                .stream()
+                .map(AddRequest::getRegimentCode)
+                .collect(Collectors.toSet());
+
+        final Map<String, Brigade> mapOfBrigades = brigadeRepository.findAllByRegimentCodeIn(regimentCodes)
+                .stream()
                 .collect(Collectors.toMap(Brigade::getRegimentCode, Function.identity()));
 
         if (mapOfBrigades.size() != militaryPersonnelCreationDTOs.size()) {
@@ -67,20 +85,21 @@ public class MilitaryPersonnelServiceImpl implements MilitaryPersonnelService {
         final List<Brigade> brigadesToUpdate = new ArrayList<>();
 
         for (final var creationDTO : militaryPersonnelCreationDTOs) {
-            final var brigade = mapOfBrigades.get(creationDTO.getRegimentCode());
-            final var addRequest = addRequestRepository.findByRequestId(hashValue(SHA_256, creationDTO.getAddRequestId()));
-            final var militaryPersonnel = getMilitaryPersonnelFromCreationDTO(creationDTO);
+            final var addRequest = addRequestsMap.get(hashValue(SHA_256, creationDTO.getAddRequestId()));
 
-            if (addRequest.isEmpty()) {
+            if (addRequest == null) {
                 throw new ApiException(ErrorCode.ADD_REQUEST_NOT_FOUND);
             }
 
-            if (addRequest.get().isExecuted()) {
+            if (addRequest.isExecuted()) {
                 throw new ApiException(ErrorCode.ADD_REQUEST_IS_ALREADY_EXECUTED);
             }
 
-            addRequest.get().setExecuted(true);
-            requestsToUpdate.add(addRequest.get());
+            final var brigade = mapOfBrigades.get(addRequest.getRegimentCode());
+            final var militaryPersonnel = getMilitaryPersonnelFromCreationDTO(creationDTO);
+
+            addRequest.setExecuted(true);
+            requestsToUpdate.add(addRequest);
 
             brigade.setupMilitaryPersonnel(militaryPersonnel);
         }

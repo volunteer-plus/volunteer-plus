@@ -1,0 +1,1 @@
+alter table `add_request` add column `regiment_code` varchar(255) not null default 'А0105';

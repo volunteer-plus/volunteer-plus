@@ -13,10 +13,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MilitaryPersonnelCreationDTO {
-    @NotNull
-    private String regimentCode;
-
-    @NotNull
     private String addRequestId;
 
     @NotNull

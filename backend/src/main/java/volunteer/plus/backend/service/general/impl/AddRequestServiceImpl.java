@@ -11,6 +11,7 @@ import volunteer.plus.backend.exceptions.ApiException;
 import volunteer.plus.backend.exceptions.ErrorCode;
 import volunteer.plus.backend.repository.AddRequestRepository;
 import volunteer.plus.backend.service.general.AddRequestService;
+import volunteer.plus.backend.service.general.BrigadeCodesService;
 
 import java.util.*;
 
@@ -22,6 +23,7 @@ import static volunteer.plus.backend.util.HashUtil.hashValue;
 @RequiredArgsConstructor
 public class AddRequestServiceImpl implements AddRequestService {
     private final AddRequestRepository addRequestRepository;
+    private final BrigadeCodesService brigadeCodesService;
 
     @Override
     public List<AddRequestResponseDTO> getRequests() {
@@ -40,8 +42,14 @@ public class AddRequestServiceImpl implements AddRequestService {
     @SneakyThrows
     @Override
     @Transactional
-    public List<AddRequestResponseDTO> generate(final Long amount) {
+    public List<AddRequestResponseDTO> generate(final String regimentCode, final Long amount) {
         log.info("Generate add-request codes with amount: {}", amount);
+
+        final var validRegimentCodes = brigadeCodesService.getCodes();
+
+        if (!validRegimentCodes.contains(regimentCode)) {
+            throw new ApiException(ErrorCode.NOT_VALID_REGIMENT_CODE);
+        }
 
         final List<AddRequest> addRequests = new ArrayList<>();
         final List<String> keys = new ArrayList<>();
@@ -54,6 +62,7 @@ public class AddRequestServiceImpl implements AddRequestService {
 
             addRequests.add(
                     AddRequest.builder()
+                            .regimentCode(regimentCode)
                             .requestId(encodedHash)
                             .executed(false)
                             .build()
@@ -66,6 +75,19 @@ public class AddRequestServiceImpl implements AddRequestService {
         populateResult(savedRequests, keys, result);
 
         return result;
+    }
+
+    @Override
+    public void validateCode(final String code) {
+        final var addRequest = addRequestRepository.findByRequestId(hashValue(SHA_256, code));
+
+        if (addRequest.isEmpty()) {
+            throw new ApiException(ErrorCode.ADD_REQUEST_NOT_FOUND);
+        }
+
+        if (addRequest.get().isExecuted()) {
+            throw new ApiException(ErrorCode.ADD_REQUEST_IS_ALREADY_EXECUTED);
+        }
     }
 
     // we need to populate results because we need to return real data without being hashed

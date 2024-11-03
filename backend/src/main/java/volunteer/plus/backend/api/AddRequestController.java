@@ -24,12 +24,19 @@ public class AddRequestController {
         return ResponseEntity.ok(addRequestService.getRequests());
     }
 
-    @GetMapping("/add-request/generate")
-    @Operation(description = "Generate and retrieve verification codes for add request")
-    public ResponseEntity<List<AddRequestResponseDTO>> generateCodes(@RequestParam final Long amount) {
-        return ResponseEntity.ok(addRequestService.generate(amount));
+    @PostMapping("/add-request/generate")
+    @Operation(description = "Generate and retrieve verification codes for add request for specific regiment")
+    public ResponseEntity<List<AddRequestResponseDTO>> generateCodes(@RequestParam final String regimentCode,
+                                                                     @RequestParam final Long amount) {
+        return ResponseEntity.ok(addRequestService.generate(regimentCode, amount));
     }
 
+    @PostMapping("/add-request/validate")
+    @Operation(description = "Validate code")
+    public ResponseEntity<Void> validateCode(@RequestParam final String code) {
+        addRequestService.validateCode(code);
+        return ResponseEntity.ok().build();
+    }
 
     @DeleteMapping("/add-request/delete")
     @Operation(description = "Delete all selected codes")
