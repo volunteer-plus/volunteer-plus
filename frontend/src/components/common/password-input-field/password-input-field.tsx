@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { TextInputField } from '../text-input-field';
+import { TextInputField } from '@/components/common';
+
+import styles from './styles.module.scss';
 
 type Props = Omit<
   React.ComponentPropsWithoutRef<typeof TextInputField>,
@@ -18,8 +20,14 @@ const PasswordInputField: React.FC<Props> = (props) => {
       {...props}
       type={isPasswordVisible ? 'text' : 'password'}
       rightIcon={
-        <button type='button' onClick={togglePasswordVisibility}>
-          {isPasswordVisible ? 'H' : 'S'}
+        <button
+          type='button'
+          onClick={togglePasswordVisibility}
+          className={styles.visibilityButton}
+        >
+          <span className='material-symbols-outlined'>
+            {isPasswordVisible ? 'visibility_off' : 'visibility'}
+          </span>
         </button>
       }
     />
