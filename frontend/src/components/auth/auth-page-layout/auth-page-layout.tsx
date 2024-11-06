@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import Logo from '@/assets/logo.svg?react';
 import styles from './styles.module.scss';
 
@@ -9,9 +10,9 @@ const AuthPageLayout: React.FC<Props> = ({ children }) => {
   return (
     <div className={styles.root}>
       <main className={styles.main}>
-        <div className={styles.logoWrapper}>
+        <Link className={styles.logoWrapper} to='/'>
           <Logo className={styles.logo} />
-        </div>
+        </Link>
         <div className={styles.content}>{children}</div>
       </main>
     </div>

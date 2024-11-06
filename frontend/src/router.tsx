@@ -1,12 +1,52 @@
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, Outlet } from 'react-router-dom';
 
-import { HomePage } from './components/common';
-import { SignInPage, SignUpPage } from './components/auth';
+import {
+  HomePage,
+  PageFooter,
+  PageHeader,
+  PageLayout,
+} from './components/common';
+import { SignInPage, SignUpPage } from '@/components/auth';
+import {
+  AdminPageBody,
+  AdminPageHeader,
+  AdminPageLayout,
+  AdminPageSidebar,
+} from './components/admin';
+import { BrigadesPage } from './components/brigades';
 
 const router = createBrowserRouter([
   {
-    path: '',
-    element: <HomePage />,
+    element: (
+      <PageLayout>
+        <PageHeader />
+        <Outlet />
+        <PageFooter />
+      </PageLayout>
+    ),
+    children: [
+      {
+        path: '',
+        element: <HomePage />,
+      },
+    ],
+  },
+  {
+    element: (
+      <AdminPageLayout>
+        <AdminPageHeader />
+        <AdminPageBody>
+          <AdminPageSidebar />
+          <Outlet />
+        </AdminPageBody>
+      </AdminPageLayout>
+    ),
+    children: [
+      {
+        path: 'brigades',
+        element: <BrigadesPage />,
+      },
+    ],
   },
   {
     path: 'sign-in',

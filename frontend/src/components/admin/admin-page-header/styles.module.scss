@@ -1,0 +1,37 @@
+@use 'sass:map';
+@use '@/assets/columns' as columns;
+@use '@/assets/colors' as colors;
+
+.header {
+  height: 50px;
+
+  display: flex;
+  align-items: center;
+
+  border-bottom: 1px solid var(--color-gray-300);
+}
+
+.leftPart {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  height: 12px;
+  width: auto;
+
+  margin-left: 8px;
+}
+
+.burgerWrapper {
+  display: flex;
+  justify-content: center;
+  width: 60px;
+}
+
+.burgerButton {
+  padding: 0;
+  background: transparent;
+  border: none;
+  font-size: 0;
+}

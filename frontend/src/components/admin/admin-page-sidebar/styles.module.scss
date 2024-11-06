@@ -1,0 +1,7 @@
+@use '@/assets/columns' as columns;
+
+.sidebar {
+  width: 60px;
+
+  border-right: 1px solid var(--color-gray-300);
+}

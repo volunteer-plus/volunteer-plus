@@ -5,3 +5,5 @@ export * from './auth-form-title';
 export * from './sign-in-page';
 export * from './sign-up-page';
 export * from './auth-form-body';
+export * from './public-only';
+export * from './authenticated';

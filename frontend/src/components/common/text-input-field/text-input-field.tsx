@@ -1,4 +1,4 @@
-import { FieldBody, FieldLabel } from '@/components/common';
+import { FieldBody, FieldLabel, makeFormikField } from '@/components/common';
 import classNames from 'classnames';
 
 import styles from './styles.module.scss';
@@ -60,4 +60,6 @@ const TextInputField: React.FC<Props> = ({
   );
 };
 
-export { TextInputField };
+const FormikTextInputField = makeFormikField(TextInputField);
+
+export { TextInputField, FormikTextInputField };

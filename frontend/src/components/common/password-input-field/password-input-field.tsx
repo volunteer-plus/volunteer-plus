@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { TextInputField } from '@/components/common';
+import { makeFormikField, TextInputField } from '@/components/common';
 
 import styles from './styles.module.scss';
 
@@ -34,4 +34,6 @@ const PasswordInputField: React.FC<Props> = (props) => {
   );
 };
 
-export { PasswordInputField };
+const FormikPasswordInputField = makeFormikField(PasswordInputField);
+
+export { PasswordInputField, FormikPasswordInputField };

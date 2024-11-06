@@ -1,3 +1,6 @@
+import { Form, Formik } from 'formik';
+
+import { Yup } from '@/yup';
 import {
   AuthForm,
   AuthFormActions,
@@ -7,37 +10,85 @@ import {
 } from '@/components/auth';
 import {
   Button,
+  FormikPasswordInputField,
+  FormikTextInputField,
   Link,
-  PasswordInputField,
-  TextInputField,
 } from '@/components/common';
+import { getUserHomepage } from '@/helpers/user';
+import { PublicOnly } from '@/components/auth/public-only';
 
 import styles from './styles.module.scss';
+import { useAppDispatch } from '@/hooks/store';
+import { login } from '@/slices/user';
 
-const SignInPage: React.FC = () => {
+type FormValues = {
+  email: string;
+  password: string;
+};
+
+const INITIAL_FORM_VALUES: FormValues = {
+  email: '',
+  password: '',
+};
+
+const FORM_VALIDATION_SCHEMA = Yup.object({
+  email: Yup.string().required().label('Email'),
+  password: Yup.string().required().label('Пароль'),
+});
+
+const BareSignInPage: React.FC = () => {
+  const dispatch = useAppDispatch();
+
+  const onSubmit = async (values: FormValues) => {
+    await dispatch(login(values));
+  };
+
   return (
     <AuthPageLayout>
-      <AuthForm>
-        <AuthFormTitle>Увійти</AuthFormTitle>
-        <AuthFormBody>
-          <TextInputField
-            label='Email'
-            isRequired
-            placeholder='example@example.ua'
-          />
-          <PasswordInputField label='Пароль' isRequired />
-        </AuthFormBody>
-        <AuthFormActions>
-          <Button className={styles.submitButton} type='submit'>
-            Увійти
-          </Button>
-          <Link to='/sign-up' className={styles.signUpLink}>
-            Зареєструватися
-          </Link>
-        </AuthFormActions>
-      </AuthForm>
+      <Formik
+        initialValues={INITIAL_FORM_VALUES}
+        onSubmit={onSubmit}
+        validationSchema={FORM_VALIDATION_SCHEMA}
+      >
+        {({ isValid, isSubmitting }) => {
+          return (
+            <AuthForm as={Form}>
+              <AuthFormTitle>Увійти</AuthFormTitle>
+              <AuthFormBody>
+                <FormikTextInputField
+                  name='email'
+                  label='Email'
+                  isRequired
+                  placeholder='example@example.ua'
+                />
+                <FormikPasswordInputField
+                  name='password'
+                  label='Пароль'
+                  isRequired
+                />
+              </AuthFormBody>
+              <AuthFormActions>
+                <Button
+                  className={styles.submitButton}
+                  type='submit'
+                  disabled={!isValid || isSubmitting}
+                >
+                  Увійти
+                </Button>
+                <Link to='/sign-up' className={styles.signUpLink}>
+                  Зареєструватися
+                </Link>
+              </AuthFormActions>
+            </AuthForm>
+          );
+        }}
+      </Formik>
     </AuthPageLayout>
   );
 };
+
+const SignInPage = PublicOnly(BareSignInPage, {
+  getRedirectUrl: (user) => getUserHomepage(user),
+});
 
 export { SignInPage };
