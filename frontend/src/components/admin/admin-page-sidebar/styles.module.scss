@@ -1,7 +1,33 @@
-@use '@/assets/columns' as columns;
+$collapsed-sidebar-width: 60px;
+$expanded-sidebar-width: 260px;
 
 .sidebar {
-  width: 60px;
+}
 
+.main {
+  position: relative;
+  z-index: 50;
+  transition: width 0.3s;
+  padding: 32px 8px;
+  box-sizing: border-box;
   border-right: 1px solid var(--color-gray-300);
+  height: 100%;
+  background: var(--color-white);
+}
+
+.main,
+.sidebar {
+  width: $collapsed-sidebar-width;
+}
+
+.sidebar.expanded {
+  width: $expanded-sidebar-width;
+
+  .main {
+    width: $expanded-sidebar-width;
+  }
+}
+
+.itemsList > *:not(:last-child) {
+  margin-bottom: 8px;
 }
