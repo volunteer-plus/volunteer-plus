@@ -26,6 +26,8 @@ public enum ErrorCode {
     LEVY_ALREADY_HAS_A_REPORT("Levy already has a report"),
     CANNOT_DESERIALIZE_JSON("Cannot deserialize a json"),
     EMAIL_TEMPLATE_NOT_FOUND("Email template not found"),
-    CANNOT_SERIALIZE_JSON("Cannot serialize data");
+    CANNOT_SERIALIZE_JSON("Cannot serialize data"),
+    VOLUNTEER_IS_ALREADY_ASSIGNED_TO_USER("Volunteer is already assigned to user"),
+    VOLUNTEER_FEEDBACK_NOT_FOUND("Volunteer feedback not found");
     private final String data;
 }

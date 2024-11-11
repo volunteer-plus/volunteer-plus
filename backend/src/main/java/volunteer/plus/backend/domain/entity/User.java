@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@EqualsAndHashCode(callSuper = true, exclude = {"volunteer", "requests"})
+@EqualsAndHashCode(callSuper = false, exclude = {"volunteer", "requests", "volunteerFeedbacks"})
 @Entity
 @Table(name = "user")
 public class User extends BaseEntity {
@@ -42,6 +42,17 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Request> requests = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<VolunteerFeedback> volunteerFeedbacks = new ArrayList<>();
+
+    public void addFeedback(VolunteerFeedback volunteerFeedback) {
+        if (this.volunteerFeedbacks == null) {
+            this.volunteerFeedbacks = new ArrayList<>();
+        }
+        this.volunteerFeedbacks.add(volunteerFeedback);
+        volunteerFeedback.setUser(this);
+    }
 
     public void addRequest(Request request) {
         if (this.requests == null) {
