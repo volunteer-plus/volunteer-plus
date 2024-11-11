@@ -64,7 +64,52 @@ public class EmailNotificationBuilderServiceImpl implements EmailNotificationBui
         emailTemplateRepository.save(emailTemplate);
     }
 
+    @Override
+    @Transactional
+    public void createVolunteerFeedbackEmail(final VolunteerFeedback feedback) {
+        final var emailTemplate = emailTemplateRepository.findByEmailMessageTag(EmailMessageTag.EMAIL_MESSAGE_TAG_2)
+                .orElseThrow(() -> new ApiException(ErrorCode.EMAIL_TEMPLATE_NOT_FOUND));
+
+        final EmailNotification emailNotification = new EmailNotification();
+        emailNotification.setSubjectData(JacksonUtil.serialize(
+                Map.of(
+                        "name", getFullName(feedback.getUser())
+                )
+        ));
+        emailNotification.setTemplateData(JacksonUtil.serialize(
+                Map.of(
+                        "score", feedback.getReputationScore().toPlainString(),
+                        "text", feedback.getText()
+                )
+        ));
+        emailNotification.setDeleted(false);
+        emailNotification.setDraft(false);
+        emailNotification.setStatus(EmailStatus.PENDING);
+        emailNotification.setEmailRecipients(new ArrayList<>());
+        emailNotification.setEmailAttachments(new ArrayList<>());
+
+        if (feedback.getVolunteer().getUser() != null) {
+            final EmailRecipient emailRecipient = EmailRecipient.builder()
+                    .fullName(getFullName(feedback.getVolunteer().getUser()))
+                    .emailAddress(feedback.getVolunteer().getUser().getEmail())
+                    .toRecipient(true)
+                    .build();
+            emailNotification.addRecipient(emailRecipient);
+        }
+
+        emailTemplate.addNotification(emailNotification);
+
+        emailTemplateRepository.save(emailTemplate);
+    }
+
     private String getFullName(final UserRepository.UserMainDataProjection user) {
+        if (user.getFirstName() == null && user.getLastName() == null) {
+            return "";
+        }
+        return (user.getFirstName() == null ? "" : user.getFirstName() + " ") + (user.getLastName() == null ? "" : user.getLastName());
+    }
+
+    private String getFullName(final User user) {
         if (user.getFirstName() == null && user.getLastName() == null) {
             return "";
         }
