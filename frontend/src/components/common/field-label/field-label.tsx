@@ -4,11 +4,11 @@ type Props = React.ComponentPropsWithoutRef<'label'> & {
   isRequired?: boolean;
 };
 
-const FieldLabel: React.FC<Props> = ({ children, ...props }) => {
+const FieldLabel: React.FC<Props> = ({ children, isRequired, ...props }) => {
   return (
     <label {...props} className={styles.label}>
       {children}
-      {props.isRequired && <span className={styles.asterisk}> *</span>}
+      {isRequired && <span className={styles.asterisk}> *</span>}
     </label>
   );
 };

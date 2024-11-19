@@ -53,6 +53,7 @@ $gapToIcons: 8px;
   border: 1px solid var(--field-body-border-color);
   border-radius: 4px;
 
+  font-size: 0;
   overflow: hidden;
 
   transition: border $transition, background-color $transition;

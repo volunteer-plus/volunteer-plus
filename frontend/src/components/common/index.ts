@@ -13,3 +13,8 @@ export * from './link';
 export * from './password-input-field';
 export * from './make-formik-field';
 export * from './fullscreen-loader';
+export * from './modal';
+export * from './modal-container';
+export * from './modal-title';
+export * from './modal-close-button';
+export * from './textarea-field';

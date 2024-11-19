@@ -1,0 +1,17 @@
+.container {
+  width: 450px;
+}
+
+.fields > *:not(:last-child) {
+  margin-bottom: 16px;
+}
+
+.fields {
+  margin-bottom: 32px;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}

@@ -1,4 +1,6 @@
 @use '@/assets/columns' as columns;
 
 .content {
+  padding: 50px;
+  flex-grow: 1;
 }
