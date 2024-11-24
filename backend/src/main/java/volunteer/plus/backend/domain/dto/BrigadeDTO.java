@@ -24,6 +24,8 @@ public class BrigadeDTO {
 
     private String regimentCode;
 
+    private String name;
+
     private String branch;
 
     private String role;

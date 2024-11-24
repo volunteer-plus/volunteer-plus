@@ -20,6 +20,9 @@ public class Brigade extends BaseEntity {
     private String regimentCode;
 
     @Column
+    private String name;
+
+    @Column
     private String branch;
 
     @Column
