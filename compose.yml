@@ -15,11 +15,11 @@ services:
     image: mariadb:11.0
     container_name: db_main
     environment:
-      MARIADB_USER: ${MAIN_DB_USER}
-      MARIADB_ROOT_PASSWORD: ${MAIN_DB_PASSWORD}
-      MARIADB_DATABASE: ${MAIN_DB_NAME}
+      MARIADB_USER: root
+      MARIADB_ROOT_PASSWORD: user
+      MARIADB_DATABASE: volunteer_plus
     ports:
-      - ${MAIN_DB_PORT}:${MAIN_DB_PORT}
+      - "3306:3306"
 
   backend:
     build:
@@ -45,3 +45,5 @@ services:
       MAIL_PORT: ${MAIL_PORT}
       MAIL_USERNAME: ${MAIL_USERNAME}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
+      LIQPAY_PUBLIC_KEY:  ${LIQPAY_PUBLIC_KEY}
+      LIQPAY_PRIVATE_KEY: ${LIQPAY_PRIVATE_KEY}

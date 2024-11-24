@@ -46,6 +46,9 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<VolunteerFeedback> volunteerFeedbacks = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<LiqPayOrder> liqPayOrders = new ArrayList<>();
+
     public void addFeedback(VolunteerFeedback volunteerFeedback) {
         if (this.volunteerFeedbacks == null) {
             this.volunteerFeedbacks = new ArrayList<>();

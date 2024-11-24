@@ -1,0 +1,10 @@
+services:
+  db_main:
+    image: mariadb:11.0
+    container_name: db_main
+    environment:
+      MARIADB_USER: root
+      MARIADB_ROOT_PASSWORD: user
+      MARIADB_DATABASE: volunteer_plus
+    ports:
+      - "3306:3306"
