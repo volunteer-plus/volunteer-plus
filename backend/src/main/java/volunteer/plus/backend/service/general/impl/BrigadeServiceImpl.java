@@ -71,6 +71,7 @@ public class BrigadeServiceImpl implements BrigadeService {
 
            // update brigade
            if (brigadeFromDB != null) {
+               brigadeFromDB.setName(brigade.getName());
                brigadeFromDB.setBranch(brigade.getBranch());
                brigadeFromDB.setRole(brigade.getRole());
                brigadeFromDB.setPartOf(brigade.getPartOf());
@@ -82,6 +83,7 @@ public class BrigadeServiceImpl implements BrigadeService {
                // create a brigade
                final var newBrigade = Brigade.builder()
                        .regimentCode(brigade.getRegimentCode())
+                       .name(brigade.getName())
                        .branch(brigade.getBranch())
                        .role(brigade.getRole())
                        .partOf(brigade.getPartOf())
@@ -119,6 +121,7 @@ public class BrigadeServiceImpl implements BrigadeService {
                                 .createDate(brigade.getCreateDate())
                                 .updateDate(brigade.getUpdateDate())
                                 .regimentCode(brigade.getRegimentCode())
+                                .name(brigade.getName())
                                 .branch(brigade.getBranch())
                                 .role(brigade.getRole())
                                 .partOf(brigade.getPartOf())

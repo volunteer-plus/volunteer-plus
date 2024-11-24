@@ -1,0 +1,1 @@
+alter table `brigade` add column `name` varchar(255);
