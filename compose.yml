@@ -9,6 +9,7 @@ services:
       - ./frontend/index.html:/usr/src/app/index.html
     environment:
       - FRONTEND_PORT=${FRONTEND_PORT}
+      - VITE_VOLUNTEER_PLUS_API_BASE_URL=${VOLUNTEER_PLUS_API_BASE_URL}
     container_name: volunteer-plus-frontend
 
   db_main:
