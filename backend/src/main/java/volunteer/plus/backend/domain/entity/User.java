@@ -2,8 +2,11 @@ package volunteer.plus.backend.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Getter
@@ -14,7 +17,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false, exclude = {"volunteer", "requests", "volunteerFeedbacks"})
 @Entity
 @Table(name = "user")
-public class User extends BaseEntity {
+public class User extends BaseEntity implements UserDetails {
 
     @Column(nullable = false, unique = true)
     private String email;
@@ -49,6 +52,11 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<LiqPayOrder> liqPayOrders = new ArrayList<>();
 
+    private boolean enabled;
+    private boolean accountNonExpired;
+    private boolean accountNonLocked;
+    private boolean credentialsNonExpired;
+
     public void addFeedback(VolunteerFeedback volunteerFeedback) {
         if (this.volunteerFeedbacks == null) {
             this.volunteerFeedbacks = new ArrayList<>();
@@ -63,5 +71,40 @@ public class User extends BaseEntity {
         }
         this.requests.add(request);
         request.setUser(this);
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of();
+    }
+
+    @Override
+    public String getPassword() {
+        return password;
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return accountNonExpired;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return accountNonLocked;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return credentialsNonExpired;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return enabled;
     }
 }

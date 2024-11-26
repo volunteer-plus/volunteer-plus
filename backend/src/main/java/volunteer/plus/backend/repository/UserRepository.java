@@ -10,6 +10,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String userEmail);
 
     List<UserMainDataProjection> findAllByEmailNotNull();
+    Optional<User> findUserByEmail(String email);
 
     interface UserMainDataProjection {
         String getFirstName();
