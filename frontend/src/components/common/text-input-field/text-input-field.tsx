@@ -11,7 +11,7 @@ type Props = {
   description?: React.ReactNode;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
-  type?: 'text' | 'password';
+  type?: 'text' | 'password' | 'number' | 'email';
 } & Omit<React.ComponentPropsWithoutRef<'input'>, 'type'>;
 
 const TextInputField: React.FC<Props> = ({
