@@ -33,16 +33,26 @@ public class BrigadeServiceImpl implements BrigadeService {
     @Override
     public List<BrigadeDTO> getBrigades(Set<Long> ids) {
         log.info("Retrieve brigades data");
-
         final List<Brigade> brigades;
 
-       if (ids == null) {
-           brigades = brigadeRepository.findAll();
-       } else {
-           brigades = brigadeRepository.findAllById(ids);
-       }
+        if (ids == null) {
+            brigades = brigadeRepository.findAll();
+        } else {
+            brigades = brigadeRepository.findAllById(ids);
+        }
 
-        return getBrigadeDTOS(brigades);
+        return brigades.stream()
+                .map(this::mapBrigade)
+                .toList();
+    }
+
+    @Override
+    public BrigadeDTO getBrigade(final String name) {
+        log.info("Retrieve brigade by name");
+
+        final Brigade brigade = brigadeRepository.findByNameIgnoreCase(name).orElseGet(Brigade::new);
+
+        return mapBrigade(brigade);
     }
 
     @Override
@@ -98,7 +108,9 @@ public class BrigadeServiceImpl implements BrigadeService {
 
         final List<Brigade> savedBrigades = brigadeRepository.saveAll(brigadesToPersist);
 
-        return getBrigadeDTOS(savedBrigades);
+        return savedBrigades.stream()
+                .map(this::mapBrigade)
+                .toList();
     }
 
     @Override
@@ -113,24 +125,20 @@ public class BrigadeServiceImpl implements BrigadeService {
         brigadeRepository.deleteAll(brigades);
     }
 
-    private List<BrigadeDTO> getBrigadeDTOS(List<Brigade> savedBrigades) {
-        return savedBrigades.stream()
-                .map(brigade ->
-                        BrigadeDTO.builder()
-                                .id(brigade.getId())
-                                .createDate(brigade.getCreateDate())
-                                .updateDate(brigade.getUpdateDate())
-                                .regimentCode(brigade.getRegimentCode())
-                                .name(brigade.getName())
-                                .branch(brigade.getBranch())
-                                .role(brigade.getRole())
-                                .partOf(brigade.getPartOf())
-                                .websiteLink(brigade.getWebsiteLink())
-                                .currentCommander(brigade.getCurrentCommander())
-                                .description(brigade.getDescription())
-                                .militaryPersonnel(brigade.getMilitaryPersonnel() == null ? new ArrayList<>() : mapMilitaryPersonnel(brigade.getMilitaryPersonnel()))
-                                .build()
-                )
-                .toList();
+    private BrigadeDTO mapBrigade(final Brigade brigade) {
+        return BrigadeDTO.builder()
+                .id(brigade.getId())
+                .createDate(brigade.getCreateDate())
+                .updateDate(brigade.getUpdateDate())
+                .regimentCode(brigade.getRegimentCode())
+                .name(brigade.getName())
+                .branch(brigade.getBranch())
+                .role(brigade.getRole())
+                .partOf(brigade.getPartOf())
+                .websiteLink(brigade.getWebsiteLink())
+                .currentCommander(brigade.getCurrentCommander())
+                .description(brigade.getDescription())
+                .militaryPersonnel(brigade.getMilitaryPersonnel() == null ? new ArrayList<>() : mapMilitaryPersonnel(brigade.getMilitaryPersonnel()))
+                .build();
     }
 }

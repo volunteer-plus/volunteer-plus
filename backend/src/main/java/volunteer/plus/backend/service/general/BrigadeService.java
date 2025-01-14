@@ -9,6 +9,8 @@ import java.util.Set;
 public interface BrigadeService {
     List<BrigadeDTO> getBrigades(Set<Long> ids);
 
+    BrigadeDTO getBrigade(String name);
+
     List<BrigadeDTO> createOrUpdate(BrigadeCreationRequestDTO creationRequestDTO);
 
     void deleteAll(Set<Long> ids);

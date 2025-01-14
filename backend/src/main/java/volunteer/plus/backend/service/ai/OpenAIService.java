@@ -1,5 +1,7 @@
 package volunteer.plus.backend.service.ai;
 
+import org.springframework.ai.chat.model.ChatResponse;
+
 public interface OpenAIService {
-    String chat(String message);
+    ChatResponse chat(String message);
 }
