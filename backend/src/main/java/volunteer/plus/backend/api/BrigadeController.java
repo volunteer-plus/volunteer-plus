@@ -34,6 +34,12 @@ public class BrigadeController {
         return ResponseEntity.ok(brigadeService.getBrigades(ids));
     }
 
+    @GetMapping("/brigade")
+    @Operation(description = "Retrieve brigade by name")
+    public ResponseEntity<BrigadeDTO> getBrigades(@RequestParam final String name) {
+        return ResponseEntity.ok(brigadeService.getBrigade(name));
+    }
+
     @PostMapping("/brigade/create-or-update")
     @Operation(description = "Create or update brigades")
     public ResponseEntity<List<BrigadeDTO>> createOrUpdate(@RequestBody @Valid BrigadeCreationRequestDTO creationRequestDTO) {
