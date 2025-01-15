@@ -18,12 +18,18 @@ import volunteer.plus.backend.service.ai.DataInjectionService;
 public class DataInjectionServiceImpl implements DataInjectionService {
     private final VectorStore vectorStore;
 
+    @Value("${allow.ai.prompt.pdf.pre-upload}")
+    private boolean allowAIPromptPDFPreUpload;
+
     @Value("classpath:/prompts/general_law.pdf")
     private Resource promptPDF;
 
 
     @EventListener(ApplicationReadyEvent.class)
     public void inject() {
+        if (!allowAIPromptPDFPreUpload) {
+            return;
+        }
         log.info("Starting data injecting process...");
         final var pdfReader = new PagePdfDocumentReader(promptPDF);
         final var textSplitter = new TokenTextSplitter();
