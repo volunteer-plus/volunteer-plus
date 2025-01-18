@@ -3,7 +3,10 @@ package volunteer.plus.backend.service.ai.impl;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
+import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
+import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatOptions;
@@ -17,6 +20,8 @@ import volunteer.plus.backend.util.FunctionMethodNameCollector;
 
 import java.util.Set;
 
+import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.DEFAULT_CHAT_MEMORY_CONVERSATION_ID;
+
 @Slf4j
 @Service
 public class OpenAIServiceImpl implements OpenAIService {
@@ -27,12 +32,18 @@ public class OpenAIServiceImpl implements OpenAIService {
     @SneakyThrows
     public OpenAIServiceImpl(final FunctionMethodNameCollector functionMethodNameCollector,
                              final ChatClient.Builder builder,
+                             final ChatMemory chatMemory,
                              final VectorStore vectorStore,
-                             final @Value("classpath:/prompts/default_system_ai_prompt.txt") Resource defaultSystemPrompt) {
+                             final @Value("classpath:/prompts/default_system_ai_prompt.txt") Resource defaultSystemPrompt,
+                             final @Value("${ai.chat.history.window.size}") Integer chatWindowSize) {
         this.functionMethodNameCollector = functionMethodNameCollector;
         this.chatClient = builder
                 .defaultSystem(defaultSystemPrompt)
-                .defaultAdvisors(new QuestionAnswerAdvisor(vectorStore))
+                .defaultAdvisors(
+                        new QuestionAnswerAdvisor(vectorStore),
+                        new MessageChatMemoryAdvisor(chatMemory, DEFAULT_CHAT_MEMORY_CONVERSATION_ID, chatWindowSize),
+                        new SimpleLoggerAdvisor()
+                )
                 .build();
     }
 
