@@ -4,9 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Description;
+import volunteer.plus.backend.domain.dto.BrigadeCodesDateDTO;
 import volunteer.plus.backend.domain.dto.BrigadeCreationRequestDTO;
 import volunteer.plus.backend.domain.dto.BrigadeDTO;
 import volunteer.plus.backend.domain.dto.BrigadeNameDTO;
+import volunteer.plus.backend.domain.entity.BrigadeCodes;
+import volunteer.plus.backend.service.general.BrigadeCodesService;
 import volunteer.plus.backend.service.general.BrigadeService;
 
 import java.util.List;
@@ -15,7 +18,14 @@ import java.util.function.Function;
 @Configuration
 @RequiredArgsConstructor
 public class FunctionalAIConfiguration {
+    private final BrigadeCodesService brigadeCodesService;
     private final BrigadeService brigadeService;
+
+    @Bean
+    @Description("Get Army all valid brigade regiment codes in the system")
+    public Function<BrigadeCodesDateDTO, List<BrigadeCodes>> getArmyBrigadeValidCodes() {
+        return brigadeCodesService::getCodesCreatedAt;
+    }
 
     @Bean
     @Description("Get Army brigade details by name")
