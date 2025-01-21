@@ -6,6 +6,8 @@ import org.springframework.ai.chat.memory.InMemoryChatMemory;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.openai.OpenAiImageModel;
 import org.springframework.ai.openai.api.OpenAiImageApi;
+import org.springframework.ai.transformer.splitter.TextSplitter;
+import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.SimpleVectorStore;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,5 +35,10 @@ public class OpenAIConfig {
     @Bean
     public OpenAiImageModel imageClient(@Value("${spring.ai.openai.api-key}") String apiKey) {
         return new OpenAiImageModel(new OpenAiImageApi(apiKey));
+    }
+
+    @Bean
+    public TextSplitter textSplitter() {
+        return new TokenTextSplitter();
     }
 }

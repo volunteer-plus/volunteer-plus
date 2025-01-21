@@ -8,11 +8,14 @@ import volunteer.plus.backend.domain.dto.BrigadeCodesDateDTO;
 import volunteer.plus.backend.domain.dto.BrigadeCreationRequestDTO;
 import volunteer.plus.backend.domain.dto.BrigadeDTO;
 import volunteer.plus.backend.domain.dto.BrigadeNameDTO;
+import volunteer.plus.backend.domain.dto.MilitaryPersonnelCreationRequestDTO;
 import volunteer.plus.backend.domain.entity.BrigadeCodes;
 import volunteer.plus.backend.service.general.BrigadeCodesService;
 import volunteer.plus.backend.service.general.BrigadeService;
+import volunteer.plus.backend.service.general.MilitaryPersonnelService;
 
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 @Configuration
@@ -20,9 +23,10 @@ import java.util.function.Function;
 public class FunctionalAIConfiguration {
     private final BrigadeCodesService brigadeCodesService;
     private final BrigadeService brigadeService;
+    private final MilitaryPersonnelService militaryPersonnelService;
 
     @Bean
-    @Description("Get Army all valid brigade regiment codes in the system")
+    @Description("Get Army all valid brigade regiment codes in the system based on given date criteria.")
     public Function<BrigadeCodesDateDTO, List<BrigadeCodes>> getArmyBrigadeValidCodes() {
         return brigadeCodesService::getCodesCreatedAt;
     }
@@ -55,4 +59,29 @@ public class FunctionalAIConfiguration {
         return brigadeService::createOrUpdate;
     }
 
+
+    @Bean
+    @Description(
+            """
+            Create military personnel records for specified brigades.
+            Accepts a MilitaryPersonnelCreationRequestDTO containing personnel data.
+            Returns a map grouping the newly created MilitaryPersonnelDTO objects,
+            typically organized by brigade or regiment code.
+            """
+    )
+    public Function<MilitaryPersonnelCreationRequestDTO, Map<String, List<BrigadeDTO.MilitaryPersonnelDTO>>> createMilitaryPersonnel() {
+        return militaryPersonnelService::createMilitaryPersonnel;
+    }
+
+    @Bean
+    @Description(
+            """
+            Update existing military personnel records for specified brigades.
+            Accepts a MilitaryPersonnelCreationRequestDTO with updated personnel information.
+            Returns a list of updated MilitaryPersonnelDTO objects reflecting the changes.
+            """
+    )
+    public Function<MilitaryPersonnelCreationRequestDTO, List<BrigadeDTO.MilitaryPersonnelDTO>> updateMilitaryPersonnel() {
+        return militaryPersonnelService::updateMilitaryPersonnel;
+    }
 }
