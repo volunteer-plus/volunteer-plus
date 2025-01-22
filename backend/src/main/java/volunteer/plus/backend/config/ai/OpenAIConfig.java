@@ -4,7 +4,10 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.InMemoryChatMemory;
 import org.springframework.ai.embedding.EmbeddingModel;
+import org.springframework.ai.openai.OpenAiAudioSpeechModel;
+import org.springframework.ai.openai.OpenAiAudioTranscriptionModel;
 import org.springframework.ai.openai.OpenAiImageModel;
+import org.springframework.ai.openai.api.OpenAiAudioApi;
 import org.springframework.ai.openai.api.OpenAiImageApi;
 import org.springframework.ai.transformer.splitter.TextSplitter;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
@@ -35,6 +38,16 @@ public class OpenAIConfig {
     @Bean
     public OpenAiImageModel imageClient(@Value("${spring.ai.openai.api-key}") String apiKey) {
         return new OpenAiImageModel(new OpenAiImageApi(apiKey));
+    }
+
+    @Bean
+    public OpenAiAudioTranscriptionModel openAiAudioTranscriptionModel(@Value("${spring.ai.openai.api-key}") String apiKey) {
+        return new OpenAiAudioTranscriptionModel(new OpenAiAudioApi(apiKey));
+    }
+
+    @Bean
+    public OpenAiAudioSpeechModel openAiAudioSpeechModel(@Value("${spring.ai.openai.api-key}") String apiKey) {
+        return new OpenAiAudioSpeechModel(new OpenAiAudioApi(apiKey));
     }
 
     @Bean
