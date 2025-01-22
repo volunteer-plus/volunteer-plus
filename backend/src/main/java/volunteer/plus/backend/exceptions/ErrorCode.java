@@ -21,6 +21,7 @@ public enum ErrorCode {
     RESOURCE_NOT_FOUND("Resource is not found"),
     FAILED_S3_UPLOAD("Failed upload for s3 bucket"),
     EMPTY_FILE("File is empty"),
+    WRONG_FILE_FORMAT("File format is considered as wrong"),
     ATTACHMENT_NOT_FOUND("Attachment not found"),
     NO_DATA_FOR_REPORT_OPERATION("No data for report operation"),
     LEVY_ALREADY_HAS_A_REPORT("Levy already has a report"),

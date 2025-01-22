@@ -33,6 +33,19 @@ public class OpenAIChatController {
         return ResponseEntity.ok(openAIService.generateImage(imageGenerationRequestDTO));
     }
 
+    @PostMapping("/open-ai/generate/text-from-audio")
+    @Operation(description = "Text transcription generation from audio")
+    public ResponseEntity<String> generateTextFromAudio(@RequestParam final String lang,
+                                                        @RequestBody final MultipartFile file) {
+        return ResponseEntity.ok(openAIService.generateTextFromAudio(lang, file));
+    }
+
+    @PostMapping("/open-ai/generate/audio-from-text")
+    @Operation(description = "Audio generation from text")
+    public ResponseEntity<byte[]> generateAudioFromText(@RequestBody final String message) {
+        return openAIService.generateAudioFromText(message);
+    }
+
     @PostMapping("/open-ai/inject/vector-documents")
     @Operation(description = "Inject file data to vector store")
     public ResponseEntity<Void> injectData(@RequestBody final MultipartFile file) {
