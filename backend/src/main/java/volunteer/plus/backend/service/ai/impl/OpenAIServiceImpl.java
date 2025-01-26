@@ -28,10 +28,10 @@ import volunteer.plus.backend.exceptions.ErrorCode;
 import volunteer.plus.backend.service.ai.OpenAIService;
 import volunteer.plus.backend.util.FunctionMethodNameCollector;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URL;
+import java.util.*;
 
 import static volunteer.plus.backend.domain.enums.FileType.MP3;
 
@@ -91,9 +91,44 @@ public class OpenAIServiceImpl implements OpenAIService {
                 .content();
     }
 
+    @SneakyThrows
     @Override
-    public List<String> generateImage(final ImageGenerationRequestDTO imageGenerationRequestDTO) {
-        log.info("Asking GPT to generate an image(s): {}", imageGenerationRequestDTO.getPrompt());
+    public ResponseEntity<byte[]> generateImage(final ImageGenerationRequestDTO imageGenerationRequestDTO) {
+        log.info("Asking GPT to generate an image: {}", imageGenerationRequestDTO.getPrompt());
+
+        final ImageResponse response = imageModel.call(
+                new ImagePrompt(
+                        imageGenerationRequestDTO.getPrompt(),
+                        OpenAiImageOptions.builder()
+                                .withQuality(imageGenerationRequestDTO.getQuality())
+                                .withN(1)
+                                .withHeight(imageGenerationRequestDTO.getHeight())
+                                .withWidth(imageGenerationRequestDTO.getWidth())
+                                .build()
+                )
+        );
+
+        final Image image = response.getResult().getOutput();
+
+        if (image == null || image.getUrl() == null) {
+            throw new ApiException(ErrorCode.EMPTY_FILE);
+        }
+
+        try {
+            final URL specUrl = URI.create(image.getUrl()).toURL();
+            final InputStream is = specUrl.openStream();
+
+            return ResponseEntity.ok()
+                    .header("content-disposition", "attachment; filename=output.png")
+                    .body(is.readAllBytes());
+        } catch (Exception e) {
+            throw new ApiException(ErrorCode.CANNOT_DOWNLOAD_OUTPUT_FILE);
+        }
+    }
+
+    @Override
+    public List<String> generateImageUrls(final ImageGenerationRequestDTO imageGenerationRequestDTO) {
+        log.info("Asking GPT to generate an image(s) urls: {}", imageGenerationRequestDTO.getPrompt());
 
         final ImageResponse response = imageModel.call(
                 new ImagePrompt(

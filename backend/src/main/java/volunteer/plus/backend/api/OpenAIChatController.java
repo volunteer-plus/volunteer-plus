@@ -36,8 +36,14 @@ public class OpenAIChatController {
 
     @PostMapping("/open-ai/generate/image")
     @Operation(description = "Image generation with OpenAI model")
-    public ResponseEntity<List<String>> generateImage(@RequestBody final ImageGenerationRequestDTO imageGenerationRequestDTO) {
-        return ResponseEntity.ok(openAIService.generateImage(imageGenerationRequestDTO));
+    public ResponseEntity<byte[]> generateImage(@RequestBody final ImageGenerationRequestDTO imageGenerationRequestDTO) {
+        return openAIService.generateImage(imageGenerationRequestDTO);
+    }
+
+    @PostMapping("/open-ai/generate/image-url")
+    @Operation(description = "Image generation with OpenAI model")
+    public ResponseEntity<List<String>> generateImageUrls(@RequestBody final ImageGenerationRequestDTO imageGenerationRequestDTO) {
+        return ResponseEntity.ok(openAIService.generateImageUrls(imageGenerationRequestDTO));
     }
 
     @PostMapping("/open-ai/generate/text-from-audio")
