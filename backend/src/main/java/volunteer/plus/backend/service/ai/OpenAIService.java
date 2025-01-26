@@ -14,7 +14,9 @@ public interface OpenAIService {
 
     Flux<String> streamingChat(String message);
 
-    List<String> generateImage(ImageGenerationRequestDTO imageGenerationRequestDTO);
+    ResponseEntity<byte[]> generateImage(ImageGenerationRequestDTO imageGenerationRequestDTO);
+
+    List<String> generateImageUrls(ImageGenerationRequestDTO imageGenerationRequestDTO);
 
     String generateTextFromAudio(String lang, MultipartFile file);
 

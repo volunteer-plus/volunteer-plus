@@ -16,9 +16,9 @@ services:
     image: mariadb:11.0
     container_name: db_main
     environment:
-      MARIADB_USER: root
-      MARIADB_ROOT_PASSWORD: user
-      MARIADB_DATABASE: volunteer_plus
+      MARIADB_USER: ${MAIN_DB_USER}
+      MARIADB_ROOT_PASSWORD: ${MAIN_DB_PASSWORD}
+      MARIADB_DATABASE: ${MAIN_DB_NAME}
     ports:
       - "3306:3306"
 
