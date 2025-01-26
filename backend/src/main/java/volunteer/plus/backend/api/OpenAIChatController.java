@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import reactor.core.publisher.Flux;
 import volunteer.plus.backend.domain.dto.ImageGenerationRequestDTO;
 import volunteer.plus.backend.service.ai.DataInjectionService;
 import volunteer.plus.backend.service.ai.OpenAIService;
@@ -25,6 +26,12 @@ public class OpenAIChatController {
     @Operation(description = "Chat with OpenAI model chat")
     public ResponseEntity<ChatResponse> chat(@RequestBody final String message) {
         return ResponseEntity.ok(openAIService.chat(message));
+    }
+
+    @PostMapping("/open-ai/generate/streaming/chat")
+    @Operation(description = "Streaming Chat with OpenAI model chat")
+    public ResponseEntity<Flux<String>> streamingChat(@RequestBody final String message) {
+        return ResponseEntity.ok(openAIService.streamingChat(message));
     }
 
     @PostMapping("/open-ai/generate/image")
