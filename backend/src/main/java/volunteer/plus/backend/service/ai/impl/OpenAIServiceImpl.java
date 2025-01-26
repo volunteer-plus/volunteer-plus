@@ -5,10 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.audio.transcription.AudioTranscriptionPrompt;
 import org.springframework.ai.audio.transcription.AudioTranscriptionResponse;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
-import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
-import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
-import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.image.Image;
@@ -19,13 +15,12 @@ import org.springframework.ai.openai.*;
 import org.springframework.ai.openai.api.OpenAiAudioApi;
 import org.springframework.ai.openai.audio.speech.SpeechPrompt;
 import org.springframework.ai.openai.audio.speech.SpeechResponse;
-import org.springframework.ai.vectorstore.VectorStore;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import reactor.core.publisher.Flux;
 import volunteer.plus.backend.config.ai.FunctionalAIConfiguration;
 import volunteer.plus.backend.domain.dto.ImageGenerationRequestDTO;
 import volunteer.plus.backend.exceptions.ApiException;
@@ -38,14 +33,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.DEFAULT_CHAT_MEMORY_CONVERSATION_ID;
 import static volunteer.plus.backend.domain.enums.FileType.MP3;
 
 @Slf4j
 @Service
 public class OpenAIServiceImpl implements OpenAIService {
 
-    private final ChatClient chatClient;
+    private final ChatClient generalChatClient;
+    private final ChatClient militaryChatClient;
     private final OpenAiImageModel imageModel;
     private final OpenAiAudioTranscriptionModel openAiAudioTranscriptionModel;
     private final OpenAiAudioSpeechModel openAiAudioSpeechModel;
@@ -56,29 +51,21 @@ public class OpenAIServiceImpl implements OpenAIService {
                              final OpenAiAudioTranscriptionModel openAiAudioTranscriptionModel,
                              final OpenAiAudioSpeechModel openAiAudioSpeechModel,
                              final FunctionMethodNameCollector functionMethodNameCollector,
-                             final ChatClient.Builder builder,
-                             final ChatMemory chatMemory,
-                             final VectorStore vectorStore,
-                             final @Value("classpath:/prompts/default_system_ai_prompt.txt") Resource defaultSystemPrompt,
-                             final @Value("${ai.chat.history.window.size}") Integer chatWindowSize) {
+                             final @Qualifier("generalChatClient") ChatClient generalChatClient,
+                             final @Qualifier("militaryChatClient") ChatClient militaryChatClient) {
         this.imageModel = imageModel;
         this.openAiAudioTranscriptionModel = openAiAudioTranscriptionModel;
         this.openAiAudioSpeechModel = openAiAudioSpeechModel;
         this.functionMethodNameCollector = functionMethodNameCollector;
-        this.chatClient = builder
-                .defaultSystem(defaultSystemPrompt)
-                .defaultAdvisors(
-                        new QuestionAnswerAdvisor(vectorStore),
-                        new MessageChatMemoryAdvisor(chatMemory, DEFAULT_CHAT_MEMORY_CONVERSATION_ID, chatWindowSize),
-                        new SimpleLoggerAdvisor()
-                )
-                .build();
+        this.generalChatClient = generalChatClient;
+        this.militaryChatClient = militaryChatClient;
     }
 
     @Override
     public ChatResponse chat(final String message) {
         log.info("Asking GPT: {}", message);
 
+        // this is prompt configuration that is why we need it in this service
         final Set<String> functionMethodNames = functionMethodNameCollector.getFunctionBeanMethodNames(FunctionalAIConfiguration.class);
 
         final Prompt prompt = new Prompt(
@@ -89,9 +76,19 @@ public class OpenAIServiceImpl implements OpenAIService {
                         .build()
         );
 
-        return chatClient.prompt(prompt)
+        return militaryChatClient.prompt(prompt)
                 .call()
                 .chatResponse();
+    }
+
+    @Override
+    public Flux<String> streamingChat(final String message) {
+        log.info("Asking Streaming GPT: {}", message);
+
+        return generalChatClient.prompt()
+                .user(message)
+                .stream()
+                .content();
     }
 
     @Override

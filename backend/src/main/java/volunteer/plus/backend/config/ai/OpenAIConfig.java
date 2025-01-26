@@ -1,6 +1,5 @@
 package volunteer.plus.backend.config.ai;
 
-import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.InMemoryChatMemory;
 import org.springframework.ai.embedding.EmbeddingModel;
@@ -28,11 +27,6 @@ public class OpenAIConfig {
     @Bean
     public VectorStore vectorStore(EmbeddingModel embeddingModel) {
         return new SimpleVectorStore(embeddingModel);
-    }
-
-    @Bean
-    public ChatClient chatClient(ChatClient.Builder builder) {
-        return builder.build();
     }
 
     @Bean
