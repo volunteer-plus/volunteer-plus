@@ -5,7 +5,6 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
-import org.springframework.ai.chat.client.advisor.VectorStoreChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,6 +32,7 @@ public class ChatClientBuildingConfig {
         return builder
                 .defaultAdvisors(
                         new SimpleLoggerAdvisor(),
+                        new MessageChatMemoryAdvisor(chatMemory, DEFAULT_CHAT_MEMORY_CONVERSATION_ID, chatWindowSize),
                         new Re2Advisor()
                 )
                 .build();
@@ -46,7 +46,6 @@ public class ChatClientBuildingConfig {
                 .defaultAdvisors(
                         new QuestionAnswerAdvisor(vectorStore),
                         new MessageChatMemoryAdvisor(chatMemory, DEFAULT_CHAT_MEMORY_CONVERSATION_ID, chatWindowSize),
-                        new VectorStoreChatMemoryAdvisor(vectorStore, DEFAULT_CHAT_MEMORY_CONVERSATION_ID, chatWindowSize),
                         new SimpleLoggerAdvisor(),
                         new Re2Advisor()
                 )

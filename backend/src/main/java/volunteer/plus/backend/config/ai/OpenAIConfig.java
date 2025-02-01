@@ -1,7 +1,6 @@
 package volunteer.plus.backend.config.ai;
 
 import org.springframework.ai.chat.memory.ChatMemory;
-import org.springframework.ai.chat.memory.InMemoryChatMemory;
 import org.springframework.ai.openai.OpenAiAudioSpeechModel;
 import org.springframework.ai.openai.OpenAiAudioTranscriptionModel;
 import org.springframework.ai.openai.OpenAiImageModel;
@@ -12,13 +11,20 @@ import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import volunteer.plus.backend.repository.AIChatMessageRepository;
 
 @Configuration
 public class OpenAIConfig {
 
+    private final AIChatMessageRepository aiChatMessageRepository;
+
+    public OpenAIConfig(final AIChatMessageRepository aiChatMessageRepository) {
+        this.aiChatMessageRepository = aiChatMessageRepository;
+    }
+
     @Bean
     public ChatMemory chatMemory() {
-        return new InMemoryChatMemory();
+        return new AIMemory(aiChatMessageRepository);
     }
 
     @Bean
