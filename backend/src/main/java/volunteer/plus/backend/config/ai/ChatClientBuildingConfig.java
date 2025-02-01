@@ -32,6 +32,7 @@ public class ChatClientBuildingConfig {
         return builder
                 .defaultAdvisors(
                         new SimpleLoggerAdvisor(),
+                        new MessageChatMemoryAdvisor(chatMemory, DEFAULT_CHAT_MEMORY_CONVERSATION_ID, chatWindowSize),
                         new Re2Advisor()
                 )
                 .build();

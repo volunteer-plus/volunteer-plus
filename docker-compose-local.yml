@@ -8,3 +8,22 @@ services:
       MARIADB_DATABASE: volunteer_plus
     ports:
       - "3306:3306"
+
+  redis:
+    image: redislabs/redismod
+    container_name: redislabs_container
+    restart: always
+    ports:
+      - "6379:6379"
+
+  redis-insight:
+    image: redis/redisinsight:latest
+    container_name: redis_insight_container
+    restart: always
+    ports:
+      - '5540:5540'
+    volumes:
+      - redisinsight_db:/db
+
+volumes:
+  redisinsight_db:

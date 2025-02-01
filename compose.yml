@@ -20,7 +20,23 @@ services:
       MARIADB_ROOT_PASSWORD: ${MAIN_DB_PASSWORD}
       MARIADB_DATABASE: ${MAIN_DB_NAME}
     ports:
-      - "3306:3306"
+      - ${MAIN_DB_PORT}:${MAIN_DB_PORT}
+
+  redis:
+    image: redislabs/redismod
+    container_name: redislabs_container
+    restart: always
+    ports:
+      - ${REDIS_PORT}:${REDIS_PORT}
+
+  redis-insight:
+    image: redis/redisinsight:latest
+    container_name: redis_insight_container
+    restart: always
+    ports:
+      - ${REDIS_INSIGHT_PORT}:${REDIS_INSIGHT_PORT}
+    volumes:
+      - redisinsight_db:/db
 
   backend:
     build:
@@ -31,6 +47,8 @@ services:
       - ${BACKEND_PORT}:${BACKEND_PORT}
     depends_on:
       - db_main
+      - redis
+      - redis-insight
     environment:
       DB_HOST: db_main
       DB_PORT: ${MAIN_DB_PORT}
@@ -49,3 +67,8 @@ services:
       LIQPAY_PUBLIC_KEY:  ${LIQPAY_PUBLIC_KEY}
       LIQPAY_PRIVATE_KEY: ${LIQPAY_PRIVATE_KEY}
       SPRING_AI_OPENAI_API_KEY: ${SPRING_AI_OPENAI_API_KEY}
+      REDIS_HOST: redis
+      REDIS_PORT: ${REDIS_PORT}
+
+volumes:
+  redisinsight_db:
