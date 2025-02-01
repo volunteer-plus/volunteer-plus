@@ -2,6 +2,7 @@ package volunteer.plus.backend.service.general.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import volunteer.plus.backend.domain.dto.BrigadeCodesDateDTO;
 import volunteer.plus.backend.domain.entity.BrigadeCodes;
@@ -17,6 +18,7 @@ public class BrigadeCodesServiceImpl implements BrigadeCodesService {
     private final BrigadeCodesRepository brigadeCodesRepository;
 
     @Override
+    @Cacheable(value = "brigade_codes", key = "'allBrigadeCodes'")
     public List<String> getCodes() {
         log.info("Get all validated brigade codes");
         return brigadeCodesRepository.findAll()
