@@ -1,0 +1,91 @@
+.menu {
+  position: fixed;
+
+  &.topSide {
+    bottom: var(--menu-bottom);
+
+    &.startAlignment {
+      left: var(--menu-left);
+    }
+
+    &.endAlignment {
+      right: var(--menu-right);
+    }
+
+    &.centerAlignment {
+      left: var(--menu-left);
+      transform: translateX(-50%);
+    }
+
+    &.stretchAlignment {
+      left: var(--menu-left);
+      width: var(--menu-width);
+    }
+  }
+
+  &.bottomSide {
+    top: var(--menu-top);
+
+    &.startAlignment {
+      left: var(--menu-left);
+    }
+
+    &.endAlignment {
+      right: var(--menu-right);
+    }
+
+    &.centerAlignment {
+      left: var(--menu-left);
+      transform: translateX(-50%);
+    }
+
+    &.stretchAlignment {
+      left: var(--menu-left);
+      width: var(--menu-width);
+    }
+  }
+
+  &.leftSide {
+    right: var(--menu-right);
+
+    &.startAlignment {
+      top: var(--menu-top);
+    }
+
+    &.endAlignment {
+      bottom: var(--menu-bottom);
+    }
+
+    &.centerAlignment {
+      top: var(--menu-top);
+      transform: translateY(-50%);
+    }
+
+    &.stretchAlignment {
+      top: var(--menu-top);
+      width: var(--menu-width);
+    }
+  }
+
+  &.rightSide {
+    left: var(--menu-left);
+
+    &.startAlignment {
+      top: var(--menu-top);
+    }
+
+    &.endAlignment {
+      bottom: var(--menu-bottom);
+    }
+
+    &.centerAlignment {
+      top: var(--menu-top);
+      transform: translateY(-50%);
+    }
+
+    &.stretchAlignment {
+      top: var(--menu-top);
+      width: var(--menu-width);
+    }
+  }
+}

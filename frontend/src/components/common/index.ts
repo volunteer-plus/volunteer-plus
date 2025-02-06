@@ -18,3 +18,8 @@ export * from './modal-container';
 export * from './modal-title';
 export * from './modal-close-button';
 export * from './textarea-field';
+export * from './avatar';
+export * from './expand-icon';
+export * from './session-user-block';
+export * from './menu';
+export * from './menu-container';

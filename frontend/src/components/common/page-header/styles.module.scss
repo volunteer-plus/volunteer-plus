@@ -13,8 +13,7 @@
   justify-content: space-between;
   gap: columns.get-width(1);
 
-  background: rgba(map.get(colors.$definitions, 'white'), 0.6);
-  backdrop-filter: blur(10px);
+  background: var(--color-white);
 
   border-bottom: 1px solid var(--color-gray-300);
 }

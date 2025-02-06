@@ -1,10 +1,8 @@
-import { ButtonBase } from '@/components/common';
-
 import Logo from '@/assets/logo.svg?react';
 
 import styles from './styles.module.scss';
-import { Link } from 'react-router-dom';
 import { useAdminPageSidebarContext } from '@/hooks/admin';
+import { SessionUserBlock } from '@/components/common/session-user-block';
 
 const AdminPageHeader: React.FC = () => {
   const { toggle: toggleSidebar } = useAdminPageSidebarContext();
@@ -23,7 +21,9 @@ const AdminPageHeader: React.FC = () => {
         </div>
         <Logo className={styles.logo} />
       </div>
-      <div className={styles.rightPart}></div>
+      <div className={styles.rightPart}>
+        <SessionUserBlock />
+      </div>
     </header>
   );
 };
