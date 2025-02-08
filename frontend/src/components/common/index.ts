@@ -23,3 +23,5 @@ export * from './expand-icon';
 export * from './session-user-block';
 export * from './menu';
 export * from './menu-container';
+export * from './menu-item';
+export * from './menu-item-icon-material';

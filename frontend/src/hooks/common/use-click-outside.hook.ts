@@ -4,7 +4,10 @@ import { useEventCallback } from './use-event-callback.hook';
 const useClickOutside = (
   callback: () => void,
   isEnabled: boolean = true
-): Pick<React.HTMLAttributes<HTMLElement>, 'onMouseDown' | 'onTouchStart'> => {
+): {
+  onMouseDown: React.MouseEventHandler;
+  onTouchStart: React.TouchEventHandler;
+} => {
   const isClickFromOutsideRef = useRef(true);
 
   const targetCallback = () => {
@@ -28,6 +31,7 @@ const useClickOutside = (
 
     document.addEventListener('mousedown', documentClickHandler);
     document.addEventListener('touchstart', documentClickHandler);
+    isClickFromOutsideRef.current = true;
 
     return () => {
       document.removeEventListener('mousedown', documentClickHandler);

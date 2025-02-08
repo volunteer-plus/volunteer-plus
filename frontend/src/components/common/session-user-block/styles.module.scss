@@ -1,7 +1,8 @@
 .userBlock {
   display: flex;
   align-items: center;
-  gap: 8px;
+
+  gap: 8px; 
 
   padding: 0;
   line-height: 0;
@@ -10,4 +11,5 @@
 
   font-family: inherit;
   font-size: 14px;
+  color: var(--color-gray-900);
 }
