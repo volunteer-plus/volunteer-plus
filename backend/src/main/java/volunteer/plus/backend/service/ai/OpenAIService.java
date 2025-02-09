@@ -6,15 +6,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Flux;
 import volunteer.plus.backend.domain.dto.ImageGenerationRequestDTO;
+import volunteer.plus.backend.domain.enums.OpenAIClient;
 
 import java.util.List;
 import java.util.concurrent.Future;
 
 
 public interface OpenAIService {
-    ChatResponse chat(String message);
+    ChatResponse chat(OpenAIClient openAIClient, String message);
 
-    Flux<String> streamingChat(String message);
+    Flux<String> streamingChat(OpenAIClient openAIClient, String message);
 
     ResponseEntity<byte[]> generateImage(ImageGenerationRequestDTO imageGenerationRequestDTO);
 

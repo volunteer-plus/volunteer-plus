@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Flux;
 import volunteer.plus.backend.domain.dto.ImageGenerationRequestDTO;
+import volunteer.plus.backend.domain.enums.OpenAIClient;
 import volunteer.plus.backend.service.ai.DataInjectionService;
 import volunteer.plus.backend.service.ai.OpenAIService;
 
@@ -24,14 +25,16 @@ public class OpenAIChatController {
 
     @PostMapping("/open-ai/generate/chat")
     @Operation(description = "Chat with OpenAI model chat")
-    public ResponseEntity<ChatResponse> chat(@RequestBody final String message) {
-        return ResponseEntity.ok(openAIService.chat(message));
+    public ResponseEntity<ChatResponse> chat(@RequestParam final OpenAIClient openAIClient,
+                                             @RequestBody final String message) {
+        return ResponseEntity.ok(openAIService.chat(openAIClient, message));
     }
 
     @PostMapping("/open-ai/generate/streaming/chat")
     @Operation(description = "Streaming Chat with OpenAI model chat")
-    public ResponseEntity<Flux<String>> streamingChat(@RequestBody final String message) {
-        return ResponseEntity.ok(openAIService.streamingChat(message));
+    public ResponseEntity<Flux<String>> streamingChat(@RequestParam final OpenAIClient openAIClient,
+                                                      @RequestBody final String message) {
+        return ResponseEntity.ok(openAIService.streamingChat(openAIClient, message));
     }
 
     @PostMapping("/open-ai/generate/image")

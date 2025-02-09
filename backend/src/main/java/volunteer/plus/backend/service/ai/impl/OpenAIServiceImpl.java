@@ -25,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Flux;
 import volunteer.plus.backend.config.ai.FunctionalAIConfiguration;
 import volunteer.plus.backend.domain.dto.ImageGenerationRequestDTO;
+import volunteer.plus.backend.domain.enums.OpenAIClient;
 import volunteer.plus.backend.exceptions.ApiException;
 import volunteer.plus.backend.exceptions.ErrorCode;
 import volunteer.plus.backend.service.ai.OpenAIService;
@@ -45,6 +46,7 @@ public class OpenAIServiceImpl implements OpenAIService {
 
     private final ChatClient generalChatClient;
     private final ChatClient militaryChatClient;
+    private final ChatClient inMemoryChatClient;
     private final OpenAiImageModel imageModel;
     private final OpenAiAudioTranscriptionModel openAiAudioTranscriptionModel;
     private final OpenAiAudioSpeechModel openAiAudioSpeechModel;
@@ -58,6 +60,7 @@ public class OpenAIServiceImpl implements OpenAIService {
                              final FunctionMethodNameCollector functionMethodNameCollector,
                              final @Qualifier("generalChatClient") ChatClient generalChatClient,
                              final @Qualifier("militaryChatClient") ChatClient militaryChatClient,
+                             final @Qualifier("inMemoryChatClient") ChatClient inMemoryChatClient,
                              final @Lazy OpenAIService openAIService) {
         this.imageModel = imageModel;
         this.openAiAudioTranscriptionModel = openAiAudioTranscriptionModel;
@@ -65,11 +68,13 @@ public class OpenAIServiceImpl implements OpenAIService {
         this.functionMethodNameCollector = functionMethodNameCollector;
         this.generalChatClient = generalChatClient;
         this.militaryChatClient = militaryChatClient;
+        this.inMemoryChatClient = inMemoryChatClient;
         this.openAIService = openAIService;
     }
 
     @Override
-    public ChatResponse chat(final String message) {
+    public ChatResponse chat(final OpenAIClient openAIClient,
+                             final String message) {
         log.info("Asking GPT: {}", message);
 
         // this is prompt configuration that is why we need it in this service
@@ -83,19 +88,39 @@ public class OpenAIServiceImpl implements OpenAIService {
                         .build()
         );
 
-        return militaryChatClient.prompt(prompt)
+        final ChatClient client = getClient(openAIClient);
+
+        return client.prompt(prompt)
                 .call()
                 .chatResponse();
     }
 
     @Override
-    public Flux<String> streamingChat(final String message) {
+    public Flux<String> streamingChat(final OpenAIClient openAIClient,
+                                      final String message) {
         log.info("Asking Streaming GPT: {}", message);
 
-        return generalChatClient.prompt()
+        final ChatClient client = getClient(openAIClient);
+
+        return client.prompt()
                 .user(message)
                 .stream()
                 .content();
+    }
+
+    private ChatClient getClient(final OpenAIClient client) {
+        switch (client) {
+            case DEFAULT -> {
+                return generalChatClient;
+            }
+            case MILITARY -> {
+                return militaryChatClient;
+            }
+            case IN_MEMORY -> {
+                return inMemoryChatClient;
+            }
+            default -> throw new ApiException(ErrorCode.NO_CLIENT_SPECIFIED);
+        }
     }
 
     @SneakyThrows

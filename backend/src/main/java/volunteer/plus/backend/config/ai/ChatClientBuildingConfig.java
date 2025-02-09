@@ -44,6 +44,16 @@ public class ChatClientBuildingConfig {
         return builder
                 .defaultSystem(defaultSystemPrompt)
                 .defaultAdvisors(
+                        new SimpleLoggerAdvisor(),
+                        new Re2Advisor()
+                )
+                .build();
+    }
+
+    @Bean
+    public ChatClient inMemoryChatClient(ChatClient.Builder builder) {
+        return builder
+                .defaultAdvisors(
                         new QuestionAnswerAdvisor(vectorStore),
                         new MessageChatMemoryAdvisor(chatMemory, DEFAULT_CHAT_MEMORY_CONVERSATION_ID, chatWindowSize),
                         new SimpleLoggerAdvisor(),
