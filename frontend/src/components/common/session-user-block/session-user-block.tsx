@@ -11,10 +11,13 @@ import {
 
 import styles from './styles.module.scss';
 import { useClickOutside } from '@/hooks/common';
+import { useLogout } from '@/hooks/auth';
 
 type Props = React.ComponentPropsWithoutRef<'button'>;
 
 const SessionUserBlock: React.FC<Props> = ({ className, ...props }) => {
+  const logout = useLogout();
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const blockRef = useRef<HTMLButtonElement>(null);
@@ -47,6 +50,7 @@ const SessionUserBlock: React.FC<Props> = ({ className, ...props }) => {
         <MenuContainer {...clickOutsideHandlers}>
           <MenuItem
             leftIcon={<MenuItemIconMaterial>logout</MenuItemIconMaterial>}
+            onClick={() => logout()}
           >
             Вийти
           </MenuItem>

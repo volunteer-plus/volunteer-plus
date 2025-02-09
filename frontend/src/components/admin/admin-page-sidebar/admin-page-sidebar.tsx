@@ -18,7 +18,7 @@ const AdminPageSidebar: React.FC = () => {
     }
 
     return new SidebarService({ user });
-  }, []);
+  }, [user]);
 
   const itemsConfigs = useMemo(() => {
     if (!sidebarService) {

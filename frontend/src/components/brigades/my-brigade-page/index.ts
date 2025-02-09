@@ -1,2 +1,1 @@
-export * from './brigades-page';
 export * from './my-brigade-page';

@@ -25,3 +25,4 @@ export * from './menu';
 export * from './menu-container';
 export * from './menu-item';
 export * from './menu-item-icon-material';
+export * from './profile-page';

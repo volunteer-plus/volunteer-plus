@@ -5,6 +5,7 @@ import {
   PageFooter,
   PageHeader,
   PageLayout,
+  ProfilePage,
 } from './components/common';
 import { SignInPage, SignUpPage } from '@/components/auth';
 import {
@@ -13,7 +14,13 @@ import {
   AdminPageLayout,
   AdminPageSidebar,
 } from './components/admin';
-import { BrigadesPage } from './components/brigades';
+import { BrigadesPage, MyBrigadePage } from './components/brigades';
+import { ChatsPage } from './components/chats';
+import {
+  ServicemanRequestsPage,
+  VolunteerRequestsPage,
+} from './components/requests';
+import { FundraisingActivitiesPage } from './components/fundraising';
 
 const router = createBrowserRouter([
   {
@@ -45,6 +52,30 @@ const router = createBrowserRouter([
       {
         path: 'brigades',
         element: <BrigadesPage />,
+      },
+      {
+        path: 'my-brigade',
+        element: <MyBrigadePage />,
+      },
+      {
+        path: 'chats',
+        element: <ChatsPage />,
+      },
+      {
+        path: 'profile',
+        element: <ProfilePage />,
+      },
+      {
+        path: 'volunteer/requests',
+        element: <VolunteerRequestsPage />,
+      },
+      {
+        path: 'serviceman/requests',
+        element: <ServicemanRequestsPage />,
+      },
+      {
+        path: 'fundraising-activities',
+        element: <FundraisingActivitiesPage />,
       },
     ],
   },
