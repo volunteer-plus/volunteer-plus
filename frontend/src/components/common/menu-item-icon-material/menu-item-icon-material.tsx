@@ -1,4 +1,5 @@
-import classNames from 'classnames';
+import { MaterialSymbol } from '@/components/common';
+
 import styles from './styles.module.scss';
 
 interface Props {
@@ -6,11 +7,7 @@ interface Props {
 }
 
 const MenuItemIconMaterial: React.FC<Props> = ({ children }) => {
-  return (
-    <span className={classNames('material-symbols-outlined', styles.icon)}>
-      {children}
-    </span>
-  );
+  return <MaterialSymbol className={styles.icon}>{children}</MaterialSymbol>;
 };
 
 export { MenuItemIconMaterial };

@@ -1,5 +1,7 @@
 import classNames from 'classnames';
 
+import { MaterialSymbol } from '@/components/common';
+
 import styles from './styles.module.scss';
 
 const ModalCloseButton: React.FC<
@@ -11,7 +13,7 @@ const ModalCloseButton: React.FC<
       className={classNames(styles.button, className)}
       type='button'
     >
-      <span className='material-symbols-outlined'>close</span>
+      <MaterialSymbol>close</MaterialSymbol>
     </button>
   );
 };

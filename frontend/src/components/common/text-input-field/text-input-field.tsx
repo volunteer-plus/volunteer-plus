@@ -25,10 +25,11 @@ const TextInputField: React.FC<Props> = ({
   onBlur: onBlurProp,
   leftIcon,
   rightIcon,
+  className,
   ...props
 }) => {
   return (
-    <div>
+    <div className={className}>
       {label && <FieldLabel isRequired={isRequired}>{label}</FieldLabel>}
       <FieldBody
         variant={variant}

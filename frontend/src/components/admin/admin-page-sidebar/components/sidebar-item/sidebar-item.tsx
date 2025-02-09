@@ -5,6 +5,7 @@ import classNames from 'classnames';
 import { SidebarItemConfig } from '../../types';
 import styles from './styles.module.scss';
 import { useMemo, useState } from 'react';
+import { MaterialSymbol } from '@/components/common';
 
 interface Props {
   config: SidebarItemConfig;
@@ -36,9 +37,7 @@ const SidebarItem: React.FC<Props> = ({ config }) => {
       })}
       onClick={() => setIsExpanded(!isExpanded)}
     >
-      <span className={classNames('material-symbols-outlined', styles.icon)}>
-        {config.iconName}
-      </span>
+      <MaterialSymbol className={styles.icon}>{config.iconName}</MaterialSymbol>
       <p className={styles.label}>{config.label}</p>
     </Link>
   );

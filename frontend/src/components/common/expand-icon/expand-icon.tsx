@@ -1,23 +1,23 @@
 import classNames from 'classnames';
 import styles from './styles.module.scss';
+import { MaterialSymbol } from '../material-symbol';
 
-interface Props extends React.ComponentPropsWithoutRef<'span'> {
+interface Props extends React.ComponentPropsWithoutRef<typeof MaterialSymbol> {
   isExpanded: boolean;
 }
 
 const ExpandIcon: React.FC<Props> = ({ isExpanded, className, ...props }) => {
   return (
-    <span
-      {...props}
+    <MaterialSymbol
       className={classNames(
-        'material-symbols-outlined',
         styles.icon,
         isExpanded ? styles.expanded : styles.collapsed,
         className
       )}
+      {...props}
     >
       chevron_forward
-    </span>
+    </MaterialSymbol>
   );
 };
 

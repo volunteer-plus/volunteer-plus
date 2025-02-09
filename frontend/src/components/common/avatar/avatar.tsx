@@ -1,6 +1,7 @@
 import classNames from 'classnames';
 
 import styles from './styles.module.scss';
+import { MaterialSymbol } from '../material-symbol';
 
 interface Props extends React.ComponentPropsWithoutRef<'div'> {
   imageSrc?: string;
@@ -22,11 +23,7 @@ const Avatar: React.FC<Props> = ({ className, imageSrc, size, ...props }) => {
         <img src={imageSrc} alt='avatar' className={styles.image} />
       ) : (
         <div className={styles.iconWrapper}>
-          <span
-            className={classNames('material-symbols-outlined', styles.icon)}
-          >
-            person
-          </span>
+          <MaterialSymbol className={styles.icon}>person</MaterialSymbol>
         </div>
       )}
     </div>

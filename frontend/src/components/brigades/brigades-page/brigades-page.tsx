@@ -1,23 +1,60 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
-import { Button } from '@/components/common';
+import {
+  BarsLoader,
+  Button,
+  Pagination,
+  TextInputField,
+} from '@/components/common';
 
-import { AdminPageContent, AdminPageTitle } from '@/components/admin';
 import { Authenticated } from '@/components/auth';
+import { AdminPageContent, AdminPageTitle } from '@/components/admin';
+import { AddBrigadeModal, BrigadeListItem } from '@/components/brigades';
 
 import styles from './styles.module.scss';
-import { AddBrigadeModal } from '../add-brigade-modal';
 
 const BareBrigadesPage: React.FC = () => {
   const [isAddBrigadeModalOpen, setIsAddBrigadeModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+  }, []);
 
   return (
-    <AdminPageContent>
-      <div className={styles.header}>
-        <AdminPageTitle>Бригади</AdminPageTitle>
-        <Button onClick={() => setIsAddBrigadeModalOpen(true)}>
-          Додати бригаду
-        </Button>
+    <AdminPageContent className={styles.content}>
+      <div className={styles.internalContent}>
+        <div className={styles.header}>
+          <AdminPageTitle>Бригади</AdminPageTitle>
+          <Button onClick={() => setIsAddBrigadeModalOpen(true)}>
+            Додати бригаду
+          </Button>
+        </div>
+        <div className={styles.brigadesListAndSearch}>
+          <TextInputField placeholder='Пошук' />
+          {isLoading ? (
+            <div className={styles.loaderContainer}>
+              <BarsLoader size='50px' />
+            </div>
+          ) : (
+            <>
+              <div className={styles.brigadesList}>
+                <BrigadeListItem />
+                <BrigadeListItem />
+                <BrigadeListItem />
+                <BrigadeListItem />
+                <BrigadeListItem />
+              </div>
+              <Pagination
+                currentPage={1}
+                totalPages={10}
+                getPageUrl={() => '/'}
+              />
+            </>
+          )}
+        </div>
       </div>
       <AddBrigadeModal
         isOpen={isAddBrigadeModalOpen}
