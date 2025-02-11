@@ -30,3 +30,5 @@ export * from './profile-page';
 export * from './material-symbol';
 export * from './right-chevron-button';
 export * from './pagination';
+export * from './tabs';
+export * from './gray-container';

@@ -1,0 +1,11 @@
+.fieldsContainer {
+  margin-bottom: 32px;
+
+  :not(:last-child) {
+    margin-bottom: 16px;
+  }
+}
+
+.form {
+  width: 420px;
+}
