@@ -1,13 +1,14 @@
 package volunteer.plus.backend.service.ai.impl;
 
-import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.document.Document;
 import org.springframework.ai.document.DocumentReader;
 import org.springframework.ai.reader.pdf.PagePdfDocumentReader;
 import org.springframework.ai.reader.tika.TikaDocumentReader;
 import org.springframework.ai.transformer.splitter.TextSplitter;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
@@ -19,20 +20,28 @@ import volunteer.plus.backend.exceptions.ApiException;
 import volunteer.plus.backend.exceptions.ErrorCode;
 import volunteer.plus.backend.service.ai.DataInjectionService;
 
+import java.util.List;
+
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class DataInjectionServiceImpl implements DataInjectionService {
-
-    @Value("${spring.ai.allow.prompt.pre-upload}")
-    private boolean allowAIPromptPreUpload;
-
     public static final String PDF = ".pdf";
 
+    private final boolean allowAIPromptPreUpload;
     private final TextSplitter textSplitter;
-    private final VectorStore vectorStore;
+    private final VectorStore openAiVectorStore;
     private final ResourcePatternResolver resourcePatternResolver;
+
+    public DataInjectionServiceImpl(final TextSplitter textSplitter,
+                                    final @Qualifier("openAiVectorStore") VectorStore openAiVectorStore,
+                                    final ResourcePatternResolver resourcePatternResolver,
+                                    final @Value("${spring.ai.allow.prompt.pre-upload}") boolean allowAIPromptPreUpload) {
+        this.textSplitter = textSplitter;
+        this.openAiVectorStore = openAiVectorStore;
+        this.resourcePatternResolver = resourcePatternResolver;
+        this.allowAIPromptPreUpload = allowAIPromptPreUpload;
+    }
 
 
     @SneakyThrows
@@ -81,7 +90,9 @@ public class DataInjectionServiceImpl implements DataInjectionService {
             documentReader = new TikaDocumentReader(resource);
         }
 
-        vectorStore.write(textSplitter.apply(documentReader.get()));
+        final List<Document> documents = textSplitter.apply(documentReader.get());
+
+        openAiVectorStore.write(documents);
 
         log.info("Finished injecting a file: {} to vector store", resource.getFilename());
     }

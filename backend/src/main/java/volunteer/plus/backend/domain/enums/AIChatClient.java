@@ -1,6 +1,6 @@
 package volunteer.plus.backend.domain.enums;
 
-public enum OpenAIClient {
+public enum AIChatClient {
     DEFAULT,
     IN_MEMORY,
     MILITARY

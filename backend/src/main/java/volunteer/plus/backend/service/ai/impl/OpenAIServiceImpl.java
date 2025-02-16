@@ -22,10 +22,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import reactor.core.publisher.Flux;
 import volunteer.plus.backend.config.ai.FunctionalAIConfiguration;
 import volunteer.plus.backend.domain.dto.ImageGenerationRequestDTO;
-import volunteer.plus.backend.domain.enums.OpenAIClient;
+import volunteer.plus.backend.domain.enums.AIChatClient;
 import volunteer.plus.backend.exceptions.ApiException;
 import volunteer.plus.backend.exceptions.ErrorCode;
 import volunteer.plus.backend.service.ai.OpenAIService;
@@ -73,7 +72,7 @@ public class OpenAIServiceImpl implements OpenAIService {
     }
 
     @Override
-    public ChatResponse chat(final OpenAIClient openAIClient,
+    public ChatResponse chat(final AIChatClient chatClient,
                              final String message) {
         log.info("Asking GPT: {}", message);
 
@@ -88,27 +87,14 @@ public class OpenAIServiceImpl implements OpenAIService {
                         .build()
         );
 
-        final ChatClient client = getClient(openAIClient);
+        final ChatClient client = getClient(chatClient);
 
         return client.prompt(prompt)
                 .call()
                 .chatResponse();
     }
 
-    @Override
-    public Flux<String> streamingChat(final OpenAIClient openAIClient,
-                                      final String message) {
-        log.info("Asking Streaming GPT: {}", message);
-
-        final ChatClient client = getClient(openAIClient);
-
-        return client.prompt()
-                .user(message)
-                .stream()
-                .content();
-    }
-
-    private ChatClient getClient(final OpenAIClient client) {
+    private ChatClient getClient(final AIChatClient client) {
         switch (client) {
             case DEFAULT -> {
                 return generalChatClient;
