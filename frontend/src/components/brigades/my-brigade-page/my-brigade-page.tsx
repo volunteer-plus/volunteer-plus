@@ -2,9 +2,13 @@ import React, { useMemo, useState } from 'react';
 
 import { AdminPageContent, AdminPageTitle } from '@/components/admin';
 import { Authenticated } from '@/components/auth';
-import { TabConfig, GrayContainer, Tabs } from '@/components/common';
+import { TabConfig, Tabs } from '@/components/common';
 
-import { MyBrigadeForm } from './components';
+import {
+  BrigadeInvitesTabContent,
+  BrigadeMembersTabContent,
+  MyBrigadeForm,
+} from './components';
 import { MyBrigadeTableTab } from './enums';
 import styles from './styles.module.scss';
 
@@ -36,7 +40,12 @@ const BareMyBrigadePage: React.FC = () => {
           activeTabKey={activeTab}
           onTabChange={(tab) => setActiveTab(tab as MyBrigadeTableTab)}
         />
-        <GrayContainer isUnderTabs>Таблиця</GrayContainer>
+        {activeTab === MyBrigadeTableTab.BRIGADE_MEMBERS && (
+          <BrigadeMembersTabContent />
+        )}
+        {activeTab === MyBrigadeTableTab.BRIGADE_INVITES && (
+          <BrigadeInvitesTabContent />
+        )}
       </div>
     </AdminPageContent>
   );

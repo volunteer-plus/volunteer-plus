@@ -1,0 +1,71 @@
+$toggle-width: 36px;
+$toggle-height: 16px;
+
+$lever-margin: 4px;
+$lever-width: 12px;
+$lever-height: 8px;
+
+$transition-duration: 0.2s ease-in-out;
+
+.label {
+  max-width: max-content;
+  display: block;
+}
+
+.input {
+  display: none;
+}
+
+.toggle {
+  width: $toggle-width;
+  height: $toggle-height;
+
+  position: relative;
+
+  border-radius: 2px;
+  border: 1px solid var(--toggle-border-color);
+
+  background: var(--toggle-background-color);
+
+  transition: left $transition-duration, background-color $transition-duration,
+    border-color $transition-duration;
+
+  --toggle-border-color: var(--color-gray-300);
+  --toggle-background-color: var(--color-gray-100);
+  --toggle-lever-color: var(--color-white);
+}
+
+.lever {
+  width: $lever-width;
+  height: $lever-height;
+
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+
+  left: $lever-margin;
+
+  border-radius: 1px;
+  background: var(--toggle-lever-color);
+
+  transition: left $transition-duration;
+}
+
+input:checked + .toggle {
+  --toggle-background-color: var(--color-olive-300);
+
+  .lever {
+    left: calc(100% - #{$lever-width} - #{$lever-margin});
+  }
+}
+
+input:disabled + .toggle {
+  --toggle-border-color: var(--color-gray-500);
+  --toggle-lever-color: var(--color-gray-300);
+}
+
+input:disabled:checked + .toggle {
+  --toggle-background-color: var(--color-gray-300);
+  --toggle-border-color: var(--color-gray-500);
+  --toggle-lever-color: var(--color-gray-100);
+}

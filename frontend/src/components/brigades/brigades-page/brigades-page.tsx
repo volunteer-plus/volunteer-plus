@@ -51,6 +51,7 @@ const BareBrigadesPage: React.FC = () => {
                 currentPage={1}
                 totalPages={10}
                 getPageUrl={() => '/'}
+                className={styles.pagination}
               />
             </>
           )}

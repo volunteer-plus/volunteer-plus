@@ -28,7 +28,11 @@ const TextareaField: React.FC<Props> = ({
 }) => {
   return (
     <div>
-      {label && <FieldLabel isRequired={isRequired}>{label}</FieldLabel>}
+      {label && (
+        <FieldLabel isRequired={isRequired} className={styles.label}>
+          {label}
+        </FieldLabel>
+      )}
       <FieldBody
         variant={variant}
         isDisabled={disabled}

@@ -30,7 +30,11 @@ const TextInputField: React.FC<Props> = ({
 }) => {
   return (
     <div className={className}>
-      {label && <FieldLabel isRequired={isRequired}>{label}</FieldLabel>}
+      {label && (
+        <FieldLabel isRequired={isRequired} className={styles.label}>
+          {label}
+        </FieldLabel>
+      )}
       <FieldBody
         variant={variant}
         isDisabled={disabled}
