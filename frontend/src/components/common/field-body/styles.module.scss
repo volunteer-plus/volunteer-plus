@@ -44,6 +44,10 @@ $gapToIcons: 8px;
       padding-right: $horizontalPadding + $iconWidth + $gapToIcons;
     }
   }
+
+  --field-body-placeholder-color: var(--color-gray-300);
+  --field-body-text-color: var(--color-gray-900);
+  --field-body-transition: #{$transition};
 }
 
 .body {
@@ -66,10 +70,6 @@ $gapToIcons: 8px;
   font-weight: 400;
   font-size: 14px;
   background: transparent;
-
-  --field-body-placeholder-color: var(--color-gray-300);
-  --field-body-text-color: var(--color-gray-900);
-  --field-body-transition: #{$transition};
 }
 
 .description {

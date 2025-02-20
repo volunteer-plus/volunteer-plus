@@ -23,7 +23,8 @@ const FundraisingItem: React.FC<React.ComponentPropsWithoutRef<'div'>> = ({
     <article {...props} className={classNames(styles.item, className)}>
       <h3 className={styles.title}>На FPV 100 дронів для нищення окупантів</h3>
       <div className={styles.subtitle}>
-        <Tag>Дрони</Tag> Для <span className={styles.brigadeName}>3 ОШБ</span>
+        <Tag size='small'>Дрони</Tag> Для{' '}
+        <span className={styles.brigadeName}>3 ОШБ</span>
       </div>
       <div className={styles.volunteer}>
         Збирає <span className={styles.volunteerName}>Васильченеко В. І.</span>

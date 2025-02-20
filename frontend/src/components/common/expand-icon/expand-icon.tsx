@@ -2,7 +2,11 @@ import classNames from 'classnames';
 import styles from './styles.module.scss';
 import { MaterialSymbol } from '../material-symbol';
 
-interface Props extends React.ComponentPropsWithoutRef<typeof MaterialSymbol> {
+interface Props
+  extends Omit<
+    React.ComponentPropsWithoutRef<typeof MaterialSymbol>,
+    'children'
+  > {
   isExpanded: boolean;
 }
 

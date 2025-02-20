@@ -9,13 +9,10 @@ import {
   TableBody,
   TableRow,
   TableHeaderCell,
-  TableDataCell,
-  TableUserCell,
   Pagination,
-  TableActionsCell,
-  TableAction,
 } from '@/components/common';
 import styles from './styles.module.scss';
+import { BrigadeMemberRow } from '../brigade-member-row';
 
 const BrigadeMembersTabContent: React.FC = () => {
   return (
@@ -37,22 +34,10 @@ const BrigadeMembersTabContent: React.FC = () => {
           </TableRow>
         </TableHead>
         <TableBody>
-          <TableRow>
-            <TableUserCell />
-            <TableDataCell>petrenko@gmail.com</TableDataCell>
-            <TableDataCell>123</TableDataCell>
-            <TableActionsCell>
-              <TableAction>delete</TableAction>
-            </TableActionsCell>
-          </TableRow>
-          <TableRow>
-            <TableUserCell />
-            <TableDataCell>petrenko@gmail.com</TableDataCell>
-            <TableDataCell>123</TableDataCell>
-            <TableActionsCell>
-              <TableAction>delete</TableAction>
-            </TableActionsCell>
-          </TableRow>
+          <BrigadeMemberRow />
+          <BrigadeMemberRow />
+          <BrigadeMemberRow />
+          <BrigadeMemberRow />
         </TableBody>
       </Table>
       <Pagination currentPage={1} totalPages={10} getPageUrl={() => '/'} />

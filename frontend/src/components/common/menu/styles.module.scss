@@ -1,6 +1,7 @@
 .menu {
   position: fixed;
   z-index: 50;
+  transform: var(--scale-transform);
 
   &.topSide {
     bottom: var(--menu-bottom);
@@ -15,7 +16,7 @@
 
     &.centerAlignment {
       left: var(--menu-left);
-      transform: translateX(-50%);
+      transform: translateX(-50%), var(--scale-transform);
     }
 
     &.stretchAlignment {
@@ -37,7 +38,7 @@
 
     &.centerAlignment {
       left: var(--menu-left);
-      transform: translateX(-50%);
+      transform: translateX(-50%) var(--scale-transform);
     }
 
     &.stretchAlignment {
@@ -59,7 +60,7 @@
 
     &.centerAlignment {
       top: var(--menu-top);
-      transform: translateY(-50%);
+      transform: translateY(-50%) var(--scale-transform);
     }
 
     &.stretchAlignment {
@@ -81,7 +82,7 @@
 
     &.centerAlignment {
       top: var(--menu-top);
-      transform: translateY(-50%);
+      transform: translateY(-50%) var(--scale-transform);
     }
 
     &.stretchAlignment {

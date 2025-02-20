@@ -1,0 +1,31 @@
+.chevron {
+  color: var(--color-gray-500);
+  user-select: none;
+}
+
+.label {
+  margin-bottom: 4px;
+}
+
+.input {
+  width: 100%;
+  box-sizing: border-box;
+
+  color: var(--field-body-text-color);
+  transition: color var(--field-body-transition);
+}
+
+.input::placeholder {
+  color: var(--field-body-placeholder-color);
+  transition: color var(--field-body-transition);
+}
+
+.input,
+input:active {
+  border: none;
+  outline: none;
+}
+
+.label {
+  margin-bottom: 4px;
+}

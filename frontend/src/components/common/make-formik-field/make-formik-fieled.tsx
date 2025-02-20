@@ -9,7 +9,8 @@ type BaseProps = JSX.IntrinsicAttributes & {
 };
 
 function makeFormikField<P extends BaseProps>(
-  Component: React.ComponentType<P>
+  Component: React.ComponentType<P>,
+  { nativeEvents = true }: { nativeEvents?: boolean } = {}
 ) {
   return ({
     name,
@@ -20,14 +21,23 @@ function makeFormikField<P extends BaseProps>(
   }: P & Pick<FieldConfig, 'name'>) => {
     return (
       <Field name={name} onBlur={onBlur}>
-        {({ field, meta }: FieldProps) => {
+        {({ field, meta, form }: FieldProps) => {
           const componentProps: P = {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             ...(props as any),
             variant: meta.touched && meta.error ? 'failure' : variant,
             description: meta.touched && meta.error ? meta.error : description,
-            ...field,
           };
+
+          if (nativeEvents) {
+            Object.assign(componentProps, field);
+          } else {
+            Object.assign(componentProps, {
+              value: field.value,
+              onChange: (value: unknown) => form.setFieldValue(name, value),
+              onBlur: () => form.setFieldTouched(name, true),
+            });
+          }
 
           return <Component {...componentProps} />;
         }}

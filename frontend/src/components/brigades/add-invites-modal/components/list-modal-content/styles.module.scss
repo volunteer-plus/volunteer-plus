@@ -1,0 +1,21 @@
+.exportButtonContainer,
+.closeButtonContainer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.exportButtonContainer {
+  margin-bottom: 10px;
+}
+
+.closeButtonContainer {
+  margin-top: 32px;
+}
+
+.table {
+  width: 100%;
+}
+
+.pagination {
+  margin-top: 16px;
+}

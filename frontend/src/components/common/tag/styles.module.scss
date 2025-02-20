@@ -1,11 +1,21 @@
 .tag {
+  display: inline-block;
+
   padding: 2px 16px;
 
-  background: var(--color-olive-300);
+  background: var(--tag-color);
   border-radius: 7px;
 
   font-family: 'Montserrat', sans-serif;
   color: white;
+
+  font-weight: 500;
+}
+
+.smallSize {
   font-size: 12px;
-  font-weight: 400;
+}
+
+.mediumSize {
+  font-size: 14px;
 }

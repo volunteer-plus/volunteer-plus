@@ -22,10 +22,10 @@ const SessionUserBlock: React.FC<Props> = ({ className, ...props }) => {
 
   const blockRef = useRef<HTMLButtonElement>(null);
 
-  const clickOutsideHandlers = useClickOutside(
-    () => setIsMenuOpen(false),
-    isMenuOpen
-  );
+  const { handlers: clickOutsideHandlers } = useClickOutside({
+    callback: () => setIsMenuOpen(false),
+    isEnabled: isMenuOpen,
+  });
 
   return (
     <>

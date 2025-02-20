@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { useSpring } from '@react-spring/web';
 import classNames from 'classnames';
 
-import { useEventCallback } from '@/hooks/common';
+import { useEventCallback, useStateRef } from '@/hooks/common';
 import { MenuAlignment, MenuCoordinates, MenuSide } from './types';
 import { getCoordinateCssValue } from './helpers';
 import styles from './styles.module.scss';
@@ -26,6 +26,7 @@ const Menu: React.FC<Props> = ({
   alignment = 'center',
 }) => {
   const [coordinates, setCoordinates] = useState<MenuCoordinates | null>(null);
+  const coordinatesRef = useStateRef(coordinates);
 
   const updateMenuPosition = useCallback(
     ({
@@ -162,7 +163,7 @@ const Menu: React.FC<Props> = ({
   const [containerStyle, containerSpringApi] = useSpring(
     () => ({
       onRest: onSpringRest,
-      from: { opacity: 0, resize: 90 },
+      from: { opacity: 0, resize: 95 },
       config: {
         friction: 5,
         clamp: true,
@@ -186,7 +187,7 @@ const Menu: React.FC<Props> = ({
 
       containerSpringApi.start({ resize: 100, opacity: 1 });
     } else {
-      containerSpringApi.start({ resize: 90, opacity: 0 });
+      containerSpringApi.start({ resize: 95, opacity: 0 });
     }
   }, [
     isOpen,
@@ -197,6 +198,56 @@ const Menu: React.FC<Props> = ({
     side,
     containerSpringApi,
   ]);
+
+  useEffect(() => {
+    if (!targetRef.current) {
+      return;
+    }
+
+    const observer = new ResizeObserver(() => {
+      if (!targetRef.current || !coordinatesRef.current) {
+        return;
+      }
+
+      updateMenuPosition({
+        target: targetRef.current,
+        _alignment: alignment,
+        _gap: gap,
+        _side: side,
+      });
+    });
+
+    observer.observe(targetRef.current);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [targetRef, gap, updateMenuPosition, alignment, side, coordinatesRef]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    const onScroll = () => {
+      if (!targetRef.current) {
+        return;
+      }
+
+      updateMenuPosition({
+        target: targetRef.current,
+        _alignment: alignment,
+        _gap: gap,
+        _side: side,
+      });
+    };
+
+    document.addEventListener('scroll', onScroll, true);
+
+    return () => {
+      document.removeEventListener('scroll', onScroll);
+    };
+  }, [isOpen, targetRef, gap, updateMenuPosition, alignment, side]);
 
   if (!coordinates) {
     return null;
@@ -213,7 +264,7 @@ const Menu: React.FC<Props> = ({
       style: {
         ...children.props.style,
         opacity: containerStyle.opacity,
-        transform: containerStyle.resize.to(
+        '--scale-transform': containerStyle.resize.to(
           (resize) => `scale(${resize / 100})`
         ),
         '--menu-top': getCoordinateCssValue(coordinates.top),

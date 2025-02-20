@@ -1,12 +1,18 @@
 import { useEffect, useRef } from 'react';
 import { useEventCallback } from './use-event-callback.hook';
 
-const useClickOutside = (
-  callback: () => void,
-  isEnabled: boolean = true
-): {
-  onMouseDown: React.MouseEventHandler;
-  onTouchStart: React.TouchEventHandler;
+const useClickOutside = ({
+  callback,
+  isEnabled = true,
+}: {
+  callback?: () => void;
+  isEnabled?: boolean;
+} = {}): {
+  handlers: {
+    onMouseDown: React.MouseEventHandler;
+    onTouchStart: React.TouchEventHandler;
+  };
+  isClickFromOutsideRef: React.MutableRefObject<boolean>;
 } => {
   const isClickFromOutsideRef = useRef(true);
 
@@ -40,8 +46,11 @@ const useClickOutside = (
   }, [eventCallback, isEnabled]);
 
   return {
-    onMouseDown: targetCallback,
-    onTouchStart: targetCallback,
+    handlers: {
+      onMouseDown: targetCallback,
+      onTouchStart: targetCallback,
+    },
+    isClickFromOutsideRef,
   };
 };
 
