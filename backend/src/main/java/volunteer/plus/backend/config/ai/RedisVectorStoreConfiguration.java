@@ -11,11 +11,17 @@ import redis.clients.jedis.JedisPooled;
 @Configuration
 public class RedisVectorStoreConfiguration {
 
-    @Value("${spring.ai.vectorstore.redis.index}")
-    private String index;
+    @Value("${spring.ai.vectorstore.redis-open-ai.index}")
+    private String indexOpenAi;
 
-    @Value("${spring.ai.vectorstore.redis.prefix}")
-    private String prefix;
+    @Value("${spring.ai.vectorstore.redis-open-ai.prefix}")
+    private String prefixOpenAi;
+
+    @Value("${spring.ai.vectorstore.redis-ollama.index}")
+    private String indexOllama;
+
+    @Value("${spring.ai.vectorstore.redis-ollama.prefix}")
+    private String prefixOllama;
 
     @Value("${spring.ai.vectorstore.redis.initialize-schema}")
     private boolean initializeSchema;
@@ -28,25 +34,31 @@ public class RedisVectorStoreConfiguration {
 
     @Bean
     public RedisVectorStore openAiVectorStore(final @Qualifier("openAiEmbeddingModel") EmbeddingModel embeddingModel) {
-        return getRedisVectorStore(embeddingModel);
+        final RedisVectorStore.RedisVectorStoreConfig config = RedisVectorStore.RedisVectorStoreConfig.builder()
+                .withIndexName(indexOpenAi)
+                .withPrefix(prefixOpenAi)
+                .build();
+
+        return getRedisVectorStore(embeddingModel, config);
     }
 
     @Bean
     public RedisVectorStore ollamaVectorStore(final @Qualifier("ollamaEmbeddingModel") EmbeddingModel embeddingModel) {
-        return getRedisVectorStore(embeddingModel);
-    }
-
-    private RedisVectorStore getRedisVectorStore(final EmbeddingModel embeddingModel) {
         // Create RedisVectorStoreConfig
-        RedisVectorStore.RedisVectorStoreConfig config = RedisVectorStore.RedisVectorStoreConfig.builder()
-                .withIndexName(index)
-                .withPrefix(prefix)
+        final RedisVectorStore.RedisVectorStoreConfig config = RedisVectorStore.RedisVectorStoreConfig.builder()
+                .withIndexName(indexOllama)
+                .withPrefix(prefixOllama)
                 .build();
 
+        return getRedisVectorStore(embeddingModel, config);
+    }
+
+    private RedisVectorStore getRedisVectorStore(final EmbeddingModel embeddingModel,
+                                                 final RedisVectorStore.RedisVectorStoreConfig redisConfig) {
         // Create JedisPooled instance
-        JedisPooled jedis = new JedisPooled(redisHost, redisPort);
+        final JedisPooled jedis = new JedisPooled(redisHost, redisPort);
 
         // Create RedisVectorStore with required parameters
-        return new RedisVectorStore(config, embeddingModel, jedis, initializeSchema);
+        return new RedisVectorStore(redisConfig, embeddingModel, jedis, initializeSchema);
     }
 }
