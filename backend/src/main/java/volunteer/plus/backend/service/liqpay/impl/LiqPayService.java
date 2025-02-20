@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import volunteer.plus.backend.domain.dto.LiqPayCreationDTO;
 import volunteer.plus.backend.domain.dto.LiqPayResponseDTO;
+import volunteer.plus.backend.domain.entity.User;
 import volunteer.plus.backend.domain.enums.CurrencyName;
+import volunteer.plus.backend.service.email.EmailNotificationBuilderService;
 import volunteer.plus.backend.service.liqpay.LiqPayApi;
 
 import java.util.Map;
@@ -25,10 +27,18 @@ public class LiqPayService implements LiqPayApi {
     private String privateKey;
     @Getter
     private boolean cnbSandbox;
-    ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+
+    private final EmailNotificationBuilderService emailNotificationBuilderService;
+
+    public LiqPayService(final EmailNotificationBuilderService emailNotificationBuilderService) {
+        this.emailNotificationBuilderService = emailNotificationBuilderService;
+    }
+
 
     @Override
-    public LiqPayResponseDTO createLiqPayPayload(LiqPayCreationDTO liqPayCreationDTO) throws JsonProcessingException {
+    public LiqPayResponseDTO createLiqPayPayload(final User user,
+                                                 final LiqPayCreationDTO liqPayCreationDTO) throws JsonProcessingException {
         TreeMap<String, String> params = new TreeMap<>();
         params.put("amount", liqPayCreationDTO.getAmount().toString());
 
@@ -36,6 +46,10 @@ public class LiqPayService implements LiqPayApi {
         var liqPayParamPayload = withSandboxParam(withBasicApiParams(params));
         String data = base64_encode(objectMapper.writeValueAsString(liqPayParamPayload));
         String signature = createSignature(data);
+
+        if (user != null) {
+            emailNotificationBuilderService.createUserPaymentEmail(liqPayCreationDTO, user);
+        }
 
         return LiqPayResponseDTO.builder()
                 .data(data)
