@@ -1,5 +1,6 @@
 package volunteer.plus.backend.domain.dto;
 
+import com.drew.lang.annotations.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,5 +13,6 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LiqPayCreationDTO {
+    @NotNull
     private BigDecimal amount;
 }
