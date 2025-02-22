@@ -1,0 +1,68 @@
+.item {
+  padding: 16px 32px;
+
+  display: flex;
+  gap: 16px;
+  align-items: center;
+
+  text-decoration: none;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid var(--color-gray-300);
+  }
+
+  &:hover {
+    background: var(--color-gray-50);
+  }
+
+  &.active {
+    background: var(--color-olive-100);
+  }
+}
+
+.name {
+  color: var(--color-gray-900);
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.role {
+  color: var(--color-gray-500);
+  font-size: 14px;
+}
+
+.userInfo {
+  flex-grow: 1;
+}
+
+.newMessagesCount {
+  padding: 4px 8px;
+  border-radius: 2px;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  color: var(--color-white);
+  background: var(--color-olive-300);
+}
+
+.avatarWrapper {
+  position: relative;
+}
+
+.onlineIndicator {
+  $size: 10px;
+
+  width: $size;
+  height: $size;
+
+  background: var(--color-olive-500);
+
+  position: absolute;
+
+  border-radius: 50%;
+
+  bottom: 0;
+  right: 0;
+}

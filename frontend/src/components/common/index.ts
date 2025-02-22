@@ -51,3 +51,4 @@ export * from './multiselect-field';
 export * from './confirmation-modal';
 export * from './select-field';
 export * from './select-field-no-options-message';
+export * from './grow-transition';

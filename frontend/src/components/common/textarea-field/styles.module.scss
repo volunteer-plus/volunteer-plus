@@ -4,6 +4,11 @@
 
   color: var(--field-body-text-color);
   transition: color var(--field-body-transition);
+
+  &.autoSize {
+    resize: none;
+    overflow: hidden;
+  }
 }
 
 .input::placeholder {

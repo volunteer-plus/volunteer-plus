@@ -13,6 +13,7 @@ const Tabs: React.FC<Props> = ({
   tabsConfigs,
   onTabChange,
   className,
+  activeTabKey,
   ...props
 }) => {
   return (
@@ -24,8 +25,9 @@ const Tabs: React.FC<Props> = ({
             onTabChange?.(tabConfig.key);
           }}
           className={classNames(styles.tab, {
-            [styles.active]: tabConfig.key === props.activeTabKey,
+            [styles.active]: tabConfig.key === activeTabKey,
           })}
+          key={tabConfig.key}
         >
           {tabConfig.label}
         </button>

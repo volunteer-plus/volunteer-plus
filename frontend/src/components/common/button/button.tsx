@@ -11,6 +11,7 @@ const Button = React.forwardRef<HTMLButtonElement, Props>(
         elementType='button'
         elementProps={{
           type: 'button',
+          disabled,
           ...props,
         }}
         colorSchema={colorSchema}

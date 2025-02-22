@@ -4,11 +4,13 @@ import styles from './styles.module.scss';
 
 interface Props extends React.ComponentPropsWithoutRef<'div'> {
   isUnderTabs?: boolean;
+  noPadding?: boolean;
 }
 
 const GrayContainer: React.FC<Props> = ({
-  isUnderTabs,
   className,
+  isUnderTabs = false,
+  noPadding = false,
   ...props
 }) => {
   return (
@@ -16,6 +18,7 @@ const GrayContainer: React.FC<Props> = ({
       {...props}
       className={classNames(className, styles.container, {
         [styles.underTabs]: isUnderTabs,
+        [styles.noPadding]: noPadding,
       })}
     />
   );

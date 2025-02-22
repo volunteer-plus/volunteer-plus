@@ -3,6 +3,7 @@ import classNames from 'classnames';
 
 import styles from './styles.module.scss';
 import { FieldBodyVariant } from '@/types/common';
+import { useCallback, useEffect, useRef } from 'react';
 
 type Props = {
   label?: React.ReactNode;
@@ -12,6 +13,7 @@ type Props = {
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
   type?: 'text' | 'password';
+  autoSize?: boolean;
 } & React.ComponentPropsWithoutRef<'textarea'>;
 
 const TextareaField: React.FC<Props> = ({
@@ -24,10 +26,42 @@ const TextareaField: React.FC<Props> = ({
   onBlur: onBlurProp,
   leftIcon,
   rightIcon,
+  className,
+  autoSize,
+  value,
   ...props
 }) => {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const updateHeight = useCallback(() => {
+    const textarea = textareaRef.current;
+
+    if (!textarea) {
+      return;
+    }
+
+    textarea.style.height = 'auto';
+    textarea.style.height = `${textarea.scrollHeight}px`;
+  }, []);
+
+  useEffect(() => {
+    if (!autoSize) {
+      return;
+    }
+
+    updateHeight();
+  }, [autoSize, updateHeight]);
+
+  useEffect(() => {
+    if (!autoSize) {
+      return;
+    }
+
+    updateHeight();
+  }, [value, updateHeight, autoSize]);
+
   return (
-    <div>
+    <div className={className}>
       {label && (
         <FieldLabel isRequired={isRequired} className={styles.label}>
           {label}
@@ -44,6 +78,7 @@ const TextareaField: React.FC<Props> = ({
           return (
             <textarea
               {...props}
+              value={value}
               onFocus={(event) => {
                 onFocus();
                 onFocusProp?.(event);
@@ -53,7 +88,10 @@ const TextareaField: React.FC<Props> = ({
                 onBlurProp?.(event);
               }}
               disabled={disabled}
-              className={classNames(className, styles.input)}
+              className={classNames(className, styles.input, {
+                [styles.autoSize]: autoSize,
+              })}
+              ref={textareaRef}
             />
           );
         }}

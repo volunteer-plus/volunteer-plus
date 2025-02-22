@@ -1,0 +1,40 @@
+@use '@/assets/columns' as columns;
+
+.titleWrapper {
+  padding: 16px 32px;
+}
+
+.main {
+  display: flex;
+  flex-grow: 1;
+}
+
+.rightSide {
+  flex-grow: 1;
+  display: flex;
+  padding: 16px;
+}
+
+.leftSide {
+  width: columns.get-width(3);
+
+  border-right: 1px solid var(--color-gray-300);
+
+  display: flex;
+  flex-direction: column;
+
+  flex-shrink: 0;
+}
+
+.chatsList {
+  flex-shrink: 1;
+  overflow-y: auto;
+}
+
+.chatPlaceholder {
+  flex-grow: 1;
+}
+
+.chat {
+  flex-grow: 1;
+}

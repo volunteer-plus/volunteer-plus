@@ -1,0 +1,13 @@
+.container {
+  display: flex;
+  gap: 8px;
+  align-items: end;
+
+  &.left {
+    justify-content: start;
+  }
+
+  &.right {
+    justify-content: end;
+  }
+}

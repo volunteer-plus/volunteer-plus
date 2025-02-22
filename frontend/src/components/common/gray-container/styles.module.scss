@@ -3,7 +3,9 @@
   border: 1px solid var(--color-gray-100);
   border-radius: 4px;
 
-  padding: 16px;
+  &:not(.noPadding) {
+    padding: 16px;
+  }
 
   &.underTabs {
     border-top-left-radius: 0%;
