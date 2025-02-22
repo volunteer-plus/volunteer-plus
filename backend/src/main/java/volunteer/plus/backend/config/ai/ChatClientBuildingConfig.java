@@ -48,7 +48,12 @@ public class ChatClientBuildingConfig {
 
     @Bean
     public ChatClient ollamaGeneralChatClient(ChatClient.Builder ollamaChatClientBuilder) {
-        return ollamaChatClientBuilder.build();
+        return ollamaChatClientBuilder
+                .defaultAdvisors(
+                        new MessageChatMemoryAdvisor(chatMemory, DEFAULT_CHAT_MEMORY_CONVERSATION_ID, chatWindowSize),
+                        new Re2Advisor()
+                )
+                .build();
     }
 
     @Bean
