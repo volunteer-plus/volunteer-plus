@@ -31,14 +31,17 @@ public class DataInjectionServiceImpl implements DataInjectionService {
     private final boolean allowAIPromptPreUpload;
     private final TextSplitter textSplitter;
     private final VectorStore openAiVectorStore;
+    private final VectorStore ollamaVectorStore;
     private final ResourcePatternResolver resourcePatternResolver;
 
     public DataInjectionServiceImpl(final TextSplitter textSplitter,
                                     final @Qualifier("openAiVectorStore") VectorStore openAiVectorStore,
+                                    final @Qualifier("ollamaVectorStore") VectorStore ollamaVectorStore,
                                     final ResourcePatternResolver resourcePatternResolver,
                                     final @Value("${spring.ai.allow.prompt.pre-upload}") boolean allowAIPromptPreUpload) {
         this.textSplitter = textSplitter;
         this.openAiVectorStore = openAiVectorStore;
+        this.ollamaVectorStore = ollamaVectorStore;
         this.resourcePatternResolver = resourcePatternResolver;
         this.allowAIPromptPreUpload = allowAIPromptPreUpload;
     }
@@ -92,6 +95,7 @@ public class DataInjectionServiceImpl implements DataInjectionService {
 
         final List<Document> documents = textSplitter.apply(documentReader.get());
 
+        ollamaVectorStore.write(documents);
         openAiVectorStore.write(documents);
 
         log.info("Finished injecting a file: {} to vector store", resource.getFilename());

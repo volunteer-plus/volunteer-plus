@@ -39,7 +39,7 @@ services:
       - redisinsight_db:/db
 
   ollama:
-    image: ollama/ollama:0.1.34
+    image: ollama/ollama:latest
     ports:
       - ${OLLAMA_PORT}:${OLLAMA_PORT}
     volumes:
