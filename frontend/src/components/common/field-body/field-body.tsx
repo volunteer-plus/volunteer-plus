@@ -19,6 +19,7 @@ type Props = Omit<React.ComponentPropsWithoutRef<'div'>, 'children'> & {
   isDisabled?: boolean;
   rightIcon?: React.ReactNode;
   leftIcon?: React.ReactNode;
+  units?: React.ReactNode;
 };
 
 function getClassNameForVariant(variant: FieldBodyVariant) {
@@ -35,6 +36,7 @@ const FieldBody = React.forwardRef<HTMLDivElement, Props>(
       leftIcon,
       rightIcon,
       className,
+      units,
       ...props
     },
     ref
@@ -61,12 +63,14 @@ const FieldBody = React.forwardRef<HTMLDivElement, Props>(
             [styles.disabled]: isDisabled,
             [styles.withLeftIcon]: !!leftIcon,
             [styles.withRightIcon]: !!rightIcon,
+            [styles.withUnits]: !!units,
           }
         )}
         ref={ref}
       >
         <div className={styles.body}>
           {leftIcon && <div className={styles.leftIcon}>{leftIcon}</div>}
+          {units && <div className={styles.units}>{units}</div>}
           {children({
             onFocus,
             onBlur,

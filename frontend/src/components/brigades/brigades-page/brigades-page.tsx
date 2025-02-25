@@ -5,10 +5,10 @@ import {
   Button,
   Pagination,
   TextInputField,
+  PageTitle,
 } from '@/components/common';
-
 import { Authenticated } from '@/components/auth';
-import { AdminPageContent, AdminPageTitle } from '@/components/admin';
+import { AdminPageContent } from '@/components/admin';
 import { AddBrigadeModal, BrigadeListItem } from '@/components/brigades';
 
 import styles from './styles.module.scss';
@@ -27,7 +27,7 @@ const BareBrigadesPage: React.FC = () => {
     <AdminPageContent className={styles.content}>
       <div className={styles.internalContent}>
         <div className={styles.header}>
-          <AdminPageTitle>Бригади</AdminPageTitle>
+          <PageTitle>Бригади</PageTitle>
           <Button onClick={() => setIsAddBrigadeModalOpen(true)}>
             Додати бригаду
           </Button>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { AdminPageTitle } from '@/components/admin';
 import { Authenticated } from '@/components/auth';
+import { PageTitle } from '@/components/common';
 import {
   Chat,
   ChatNotSelectedPlaceholder,
@@ -27,7 +27,7 @@ const BareChatsPage: React.FC = () => {
     <main className={styles.main}>
       <div className={styles.leftSide}>
         <div className={styles.titleWrapper}>
-          <AdminPageTitle>Чати</AdminPageTitle>
+          <PageTitle>Чати</PageTitle>
         </div>
         <ChatsList className={styles.chatsList}>
           <ChatsListItem

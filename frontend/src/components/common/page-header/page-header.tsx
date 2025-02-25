@@ -1,14 +1,16 @@
+import { Link } from 'react-router-dom';
 import { ButtonBase } from '@/components/common';
 
 import Logo from '@/assets/logo.svg?react';
 
 import styles from './styles.module.scss';
-import { Link } from 'react-router-dom';
 
 const PageHeader: React.FC = () => {
   return (
     <header className={styles.header}>
-      <Logo />
+      <Link to='/'>
+        <Logo />
+      </Link>
       <div className={styles.actions}>
         <ButtonBase
           colorSchema='gray'

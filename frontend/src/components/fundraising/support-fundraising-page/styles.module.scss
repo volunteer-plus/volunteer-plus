@@ -1,0 +1,38 @@
+.volunteerName {
+  font-weight: 600;
+}
+
+.brigadeName {
+  font-weight: 600;
+}
+
+.brigadeLabel {
+  color: var(--color-olive-500);
+}
+
+.categoryAndBrigadeLine {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.activityName {
+  font-size: 20px;
+  font-weight: 600;
+
+  margin-bottom: 4px;
+}
+
+.form {
+  margin-top: 32px;
+}
+
+.activityDescription,
+.progressBar,
+.volunteer {
+  margin-top: 16px;
+}
+
+.pageTitle {
+  margin-bottom: 24px;
+}

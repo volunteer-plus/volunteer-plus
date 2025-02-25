@@ -1,8 +1,8 @@
 import React, { useMemo, useState } from 'react';
 
-import { AdminPageContent, AdminPageTitle } from '@/components/admin';
+import { AdminPageContent } from '@/components/admin';
 import { Authenticated } from '@/components/auth';
-import { TabConfig, Tabs } from '@/components/common';
+import { TabConfig, Tabs, PageTitle } from '@/components/common';
 
 import {
   BrigadeInvitesTabContent,
@@ -32,7 +32,7 @@ const BareMyBrigadePage: React.FC = () => {
 
   return (
     <AdminPageContent>
-      <AdminPageTitle className={styles.title}>Моя бригада</AdminPageTitle>
+      <PageTitle className={styles.title}>Моя бригада</PageTitle>
       <MyBrigadeForm />
       <div className={styles.tabsContainer}>
         <Tabs

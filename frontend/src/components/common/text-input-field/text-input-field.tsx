@@ -12,6 +12,7 @@ type Props = {
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
   type?: 'text' | 'password' | 'number' | 'email';
+  units?: React.ReactNode;
 } & Omit<React.ComponentPropsWithoutRef<'input'>, 'type'>;
 
 const TextInputField: React.FC<Props> = ({
@@ -26,6 +27,7 @@ const TextInputField: React.FC<Props> = ({
   leftIcon,
   rightIcon,
   className,
+  units,
   ...props
 }) => {
   return (
@@ -41,6 +43,7 @@ const TextInputField: React.FC<Props> = ({
         description={description}
         leftIcon={leftIcon}
         rightIcon={rightIcon}
+        units={units}
       >
         {({ onFocus, onBlur, className }) => {
           return (

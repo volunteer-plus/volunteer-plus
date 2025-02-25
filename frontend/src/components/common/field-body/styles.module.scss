@@ -5,6 +5,7 @@ $verticalPadding: 10px;
 $horizontalPadding: 16px;
 
 $gapToIcons: 8px;
+$gapToUnits: 8px;
 
 .root {
   --field-body-background-color: var(--color-white);
@@ -34,8 +35,16 @@ $gapToIcons: 8px;
   }
 
   &.withLeftIcon {
-    .children {
-      padding-left: $horizontalPadding + $iconWidth + $gapToIcons;
+    &:not(.withUnits) {
+      .children {
+        padding-left: $horizontalPadding + $iconWidth + $gapToIcons;
+      }
+    }
+
+    &.withUnits {
+      .units {
+        padding-left: $horizontalPadding + $iconWidth + $gapToIcons;
+      }
     }
   }
 
@@ -45,12 +54,20 @@ $gapToIcons: 8px;
     }
   }
 
+  &.withUnits {
+    .children {
+      padding-left: $gapToUnits;
+    }
+  }
+
   --field-body-placeholder-color: var(--color-gray-300);
   --field-body-text-color: var(--color-gray-900);
   --field-body-transition: #{$transition};
 }
 
 .body {
+  display: flex;
+
   position: relative;
   background: var(--field-body-background-color);
 
@@ -94,4 +111,11 @@ $gapToIcons: 8px;
 
 .rightIcon {
   right: $horizontalPadding;
+}
+
+.units {
+  padding: $verticalPadding 0 $verticalPadding $horizontalPadding;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-gray-900);
 }

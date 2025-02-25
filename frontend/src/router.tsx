@@ -20,7 +20,10 @@ import {
   ServicemanRequestsPage,
   VolunteerRequestsPage,
 } from './components/requests';
-import { FundraisingActivitiesPage } from './components/fundraising';
+import {
+  FundraisingActivitiesPage,
+  SupportFundraisingPage,
+} from './components/fundraising';
 
 const router = createBrowserRouter([
   {
@@ -35,6 +38,10 @@ const router = createBrowserRouter([
       {
         path: '',
         element: <HomePage />,
+      },
+      {
+        path: 'support-fundraising/:id',
+        element: <SupportFundraisingPage />,
       },
     ],
   },

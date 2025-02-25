@@ -1,0 +1,15 @@
+.fields > *:not(:last-child) {
+  margin-bottom: 16px;
+}
+
+.buttons > *:not(:last-child) {
+  margin-bottom: 8px;
+}
+
+.buttons > * {
+  width: 100%;
+}
+
+.buttons {
+  margin-top: 32px;
+}
