@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { AdminPageContent } from '@/components/admin';
 import { Authenticated } from '@/components/auth';
 import {
@@ -17,10 +18,14 @@ import {
   Tag,
   TextInputField,
 } from '@/components/common';
+import { AddRequestModal } from '@/components/requests';
 
 import styles from './styles.module.scss';
+import { FilterForm } from './components';
 
 const BareServicemanRequestsPage: React.FC = () => {
+  const [isAddRequestModalOpen, setIsAddRequestModalOpen] = useState(false);
+
   return (
     <AdminPageContent>
       <PageTitle className={styles.pageTitle}>Запити</PageTitle>
@@ -28,9 +33,13 @@ const BareServicemanRequestsPage: React.FC = () => {
         <div className={styles.toolbar}>
           <div className={styles.searchAndFilter}>
             <TextInputField placeholder='Пошук' className={styles.search} />
-            <FilterButton>Hello</FilterButton>
+            <FilterButton>
+              <FilterForm />
+            </FilterButton>
           </div>
-          <Button>Додати запит</Button>
+          <Button onClick={() => setIsAddRequestModalOpen(true)}>
+            Додати запит
+          </Button>
         </div>
         <Table className={styles.table}>
           <TableHead>
@@ -109,6 +118,10 @@ const BareServicemanRequestsPage: React.FC = () => {
           className={styles.pagination}
         />
       </GrayContainer>
+      <AddRequestModal
+        isOpen={isAddRequestModalOpen}
+        onClose={() => setIsAddRequestModalOpen(false)}
+      />
     </AdminPageContent>
   );
 };

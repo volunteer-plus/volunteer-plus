@@ -17,8 +17,10 @@ function makeFormikField<P extends BaseProps>(
     variant,
     description,
     onBlur,
+    hideError = false,
     ...props
-  }: P & Pick<FieldConfig, 'name'>) => {
+  }: Omit<P, 'value'> &
+    Pick<FieldConfig, 'name'> & { hideError?: boolean }) => {
     return (
       <Field name={name} onBlur={onBlur}>
         {({ field, meta, form }: FieldProps) => {
@@ -26,7 +28,10 @@ function makeFormikField<P extends BaseProps>(
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             ...(props as any),
             variant: meta.touched && meta.error ? 'failure' : variant,
-            description: meta.touched && meta.error ? meta.error : description,
+            description:
+              meta.touched && meta.error && !hideError
+                ? meta.error
+                : description,
           };
 
           if (nativeEvents) {

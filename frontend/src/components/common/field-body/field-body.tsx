@@ -2,6 +2,8 @@ import React, { useCallback, useState } from 'react';
 import classNames from 'classnames';
 
 import { FieldBodyVariant } from '@/types/common';
+import { FieldDescription } from '@/components/common';
+
 import styles from './styles.module.scss';
 
 type RenderChildrenProps = {
@@ -78,7 +80,11 @@ const FieldBody = React.forwardRef<HTMLDivElement, Props>(
           })}
           {rightIcon && <div className={styles.rightIcon}>{rightIcon}</div>}
         </div>
-        {description && <div className={styles.description}>{description}</div>}
+        {description && (
+          <FieldDescription variant={variant} className={styles.description}>
+            {description}
+          </FieldDescription>
+        )}
       </div>
     );
   }

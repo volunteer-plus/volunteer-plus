@@ -11,7 +11,7 @@ type Props = {
   description?: React.ReactNode;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
-  type?: 'text' | 'password' | 'number' | 'email';
+  type?: 'text' | 'password' | 'number' | 'email' | 'date';
   units?: React.ReactNode;
 } & Omit<React.ComponentPropsWithoutRef<'input'>, 'type'>;
 

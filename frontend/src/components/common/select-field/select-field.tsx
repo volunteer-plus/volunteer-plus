@@ -96,8 +96,8 @@ const SelectField: React.FC<Props> = ({
   }, []);
 
   const setValueAndBlur = useCallback(
-    (nextValue: unknown) => {
-      onChange?.(nextValue);
+    async (nextValue: unknown) => {
+      await onChange?.(nextValue);
       blur();
     },
     [onChange, blur]

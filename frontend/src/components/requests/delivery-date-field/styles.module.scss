@@ -1,0 +1,12 @@
+.inputAndCheckbox {
+  display: flex;
+  gap: 16px;
+}
+
+.asapLabel {
+  flex-shrink: 0;
+}
+
+.dateField {
+  flex-grow: 1;
+}
