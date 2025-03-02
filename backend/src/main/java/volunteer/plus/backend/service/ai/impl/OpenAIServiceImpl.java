@@ -11,6 +11,7 @@ import org.springframework.ai.image.Image;
 import org.springframework.ai.image.ImageGeneration;
 import org.springframework.ai.image.ImagePrompt;
 import org.springframework.ai.image.ImageResponse;
+import org.springframework.ai.moderation.ModerationResponse;
 import org.springframework.ai.openai.*;
 import org.springframework.ai.openai.api.OpenAiAudioApi;
 import org.springframework.ai.openai.audio.speech.SpeechPrompt;
@@ -23,10 +24,12 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import volunteer.plus.backend.config.ai.FunctionalAIConfiguration;
+import volunteer.plus.backend.domain.dto.AIChatResponse;
 import volunteer.plus.backend.domain.dto.ImageGenerationRequestDTO;
 import volunteer.plus.backend.domain.enums.AIChatClient;
 import volunteer.plus.backend.exceptions.ApiException;
 import volunteer.plus.backend.exceptions.ErrorCode;
+import volunteer.plus.backend.service.ai.AIModerationService;
 import volunteer.plus.backend.service.ai.OpenAIService;
 import volunteer.plus.backend.util.FunctionMethodNameCollector;
 
@@ -50,6 +53,7 @@ public class OpenAIServiceImpl implements OpenAIService {
     private final OpenAiAudioTranscriptionModel openAiAudioTranscriptionModel;
     private final OpenAiAudioSpeechModel openAiAudioSpeechModel;
     private final FunctionMethodNameCollector functionMethodNameCollector;
+    private final AIModerationService moderationService;
     private final OpenAIService openAIService;
 
     @SneakyThrows
@@ -60,6 +64,7 @@ public class OpenAIServiceImpl implements OpenAIService {
                              final @Qualifier("generalChatClient") ChatClient generalChatClient,
                              final @Qualifier("militaryChatClient") ChatClient militaryChatClient,
                              final @Qualifier("inMemoryChatClient") ChatClient inMemoryChatClient,
+                             final AIModerationService moderationService,
                              final @Lazy OpenAIService openAIService) {
         this.imageModel = imageModel;
         this.openAiAudioTranscriptionModel = openAiAudioTranscriptionModel;
@@ -68,13 +73,18 @@ public class OpenAIServiceImpl implements OpenAIService {
         this.generalChatClient = generalChatClient;
         this.militaryChatClient = militaryChatClient;
         this.inMemoryChatClient = inMemoryChatClient;
+        this.moderationService = moderationService;
         this.openAIService = openAIService;
     }
 
     @Override
-    public ChatResponse chat(final AIChatClient chatClient,
-                             final String message) {
+    @SneakyThrows
+    public AIChatResponse chat(final AIChatClient chatClient,
+                               final String message) {
         log.info("Asking GPT: {}", message);
+
+        // call async process of message moderation
+        final Future<ModerationResponse> moderationFuture = moderationService.moderate(message);
 
         // this is prompt configuration that is why we need it in this service
         final Set<String> functionMethodNames = functionMethodNameCollector.getFunctionBeanMethodNames(FunctionalAIConfiguration.class);
@@ -89,9 +99,16 @@ public class OpenAIServiceImpl implements OpenAIService {
 
         final ChatClient client = getClient(chatClient);
 
-        return client.prompt(prompt)
+        final ChatResponse response = client.prompt(prompt)
                 .call()
                 .chatResponse();
+
+        final ModerationResponse moderationResponse = moderationFuture.get();
+
+        return AIChatResponse.builder()
+                .chatResponse(response)
+                .moderationResponse(moderationResponse)
+                .build();
     }
 
     private ChatClient getClient(final AIChatClient client) {

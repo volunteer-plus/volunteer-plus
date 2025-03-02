@@ -1,4 +1,4 @@
-package volunteer.plus.backend.config.ai;
+package volunteer.plus.backend.service.ai.impl;
 
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.messages.AbstractMessage;
@@ -12,11 +12,11 @@ import volunteer.plus.backend.repository.AIChatMessageRepository;
 
 import java.util.List;
 
-@Component
-public class AIMemory implements ChatMemory {
+@Component("memoryService")
+public class AIMemoryServiceImpl implements ChatMemory {
     private final AIChatMessageRepository repository;
 
-    public AIMemory(final AIChatMessageRepository repository) {
+    public AIMemoryServiceImpl(final AIChatMessageRepository repository) {
         this.repository = repository;
     }
 

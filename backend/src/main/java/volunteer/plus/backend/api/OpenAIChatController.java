@@ -2,11 +2,11 @@ package volunteer.plus.backend.api;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import volunteer.plus.backend.domain.dto.AIChatResponse;
 import volunteer.plus.backend.domain.dto.ImageGenerationRequestDTO;
 import volunteer.plus.backend.domain.enums.AIChatClient;
 import volunteer.plus.backend.service.ai.OpenAIService;
@@ -22,8 +22,8 @@ public class OpenAIChatController {
 
     @PostMapping("/open-ai/generate/chat")
     @Operation(description = "Chat with OpenAI model chat")
-    public ResponseEntity<ChatResponse> chat(@RequestParam final AIChatClient aiChatClient,
-                                             @RequestBody final String message) {
+    public ResponseEntity<AIChatResponse> chat(@RequestParam final AIChatClient aiChatClient,
+                                               @RequestBody final String message) {
         return ResponseEntity.ok(openAIService.chat(aiChatClient, message));
     }
 

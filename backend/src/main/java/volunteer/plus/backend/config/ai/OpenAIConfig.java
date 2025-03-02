@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import volunteer.plus.backend.repository.AIChatMessageRepository;
+import volunteer.plus.backend.service.ai.impl.AIMemoryServiceImpl;
 
 @Configuration
 public class OpenAIConfig {
@@ -24,7 +25,7 @@ public class OpenAIConfig {
 
     @Bean
     public ChatMemory chatMemory() {
-        return new AIMemory(aiChatMessageRepository);
+        return new AIMemoryServiceImpl(aiChatMessageRepository);
     }
 
     @Bean

@@ -1,7 +1,7 @@
 package volunteer.plus.backend.service.ai;
 
-import org.springframework.ai.chat.model.ChatResponse;
+import volunteer.plus.backend.domain.dto.AIChatResponse;
 
 public interface OllamaAIService {
-    ChatResponse chat(String message);
+    AIChatResponse chat(String message);
 }
