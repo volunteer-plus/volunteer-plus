@@ -22,6 +22,7 @@ import { AddRequestModal } from '@/components/requests';
 
 import styles from './styles.module.scss';
 import { FilterForm } from './components';
+import { Link } from 'react-router-dom';
 
 const BareServicemanRequestsPage: React.FC = () => {
   const [isAddRequestModalOpen, setIsAddRequestModalOpen] = useState(false);
@@ -64,7 +65,9 @@ const BareServicemanRequestsPage: React.FC = () => {
               </TableDataCell>
               <TableDataCell>123</TableDataCell>
               <TableActionsCell>
-                <RightChevronButton />
+                <Link to='/serviceman/requests/123'>
+                  <RightChevronButton />
+                </Link>
               </TableActionsCell>
             </TableRow>
             <TableRow>
@@ -78,7 +81,9 @@ const BareServicemanRequestsPage: React.FC = () => {
               </TableDataCell>
               <TableDataCell></TableDataCell>
               <TableActionsCell>
-                <RightChevronButton />
+                <Link to='/serviceman/requests/123'>
+                  <RightChevronButton />
+                </Link>
               </TableActionsCell>
             </TableRow>
             <TableRow>
@@ -92,7 +97,9 @@ const BareServicemanRequestsPage: React.FC = () => {
               </TableDataCell>
               <TableDataCell></TableDataCell>
               <TableActionsCell>
-                <RightChevronButton />
+                <Link to='/serviceman/requests/123'>
+                  <RightChevronButton />
+                </Link>
               </TableActionsCell>
             </TableRow>
             <TableRow>
@@ -106,7 +113,9 @@ const BareServicemanRequestsPage: React.FC = () => {
               </TableDataCell>
               <TableDataCell></TableDataCell>
               <TableActionsCell>
-                <RightChevronButton />
+                <Link to='/serviceman/requests/123'>
+                  <RightChevronButton />
+                </Link>
               </TableActionsCell>
             </TableRow>
           </TableBody>

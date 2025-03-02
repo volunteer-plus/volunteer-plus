@@ -1,0 +1,58 @@
+.root {
+  display: flex;
+  gap: 8px;
+  align-items: end;
+}
+
+.volunteerName {
+  color: var(--color-olive-500);
+  font-weight: 600;
+}
+
+.data {
+  padding: 8px;
+
+  & > *:not(:last-child) {
+    margin-bottom: 8px;
+  }
+}
+
+.buttons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  $border: 1px solid var(--color-gray-100);
+
+  & > * {
+    border-top: $border;
+    padding: 10px;
+    color: var(--color-olive-500);
+    font-weight: 600;
+
+    &:not(:last-child) {
+      border-right: $border;
+    }
+  }
+}
+
+.messageSentAt {
+  color: var(--color-gray-300);
+}
+
+.messageBox {
+  position: relative;
+}
+
+.newLabel {
+  background: var(--color-olive-500);
+  color: var(--color-white);
+  font-weight: 600;
+  font-size: 12px;
+
+  border-radius: 2px;
+  padding: 4px;
+
+  position: absolute;
+
+  right: -8px;
+  top: -8px;
+}

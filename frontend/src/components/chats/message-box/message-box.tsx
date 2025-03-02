@@ -6,6 +6,7 @@ import styles from './styles.module.scss';
 interface Props extends React.ComponentPropsWithoutRef<'div'> {
   backgroundColor: string;
   borderColor: string;
+  noPadding?: boolean;
 }
 
 const MessageBox: React.FC<Props> = ({
@@ -13,12 +14,15 @@ const MessageBox: React.FC<Props> = ({
   style,
   backgroundColor,
   borderColor,
+  noPadding = false,
   ...props
 }) => {
   return (
     <animated.div
       {...props}
-      className={classNames(styles.box, className)}
+      className={classNames(styles.box, className, {
+        [styles.noPadding]: noPadding,
+      })}
       style={
         {
           ...style,

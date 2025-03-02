@@ -1,5 +1,8 @@
 .box {
-  padding: 8px;
+  &:not(.noPadding) {
+    padding: 8px;
+  }
+
   border-radius: 4px;
 
   border: 1px solid var(--message-box-border-color);

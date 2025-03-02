@@ -19,6 +19,7 @@ import { ChatsPage } from './components/chats';
 import {
   ServicemanRequestsPage,
   VolunteerRequestsPage,
+  ServicemanRequestPage,
 } from './components/requests';
 import {
   FundraisingActivitiesPage,
@@ -79,6 +80,10 @@ const router = createBrowserRouter([
       {
         path: 'serviceman/requests',
         element: <ServicemanRequestsPage />,
+      },
+      {
+        path: 'serviceman/requests/:id',
+        element: <ServicemanRequestPage />,
       },
       {
         path: 'fundraising-activities',

@@ -1,0 +1,52 @@
+#!/usr/bin/env node
+
+import fs from 'node:fs';
+import path from 'node:path';
+
+const componentPath = process.argv[2];
+
+const componentName = componentPath.split(path.sep).pop();
+
+fs.mkdirSync(componentPath, { recursive: true });
+fs.createWriteStream(path.join(componentPath, 'styles.module.scss'));
+
+const componentFileStream = fs.createWriteStream(
+  path.join(componentPath, `${componentName}.tsx`)
+);
+const indexFileStream = fs.createWriteStream(
+  path.join(componentPath, 'index.ts')
+);
+
+function toPascalCase(str) {
+  let result = str.replace(/(\w)(\w*)/g, function (g0, g1, g2) {
+    return g1.toUpperCase() + g2.toLowerCase();
+  });
+
+  return result.replace(/[^a-zA-Z0-9]/g, '');
+}
+
+const componentSymbolName = toPascalCase(componentName);
+
+const componentTemplate = `import classNames from 'classnames';
+
+import styles from './styles.module.scss';
+
+type Props = React.ComponentPropsWithoutRef<'div'>;
+
+const ${componentSymbolName}: React.FC<Props> = ({ className, ...props }) => {
+  return (
+    <div {...props} className={classNames(styles.root, className)}>
+      ${componentSymbolName}
+    </div>
+  );
+};
+
+export { ${componentSymbolName} };
+`;
+
+const indexTemplate = `export { ${componentSymbolName} } from './${componentName}';`;
+
+componentFileStream.write(componentTemplate);
+indexFileStream.write(indexTemplate);
+
+console.log(`Component ${componentSymbolName} created at ${componentPath}`);

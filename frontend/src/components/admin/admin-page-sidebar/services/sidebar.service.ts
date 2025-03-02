@@ -45,6 +45,7 @@ class SidebarService {
         iconName: 'conveyor_belt',
         label: 'Запити',
         path: '/serviceman/requests',
+        subPaths: [/\/serviceman\/requests\/\d+/],
       },
     ];
   }

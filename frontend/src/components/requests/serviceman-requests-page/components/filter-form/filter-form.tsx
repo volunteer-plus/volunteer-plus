@@ -19,6 +19,7 @@ const FilterForm: React.FC = () => {
         <FormikMultiselectField
           name='status'
           label='Статус'
+          placeholder='Оберіть статус'
           options={[
             {
               value: 'new',
@@ -41,6 +42,7 @@ const FilterForm: React.FC = () => {
         <FormikMultiselectField
           name='category'
           label='Категорія'
+          placeholder='Оберіть категорію'
           options={[
             {
               value: 'медикаменти',

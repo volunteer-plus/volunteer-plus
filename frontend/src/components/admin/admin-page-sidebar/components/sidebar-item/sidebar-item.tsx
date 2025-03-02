@@ -22,7 +22,13 @@ const SidebarItem: React.FC<Props> = ({ config }) => {
     }
 
     if (config.subPaths) {
-      return config.subPaths.some((subPath) => location.pathname === subPath);
+      return config.subPaths.some((subPath) => {
+        if (typeof subPath === 'string') {
+          return location.pathname === subPath;
+        }
+
+        return subPath.test(location.pathname);
+      });
     }
 
     return false;
