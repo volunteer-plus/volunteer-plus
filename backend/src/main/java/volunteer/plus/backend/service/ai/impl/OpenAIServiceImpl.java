@@ -112,18 +112,11 @@ public class OpenAIServiceImpl implements OpenAIService {
     }
 
     private ChatClient getClient(final AIChatClient client) {
-        switch (client) {
-            case DEFAULT -> {
-                return generalChatClient;
-            }
-            case MILITARY -> {
-                return militaryChatClient;
-            }
-            case IN_MEMORY -> {
-                return inMemoryChatClient;
-            }
-            default -> throw new ApiException(ErrorCode.NO_CLIENT_SPECIFIED);
-        }
+        return switch (client) {
+            case DEFAULT -> generalChatClient;
+            case MILITARY -> militaryChatClient;
+            case IN_MEMORY -> inMemoryChatClient;
+        };
     }
 
     @SneakyThrows
