@@ -31,7 +31,8 @@ public class S3ServiceImpl implements S3Service {
 
     @SneakyThrows
     @Override
-    public byte[] downloadFile(String s3BucketName, String s3ObjectKey) {
+    public byte[] downloadFile(final String s3BucketName,
+                               final String s3ObjectKey) {
         if (!amazonS3.doesObjectExist(s3BucketName, s3ObjectKey)) {
             throw new ApiException(ErrorCode.RESOURCE_NOT_FOUND);
         }
@@ -40,7 +41,8 @@ public class S3ServiceImpl implements S3Service {
     }
 
     @Override
-    public String uploadFile(String s3BucketName, MultipartFile multipartFile) {
+    public String uploadFile(final String s3BucketName,
+                             final MultipartFile multipartFile) {
         try {
             final PutObjectRequest putObjectRequest = getPutObjectRequest(s3BucketName, multipartFile);
             final Upload upload = transferManager.upload(putObjectRequest);
@@ -53,7 +55,8 @@ public class S3ServiceImpl implements S3Service {
     }
 
     @SneakyThrows
-    private PutObjectRequest getPutObjectRequest(String s3BucketName, MultipartFile multipartFile) {
+    private PutObjectRequest getPutObjectRequest(final String s3BucketName,
+                                                 final MultipartFile multipartFile) {
         if (Objects.isNull(multipartFile)) {
             throw new ApiException(ErrorCode.EMPTY_FILE);
         }
@@ -69,7 +72,8 @@ public class S3ServiceImpl implements S3Service {
     }
 
     @Override
-    public void deleteFile(String s3BucketName, String s3ObjectKey) {
+    public void deleteFile(final String s3BucketName,
+                           final String s3ObjectKey) {
         if (!amazonS3.doesObjectExist(s3BucketName, s3ObjectKey)) {
             throw new ApiException(ErrorCode.RESOURCE_NOT_FOUND);
         }

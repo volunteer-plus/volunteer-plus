@@ -30,7 +30,6 @@ public enum ErrorCode {
     CANNOT_SERIALIZE_JSON("Cannot serialize data"),
     VOLUNTEER_IS_ALREADY_ASSIGNED_TO_USER("Volunteer is already assigned to user"),
     VOLUNTEER_FEEDBACK_NOT_FOUND("Volunteer feedback not found"),
-    CANNOT_DOWNLOAD_OUTPUT_FILE("Cannot download output file"),
-    NO_CLIENT_SPECIFIED("No chat client specified");
+    CANNOT_DOWNLOAD_OUTPUT_FILE("Cannot download output file");
     private final String data;
 }

@@ -18,16 +18,16 @@ import volunteer.plus.backend.config.ai.advisor.Re2Advisor;
 import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.DEFAULT_CHAT_MEMORY_CONVERSATION_ID;
 
 @Configuration
-public class ChatClientBuildingConfig {
+public class OpenAIChatClientConfig {
     private final Integer chatWindowSize;
     private final Resource defaultSystemPrompt;
     private final VectorStore openAiVectorStore;
     private final ChatMemory chatMemory;
 
-    public ChatClientBuildingConfig(final @Qualifier("openAiVectorStore") VectorStore openAiVectorStore,
-                                    final ChatMemory chatMemory,
-                                    final @Value("${ai.chat.history.window.size}") Integer chatWindowSize,
-                                    final @Value("classpath:/prompts/default_system_ai_prompt.txt") Resource defaultSystemPrompt) {
+    public OpenAIChatClientConfig(final @Qualifier("openAiVectorStore") VectorStore openAiVectorStore,
+                                  final ChatMemory chatMemory,
+                                  final @Value("${ai.chat.history.window.size}") Integer chatWindowSize,
+                                  final @Value("classpath:/prompts/default_system_ai_prompt.txt") Resource defaultSystemPrompt) {
         this.openAiVectorStore = openAiVectorStore;
         this.chatMemory = chatMemory;
         this.chatWindowSize = chatWindowSize;
@@ -35,30 +35,10 @@ public class ChatClientBuildingConfig {
     }
 
     @Bean
-    public ChatClient.Builder openAiChatClientBuilder(final ChatClientBuilderConfigurer chatClientBuilderConfigurer,
-                                                      final @Qualifier("openAiChatModel") ChatModel chatModel) {
-        return getChatClientBuilder(chatClientBuilderConfigurer, chatModel);
-    }
-
-    @Bean
-    public ChatClient.Builder ollamaChatClientBuilder(final ChatClientBuilderConfigurer chatClientBuilderConfigurer,
-                                                      final @Qualifier("ollamaChatModel") ChatModel chatModel) {
-        return getChatClientBuilder(chatClientBuilderConfigurer, chatModel);
-    }
-
-    @Bean
-    public ChatClient ollamaGeneralChatClient(ChatClient.Builder ollamaChatClientBuilder) {
-        return ollamaChatClientBuilder
-                .defaultAdvisors(
-                        new MessageChatMemoryAdvisor(chatMemory, DEFAULT_CHAT_MEMORY_CONVERSATION_ID, chatWindowSize),
-                        new Re2Advisor()
-                )
-                .build();
-    }
-
-    @Bean
-    public ChatClient generalChatClient(ChatClient.Builder openAiChatClientBuilder) {
-        return openAiChatClientBuilder
+    public ChatClient generalChatClient(final ChatClientBuilderConfigurer chatClientBuilderConfigurer,
+                                        final @Qualifier("openAiChatModel") ChatModel chatModel) {
+        final ChatClient.Builder builder = ChatClient.builder(chatModel);
+        return chatClientBuilderConfigurer.configure(builder)
                 .defaultAdvisors(
                         new SimpleLoggerAdvisor(),
                         new Re2Advisor()
@@ -68,8 +48,10 @@ public class ChatClientBuildingConfig {
 
 
     @Bean
-    public ChatClient militaryChatClient(ChatClient.Builder openAiChatClientBuilder) {
-        return openAiChatClientBuilder
+    public ChatClient militaryChatClient(final ChatClientBuilderConfigurer chatClientBuilderConfigurer,
+                                         final @Qualifier("openAiChatModel") ChatModel chatModel) {
+        final ChatClient.Builder builder = ChatClient.builder(chatModel);
+        return chatClientBuilderConfigurer.configure(builder)
                 .defaultSystem(defaultSystemPrompt)
                 .defaultAdvisors(
                         new SimpleLoggerAdvisor(),
@@ -79,8 +61,10 @@ public class ChatClientBuildingConfig {
     }
 
     @Bean
-    public ChatClient inMemoryChatClient(ChatClient.Builder openAiChatClientBuilder) {
-        return openAiChatClientBuilder
+    public ChatClient inMemoryChatClient(final ChatClientBuilderConfigurer chatClientBuilderConfigurer,
+                                         final @Qualifier("openAiChatModel") ChatModel chatModel) {
+        final ChatClient.Builder builder = ChatClient.builder(chatModel);
+        return chatClientBuilderConfigurer.configure(builder)
                 .defaultAdvisors(
                         new QuestionAnswerAdvisor(openAiVectorStore),
                         new MessageChatMemoryAdvisor(chatMemory, DEFAULT_CHAT_MEMORY_CONVERSATION_ID, chatWindowSize),
@@ -88,11 +72,5 @@ public class ChatClientBuildingConfig {
                         new Re2Advisor()
                 )
                 .build();
-    }
-
-    private ChatClient.Builder getChatClientBuilder(final ChatClientBuilderConfigurer chatClientBuilderConfigurer,
-                                                    final ChatModel chatModel) {
-        ChatClient.Builder builder = ChatClient.builder(chatModel);
-        return chatClientBuilderConfigurer.configure(builder);
     }
 }
