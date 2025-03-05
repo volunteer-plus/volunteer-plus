@@ -14,6 +14,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import volunteer.plus.backend.config.ai.advisor.Re2Advisor;
+import volunteer.plus.backend.domain.enums.AIChatClient;
+
+import java.util.Map;
 
 import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.DEFAULT_CHAT_MEMORY_CONVERSATION_ID;
 
@@ -72,5 +75,16 @@ public class OpenAIChatClientConfig {
                         new Re2Advisor()
                 )
                 .build();
+    }
+
+    @Bean("openAIChatClientMap")
+    public Map<AIChatClient, ChatClient> openAIChatClientMap(final ChatClient generalChatClient,
+                                                             final ChatClient militaryChatClient,
+                                                             final ChatClient inMemoryChatClient) {
+        return Map.of(
+                AIChatClient.DEFAULT, generalChatClient,
+                AIChatClient.MILITARY, militaryChatClient,
+                AIChatClient.IN_MEMORY, inMemoryChatClient
+        );
     }
 }
