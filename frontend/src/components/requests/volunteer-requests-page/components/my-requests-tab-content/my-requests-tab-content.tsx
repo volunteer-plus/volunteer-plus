@@ -7,6 +7,7 @@ import {
   Pagination,
   RightChevronButton,
   Table,
+  TableActionsCell,
   TableBody,
   TableDataCell,
   TableHead,
@@ -58,9 +59,9 @@ const MyRequestsTabContent: React.FC<Props> = ({ className, ...props }) => {
               </Tag>
             </TableDataCell>
             <TableDataCell>{formatDateAndTime(new Date())}</TableDataCell>
-            <TableDataCell>
+            <TableActionsCell>
               <RightChevronButton as={Link} to='/volunteer/request/1234' />
-            </TableDataCell>
+            </TableActionsCell>
           </TableRow>
           <TableRow>
             <TableDataCell>12312</TableDataCell>
@@ -73,9 +74,9 @@ const MyRequestsTabContent: React.FC<Props> = ({ className, ...props }) => {
               </Tag>
             </TableDataCell>
             <TableDataCell>{formatDateAndTime(new Date())}</TableDataCell>
-            <TableDataCell>
+            <TableActionsCell>
               <RightChevronButton as={Link} to='/volunteer/request/1234' />
-            </TableDataCell>
+            </TableActionsCell>
           </TableRow>
           <TableRow>
             <TableDataCell>12312</TableDataCell>
@@ -88,9 +89,9 @@ const MyRequestsTabContent: React.FC<Props> = ({ className, ...props }) => {
               </Tag>
             </TableDataCell>
             <TableDataCell>{formatDateAndTime(new Date())}</TableDataCell>
-            <TableDataCell>
+            <TableActionsCell>
               <RightChevronButton as={Link} to='/volunteer/request/1234' />
-            </TableDataCell>
+            </TableActionsCell>
           </TableRow>
         </TableBody>
       </Table>

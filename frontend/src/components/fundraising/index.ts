@@ -8,3 +8,4 @@ export * from './support-fundraising-page';
 export * from './fundraising-progress-bar';
 export * from './fundraising-simple-list';
 export * from './fundraising-simple-list-item';
+export * from './add-fundraising-modal';

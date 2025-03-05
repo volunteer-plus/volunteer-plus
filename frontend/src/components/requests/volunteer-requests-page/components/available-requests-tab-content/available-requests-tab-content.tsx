@@ -7,6 +7,7 @@ import {
   Pagination,
   RightChevronButton,
   Table,
+  TableActionsCell,
   TableBody,
   TableDataCell,
   TableHead,
@@ -54,9 +55,9 @@ const AvailableRequestsTabContent: React.FC<Props> = ({
             <TableDataCell>Ауніція</TableDataCell>
             <TableDataCell>3 ОШБ</TableDataCell>
             <TableDataCell>{formatDateAndTime(new Date())}</TableDataCell>
-            <TableDataCell>
+            <TableActionsCell>
               <RightChevronButton as={Link} to='/volunteer/request/123' />
-            </TableDataCell>
+            </TableActionsCell>
           </TableRow>
           <TableRow>
             <TableDataCell>12312</TableDataCell>
@@ -64,9 +65,9 @@ const AvailableRequestsTabContent: React.FC<Props> = ({
             <TableDataCell>Ауніція</TableDataCell>
             <TableDataCell>3 ОШБ</TableDataCell>
             <TableDataCell>{formatDateAndTime(new Date())}</TableDataCell>
-            <TableDataCell>
+            <TableActionsCell>
               <RightChevronButton as={Link} to='/volunteer/request/123' />
-            </TableDataCell>
+            </TableActionsCell>
           </TableRow>
         </TableBody>
       </Table>
