@@ -1,0 +1,1 @@
+export { FundraisingSimpleListItem } from './fundraising-simple-list-item';

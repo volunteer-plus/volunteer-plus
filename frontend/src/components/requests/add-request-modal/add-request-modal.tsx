@@ -21,7 +21,7 @@ const AddRequestModal: React.FC<Props> = ({ isOpen, onClose }) => {
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalContainer>
         <ModalTitle>Додати запит</ModalTitle>
-        <ModalCloseButton onClick={() => onClose} />
+        <ModalCloseButton onClick={() => onClose()} />
         <Formik
           initialValues={{}}
           onSubmit={async () => null}

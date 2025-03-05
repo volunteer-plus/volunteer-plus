@@ -65,9 +65,7 @@ const BareServicemanRequestsPage: React.FC = () => {
               </TableDataCell>
               <TableDataCell>123</TableDataCell>
               <TableActionsCell>
-                <Link to='/serviceman/requests/123'>
-                  <RightChevronButton />
-                </Link>
+                <RightChevronButton as={Link} to='/serviceman/request/123' />
               </TableActionsCell>
             </TableRow>
             <TableRow>
@@ -81,9 +79,7 @@ const BareServicemanRequestsPage: React.FC = () => {
               </TableDataCell>
               <TableDataCell></TableDataCell>
               <TableActionsCell>
-                <Link to='/serviceman/requests/123'>
-                  <RightChevronButton />
-                </Link>
+                <RightChevronButton as={Link} to='/serviceman/request/123' />
               </TableActionsCell>
             </TableRow>
             <TableRow>
@@ -97,9 +93,7 @@ const BareServicemanRequestsPage: React.FC = () => {
               </TableDataCell>
               <TableDataCell></TableDataCell>
               <TableActionsCell>
-                <Link to='/serviceman/requests/123'>
-                  <RightChevronButton />
-                </Link>
+                <RightChevronButton as={Link} to='/serviceman/request/123' />
               </TableActionsCell>
             </TableRow>
             <TableRow>
@@ -113,9 +107,7 @@ const BareServicemanRequestsPage: React.FC = () => {
               </TableDataCell>
               <TableDataCell></TableDataCell>
               <TableActionsCell>
-                <Link to='/serviceman/requests/123'>
-                  <RightChevronButton />
-                </Link>
+                <RightChevronButton as={Link} to='/serviceman/request/123' />
               </TableActionsCell>
             </TableRow>
           </TableBody>

@@ -1,4 +1,3 @@
-import classNames from 'classnames';
 import { Link, useParams } from 'react-router-dom';
 
 import { AdminPageContent } from '@/components/admin';
@@ -8,7 +7,7 @@ import { OffersContainer, RequestForm } from './components';
 import styles from './styles.module.scss';
 import { Authenticated } from '@/components/auth';
 
-const BareServicemanRequestPage: React.FC = () => {
+const BareServicemanOneRequestPage: React.FC = () => {
   const { id: requestId } = useParams();
 
   return (
@@ -25,10 +24,10 @@ const BareServicemanRequestPage: React.FC = () => {
   );
 };
 
-const ServicemanRequestPage = Authenticated(BareServicemanRequestPage, {
+const ServicemanOneRequestPage = Authenticated(BareServicemanOneRequestPage, {
   allowedRoles: {
     serviceman: true,
   },
 });
 
-export { ServicemanRequestPage };
+export { ServicemanOneRequestPage };

@@ -6,3 +6,5 @@ export * from './fundraising-activities-page';
 export * from './donations-statistics';
 export * from './support-fundraising-page';
 export * from './fundraising-progress-bar';
+export * from './fundraising-simple-list';
+export * from './fundraising-simple-list-item';

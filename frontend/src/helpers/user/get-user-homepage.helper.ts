@@ -12,7 +12,7 @@ function getUserHomepage(user: User): string {
   } else if (isServiceman(user)) {
     return '/serviceman/requests';
   } else if (isVolunteer(user)) {
-    return '/volunteer/requests';
+    return '/volunteer/requests/available-requests';
   }
 
   return '/';

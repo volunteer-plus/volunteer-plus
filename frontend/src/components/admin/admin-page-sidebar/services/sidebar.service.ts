@@ -56,7 +56,11 @@ class SidebarService {
         key: 'requests',
         iconName: 'conveyor_belt',
         label: 'Запити',
-        path: '/volunteer/requests',
+        path: '/volunteer/requests/available-requests',
+        subPaths: [
+          /\/volunteer\/request\/\d+/,
+          '/volunteer/requests/my-requests',
+        ],
       },
       {
         key: 'fundraising',

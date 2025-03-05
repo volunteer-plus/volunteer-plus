@@ -18,8 +18,9 @@ import { BrigadesPage, MyBrigadePage } from './components/brigades';
 import { ChatsPage } from './components/chats';
 import {
   ServicemanRequestsPage,
+  ServicemanOneRequestPage,
   VolunteerRequestsPage,
-  ServicemanRequestPage,
+  VolunteerOneRequestPage,
 } from './components/requests';
 import {
   FundraisingActivitiesPage,
@@ -74,16 +75,20 @@ const router = createBrowserRouter([
         element: <ProfilePage />,
       },
       {
-        path: 'volunteer/requests',
+        path: 'volunteer/requests/:tab',
         element: <VolunteerRequestsPage />,
+      },
+      {
+        path: 'volunteer/request/:id',
+        element: <VolunteerOneRequestPage />,
       },
       {
         path: 'serviceman/requests',
         element: <ServicemanRequestsPage />,
       },
       {
-        path: 'serviceman/requests/:id',
-        element: <ServicemanRequestPage />,
+        path: 'serviceman/request/:id',
+        element: <ServicemanOneRequestPage />,
       },
       {
         path: 'fundraising-activities',

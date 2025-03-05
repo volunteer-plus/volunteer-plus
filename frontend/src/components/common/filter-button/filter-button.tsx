@@ -9,11 +9,15 @@ import { useClickOutside } from '@/hooks/common';
 
 import styles from './styles.module.scss';
 
-interface Props extends Omit<React.ComponentProps<typeof Button>, 'children'> {
+interface Props
+  extends Omit<
+    React.ComponentPropsWithRef<typeof Button>,
+    'children' | 'variant' | 'colorSchema' | 'onClick' | 'leftIcon'
+  > {
   children: React.ReactNode;
 }
 
-const FilterButton: React.FC<Props> = ({ children }) => {
+const FilterButton: React.FC<Props> = ({ children, ...props }) => {
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -32,6 +36,7 @@ const FilterButton: React.FC<Props> = ({ children }) => {
   return (
     <>
       <Button
+        {...props}
         variant='filled'
         colorSchema='gray'
         ref={buttonRef}

@@ -62,3 +62,6 @@ export * from './checkbox';
 export * from './field-description';
 export * from './back-button';
 export * from './page-back-button';
+export * from './user-item';
+export * from './pie-progress-indicator';
+export * from './progress-tag';
