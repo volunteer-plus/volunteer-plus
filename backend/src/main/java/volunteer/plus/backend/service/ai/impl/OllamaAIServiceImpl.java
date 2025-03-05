@@ -14,25 +14,20 @@ import volunteer.plus.backend.domain.enums.AIChatClient;
 import volunteer.plus.backend.service.ai.AIModerationService;
 import volunteer.plus.backend.service.ai.OllamaAIService;
 
+import java.util.Map;
 import java.util.concurrent.Future;
 
 
 @Slf4j
 @Service
 public class OllamaAIServiceImpl implements OllamaAIService {
-    private final ChatClient ollamaGeneralChatClient;
-    private final ChatClient ollamaMilitaryChatClient;
-    private final ChatClient ollamaInMemoryChatClient;
+    private final Map<AIChatClient, ChatClient> ollamaChatClientMap;
     private final AIModerationService moderationService;
 
 
-    public OllamaAIServiceImpl(final @Qualifier("ollamaGeneralChatClient") ChatClient ollamaGeneralChatClient,
-                               final @Qualifier("ollamaMilitaryChatClient") ChatClient ollamaMilitaryChatClient,
-                               final @Qualifier("ollamaInMemoryChatClient") ChatClient ollamaInMemoryChatClient,
+    public OllamaAIServiceImpl(final @Qualifier("ollamaChatClientMap") Map<AIChatClient, ChatClient> ollamaChatClientMap,
                                final AIModerationService moderationService) {
-        this.ollamaGeneralChatClient = ollamaGeneralChatClient;
-        this.ollamaMilitaryChatClient = ollamaMilitaryChatClient;
-        this.ollamaInMemoryChatClient = ollamaInMemoryChatClient;
+        this.ollamaChatClientMap = ollamaChatClientMap;
         this.moderationService = moderationService;
     }
 
@@ -47,7 +42,7 @@ public class OllamaAIServiceImpl implements OllamaAIService {
 
         final Prompt prompt = new Prompt(message, OllamaOptions.builder().build());
 
-        final ChatClient chatClient = getClient(aiChatClient);
+        final ChatClient chatClient = ollamaChatClientMap.get(aiChatClient);
         final ChatResponse chatResponse = chatClient
                 .prompt(prompt)
                 .call()
@@ -59,13 +54,5 @@ public class OllamaAIServiceImpl implements OllamaAIService {
                 .chatResponse(chatResponse)
                 .moderationResponse(moderationResponse)
                 .build();
-    }
-
-    private ChatClient getClient(final AIChatClient client) {
-        return switch (client) {
-            case DEFAULT -> ollamaGeneralChatClient;
-            case MILITARY -> ollamaMilitaryChatClient;
-            case IN_MEMORY -> ollamaInMemoryChatClient;
-        };
     }
 }

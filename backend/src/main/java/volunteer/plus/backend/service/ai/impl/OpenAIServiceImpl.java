@@ -46,9 +46,7 @@ import static volunteer.plus.backend.domain.enums.FileType.MP3;
 @Service
 public class OpenAIServiceImpl implements OpenAIService {
 
-    private final ChatClient generalChatClient;
-    private final ChatClient militaryChatClient;
-    private final ChatClient inMemoryChatClient;
+    private final Map<AIChatClient, ChatClient> openAIChatClientMap;
     private final OpenAiImageModel imageModel;
     private final OpenAiAudioTranscriptionModel openAiAudioTranscriptionModel;
     private final OpenAiAudioSpeechModel openAiAudioSpeechModel;
@@ -57,22 +55,18 @@ public class OpenAIServiceImpl implements OpenAIService {
     private final OpenAIService openAIService;
 
     @SneakyThrows
-    public OpenAIServiceImpl(final OpenAiImageModel imageModel,
+    public OpenAIServiceImpl(final @Qualifier("openAIChatClientMap") Map<AIChatClient, ChatClient> openAIChatClientMap,
+                             final OpenAiImageModel imageModel,
                              final OpenAiAudioTranscriptionModel openAiAudioTranscriptionModel,
                              final OpenAiAudioSpeechModel openAiAudioSpeechModel,
                              final FunctionMethodNameCollector functionMethodNameCollector,
-                             final @Qualifier("generalChatClient") ChatClient generalChatClient,
-                             final @Qualifier("militaryChatClient") ChatClient militaryChatClient,
-                             final @Qualifier("inMemoryChatClient") ChatClient inMemoryChatClient,
                              final AIModerationService moderationService,
                              final @Lazy OpenAIService openAIService) {
+        this.openAIChatClientMap = openAIChatClientMap;
         this.imageModel = imageModel;
         this.openAiAudioTranscriptionModel = openAiAudioTranscriptionModel;
         this.openAiAudioSpeechModel = openAiAudioSpeechModel;
         this.functionMethodNameCollector = functionMethodNameCollector;
-        this.generalChatClient = generalChatClient;
-        this.militaryChatClient = militaryChatClient;
-        this.inMemoryChatClient = inMemoryChatClient;
         this.moderationService = moderationService;
         this.openAIService = openAIService;
     }
@@ -97,7 +91,7 @@ public class OpenAIServiceImpl implements OpenAIService {
                         .build()
         );
 
-        final ChatClient client = getClient(chatClient);
+        final ChatClient client = openAIChatClientMap.get(chatClient);
 
         final ChatResponse response = client.prompt(prompt)
                 .call()
@@ -109,14 +103,6 @@ public class OpenAIServiceImpl implements OpenAIService {
                 .chatResponse(response)
                 .moderationResponse(moderationResponse)
                 .build();
-    }
-
-    private ChatClient getClient(final AIChatClient client) {
-        return switch (client) {
-            case DEFAULT -> generalChatClient;
-            case MILITARY -> militaryChatClient;
-            case IN_MEMORY -> inMemoryChatClient;
-        };
     }
 
     @SneakyThrows
