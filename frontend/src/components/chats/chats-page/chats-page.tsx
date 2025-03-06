@@ -35,7 +35,7 @@ const BareChatsPage: React.FC = () => {
             userFullName='Петренко Петро Петрович'
             userRole='Волонтер'
             newMessagesCount={3}
-            userAvatarImageSrc='https://ichef.bbci.co.uk/images/ic/480xn/p02n576b.jpg'
+            userAvatarImageSrc='https://i.pinimg.com/474x/98/51/1e/98511ee98a1930b8938e42caf0904d2d.jpg'
             onClick={() => setIsChatSelected(!isChatSelected)}
             isActive={isChatSelected}
             isUserOnline={isUserOnline}
