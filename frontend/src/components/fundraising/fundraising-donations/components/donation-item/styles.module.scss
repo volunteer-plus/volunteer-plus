@@ -1,0 +1,29 @@
+.root {
+  padding: 16px;
+  background: var(--color-white);
+  border-radius: 4px;
+  border: 1px solid var(--color-gray-300);
+
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+
+  color: var(--color-gray-900);
+}
+
+.amount {
+  color: var(--color-olive-500);
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.amountAndEmail {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.date {
+  color: var(--color-gray-500);
+}

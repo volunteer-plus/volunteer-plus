@@ -1,5 +1,5 @@
 function formatMoneyAmount(amount: number): string {
-  return `${amount.toLocaleString('uk')} грн`;
+  return amount.toLocaleString('uk');
 }
 
 export { formatMoneyAmount };

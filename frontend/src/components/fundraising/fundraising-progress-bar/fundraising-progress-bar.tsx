@@ -21,11 +21,11 @@ const FundraisingProgressBar: React.FC<Props> = ({
       <div className={styles.legend}>
         <div className={styles.item}>
           <div className={styles.title}>Зібрано</div>
-          <div className={styles.value}>{formatMoneyAmount(raised)}</div>
+          <div className={styles.value}>{formatMoneyAmount(raised)} грн</div>
         </div>
         <div className={styles.item}>
           <div className={styles.title}>Ціль</div>
-          <div className={styles.value}>{formatMoneyAmount(target)}</div>
+          <div className={styles.value}>{formatMoneyAmount(target)} грн</div>
         </div>
       </div>
     </div>

@@ -9,3 +9,5 @@ export * from './fundraising-progress-bar';
 export * from './fundraising-simple-list';
 export * from './fundraising-simple-list-item';
 export * from './add-fundraising-modal';
+export * from './fundraising-donations';
+export * from './one-fundraising-activity-page';

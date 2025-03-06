@@ -25,6 +25,7 @@ import {
 import {
   FundraisingActivitiesPage,
   SupportFundraisingPage,
+  OneFundraisingActivityPage,
 } from './components/fundraising';
 
 const router = createBrowserRouter([
@@ -93,6 +94,10 @@ const router = createBrowserRouter([
       {
         path: 'fundraising-activities',
         element: <FundraisingActivitiesPage />,
+      },
+      {
+        path: 'fundraising-activity/:id',
+        element: <OneFundraisingActivityPage />,
       },
     ],
   },

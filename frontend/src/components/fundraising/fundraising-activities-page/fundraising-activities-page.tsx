@@ -24,6 +24,7 @@ import { formatDateAndTime } from '@/helpers/common';
 
 import { FilterForm } from './components';
 import styles from './styles.module.scss';
+import { Link } from 'react-router-dom';
 
 const BareFundraisingActivitiesPage: React.FC = () => {
   const [isAddFundraisingModalOpen, setIsAddFundraisingModalOpen] =
@@ -67,7 +68,7 @@ const BareFundraisingActivitiesPage: React.FC = () => {
               </TableDataCell>
               <TableDataCell>{formatDateAndTime(new Date())}</TableDataCell>
               <TableActionsCell>
-                <RightChevronButton />
+                <RightChevronButton as={Link} to='/fundraising-activity/123' />
               </TableActionsCell>
             </TableRow>
             <TableRow>
@@ -81,7 +82,7 @@ const BareFundraisingActivitiesPage: React.FC = () => {
               </TableDataCell>
               <TableDataCell>{formatDateAndTime(new Date())}</TableDataCell>
               <TableActionsCell>
-                <RightChevronButton />
+                <RightChevronButton as={Link} to='/fundraising-activity/123' />
               </TableActionsCell>
             </TableRow>
             <TableRow>
@@ -95,7 +96,7 @@ const BareFundraisingActivitiesPage: React.FC = () => {
               </TableDataCell>
               <TableDataCell>{formatDateAndTime(new Date())}</TableDataCell>
               <TableActionsCell>
-                <RightChevronButton />
+                <RightChevronButton as={Link} to='/fundraising-activity/123' />
               </TableActionsCell>
             </TableRow>
           </TableBody>

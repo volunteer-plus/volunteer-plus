@@ -67,6 +67,7 @@ class SidebarService {
         iconName: 'savings',
         label: 'Збори',
         path: '/fundraising-activities',
+        subPaths: [/\/fundraising-activity\/\d+/],
       },
     ];
   }

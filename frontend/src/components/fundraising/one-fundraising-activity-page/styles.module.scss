@@ -1,0 +1,50 @@
+.pageTitle {
+  margin-bottom: 32px;
+}
+
+.pageContent {
+  display: flex;
+  flex-direction: column;
+}
+
+.sides {
+  flex-grow: 1;
+  display: grid;
+  grid-template-columns: 2fr 3fr;
+  column-gap: 64px;
+}
+
+.rightSide {
+  display: flex;
+  flex-direction: column;
+}
+
+.donations {
+  flex-basis: 0;
+  flex-grow: 1;
+}
+
+.donationsTitle {
+  margin-bottom: 16px;
+}
+
+.donationsProgressBar {
+  margin-bottom: 16px;
+}
+
+.statusAndButton {
+  display: flex;
+  justify-content: space-between;
+}
+
+.fields > *:not(:last-child) {
+  margin-bottom: 16px;
+}
+
+.formActions {
+  margin-top: 32px;
+
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}

@@ -2,6 +2,7 @@ $collapsed-sidebar-width: 60px;
 $expanded-sidebar-width: 260px;
 
 .sidebar {
+  flex-shrink: 0;
 }
 
 .main {
