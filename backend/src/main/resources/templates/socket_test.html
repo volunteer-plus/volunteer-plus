@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dual Chat Client</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .chat-wrapper {
+            display: flex;
+            gap: 20px;
+        }
+        .chat-panel {
+            flex: 1;
+            border: 1px solid #ccc;
+            display: flex;
+            flex-direction: column;
+            height: 500px;
+        }
+        .chat-header {
+            background: #f4f4f4;
+            padding: 10px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .chat-container {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+            border-top: 1px solid #ccc;
+            border-bottom: 1px solid #ccc;
+        }
+        .chat-input {
+            display: flex;
+            padding: 10px;
+        }
+        .chat-input input {
+            flex: 1;
+            padding: 8px;
+            font-size: 14px;
+        }
+        .chat-input button {
+            padding: 8px 12px;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+        .message {
+            margin: 5px 0;
+            padding: 5px;
+            border-bottom: 1px solid #eee;
+        }
+        .sent {
+            color: blue;
+        }
+        .received {
+            color: green;
+        }
+    </style>
+</head>
+<body>
+<h1>Dual Chat Client</h1>
+<div class="chat-wrapper">
+    <!-- Ollama Chat Panel -->
+    <div class="chat-panel" id="ollama-panel">
+        <div class="chat-header">Ollama Chat</div>
+        <div class="chat-container" id="ollama-chat"></div>
+        <div class="chat-input">
+            <label for="ollama-input"></label><input type="text" id="ollama-input" placeholder="Type your message...">
+            <button id="ollama-send">Send</button>
+        </div>
+    </div>
+
+    <!-- OpenAI Chat Panel -->
+    <div class="chat-panel" id="openai-panel">
+        <div class="chat-header">OpenAI Chat</div>
+        <div class="chat-container" id="openai-chat"></div>
+        <div class="chat-input">
+            <label for="openai-input"></label><input type="text" id="openai-input" placeholder="Type your message...">
+            <button id="openai-send">Send</button>
+        </div>
+    </div>
+</div>
+
+<!-- Load libraries via script tags -->
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+
+<script>
+    // UI Elements for Ollama
+    const ollamaChatContainer = document.getElementById('ollama-chat');
+    const ollamaInput = document.getElementById('ollama-input');
+    const ollamaSendButton = document.getElementById('ollama-send');
+
+    // UI Elements for OpenAI
+    const openaiChatContainer = document.getElementById('openai-chat');
+    const openaiInput = document.getElementById('openai-input');
+    const openaiSendButton = document.getElementById('openai-send');
+
+    // Create a SockJS connection to your backend endpoint
+    const socket = new SockJS('http://localhost:8080/ws-endpoint');
+    const stompClient = Stomp.over(socket);
+
+    // Connect and subscribe to both topics
+    stompClient.connect({}, () => {
+        console.log('Connected to WebSocket');
+
+        // Subscription for Ollama chat responses
+        stompClient.subscribe('/topic/ollama-response', (response) => {
+            displayMessage(response.body, 'received', ollamaChatContainer);
+        });
+
+        // Subscription for OpenAI chat responses
+        stompClient.subscribe('/topic/openai-response', (response) => {
+            displayMessage(response.body, 'received', openaiChatContainer);
+        });
+    }, (error) => {
+        console.error("Error connecting:", error);
+    });
+
+    // Helper function to display messages in a specific chat container
+    function displayMessage(message, type, container) {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('message', type);
+        messageDiv.textContent = message;
+        container.appendChild(messageDiv);
+        container.scrollTop = container.scrollHeight;
+    }
+
+    // Send message for Ollama chat
+    const sendOllamaMessage = () => {
+        const message = ollamaInput.value.trim();
+        if (!message) return;
+        // Send to the /app/ollama-message endpoint for Ollama
+        stompClient.send("/app/ollama-message", {}, message);
+        displayMessage("You: " + message, 'sent', ollamaChatContainer);
+        ollamaInput.value = '';
+        ollamaInput.focus();
+    };
+
+    // Send message for OpenAI chat
+    const sendOpenAIMessage = () => {
+        const message = openaiInput.value.trim();
+        if (!message) return;
+        // Send to the /app/openai-message endpoint for OpenAI
+        stompClient.send("/app/openai-message", {}, message);
+        displayMessage("You: " + message, 'sent', openaiChatContainer);
+        openaiInput.value = '';
+        openaiInput.focus();
+    };
+
+    // Event listeners for send buttons and Enter key in input fields
+    ollamaSendButton.addEventListener('click', sendOllamaMessage);
+    ollamaInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') sendOllamaMessage();
+    });
+
+    openaiSendButton.addEventListener('click', sendOpenAIMessage);
+    openaiInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') sendOpenAIMessage();
+    });
+</script>
+</body>
+</html>
