@@ -13,9 +13,12 @@ import volunteer.plus.backend.domain.dto.AIChatResponse;
 import volunteer.plus.backend.domain.enums.AIChatClient;
 import volunteer.plus.backend.service.ai.AIModerationService;
 import volunteer.plus.backend.service.ai.OllamaAIService;
+import volunteer.plus.backend.service.websocket.WebSocketService;
 
 import java.util.Map;
 import java.util.concurrent.Future;
+
+import static volunteer.plus.backend.config.websocket.WebSocketConfig.OLLAMA_CHAT_CLIENT_TARGET;
 
 
 @Slf4j
@@ -23,12 +26,15 @@ import java.util.concurrent.Future;
 public class OllamaAIServiceImpl implements OllamaAIService {
     private final Map<AIChatClient, ChatClient> ollamaChatClientMap;
     private final AIModerationService moderationService;
+    private final WebSocketService webSocketService;
 
 
     public OllamaAIServiceImpl(final @Qualifier("ollamaChatClientMap") Map<AIChatClient, ChatClient> ollamaChatClientMap,
-                               final AIModerationService moderationService) {
+                               final AIModerationService moderationService,
+                               final WebSocketService webSocketService) {
         this.ollamaChatClientMap = ollamaChatClientMap;
         this.moderationService = moderationService;
+        this.webSocketService = webSocketService;
     }
 
     @Override
@@ -49,6 +55,10 @@ public class OllamaAIServiceImpl implements OllamaAIService {
                 .chatResponse();
 
         final ModerationResponse moderationResponse = moderationFuture.get();
+
+        if (chatResponse != null) {
+            webSocketService.sendNotification(OLLAMA_CHAT_CLIENT_TARGET, "Ollama request:\n" + message + "\nResponse:\n" + chatResponse.getResult().getOutput().getContent());
+        }
 
         return AIChatResponse.builder()
                 .chatResponse(chatResponse)
