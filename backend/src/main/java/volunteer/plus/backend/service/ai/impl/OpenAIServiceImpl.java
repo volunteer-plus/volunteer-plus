@@ -31,6 +31,7 @@ import volunteer.plus.backend.exceptions.ApiException;
 import volunteer.plus.backend.exceptions.ErrorCode;
 import volunteer.plus.backend.service.ai.AIModerationService;
 import volunteer.plus.backend.service.ai.OpenAIService;
+import volunteer.plus.backend.service.websocket.WebSocketService;
 import volunteer.plus.backend.util.FunctionMethodNameCollector;
 
 import java.io.InputStream;
@@ -40,11 +41,14 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
+import static volunteer.plus.backend.config.websocket.WebSocketConfig.*;
 import static volunteer.plus.backend.domain.enums.FileType.MP3;
 
 @Slf4j
 @Service
 public class OpenAIServiceImpl implements OpenAIService {
+
+    private static final String RESPONSE = "\nResponse:\n";
 
     private final Map<AIChatClient, ChatClient> openAIChatClientMap;
     private final OpenAiImageModel imageModel;
@@ -53,6 +57,7 @@ public class OpenAIServiceImpl implements OpenAIService {
     private final FunctionMethodNameCollector functionMethodNameCollector;
     private final AIModerationService moderationService;
     private final OpenAIService openAIService;
+    private final WebSocketService webSocketService;
 
     @SneakyThrows
     public OpenAIServiceImpl(final @Qualifier("openAIChatClientMap") Map<AIChatClient, ChatClient> openAIChatClientMap,
@@ -61,7 +66,8 @@ public class OpenAIServiceImpl implements OpenAIService {
                              final OpenAiAudioSpeechModel openAiAudioSpeechModel,
                              final FunctionMethodNameCollector functionMethodNameCollector,
                              final AIModerationService moderationService,
-                             final @Lazy OpenAIService openAIService) {
+                             final @Lazy OpenAIService openAIService,
+                             final WebSocketService webSocketService) {
         this.openAIChatClientMap = openAIChatClientMap;
         this.imageModel = imageModel;
         this.openAiAudioTranscriptionModel = openAiAudioTranscriptionModel;
@@ -69,6 +75,7 @@ public class OpenAIServiceImpl implements OpenAIService {
         this.functionMethodNameCollector = functionMethodNameCollector;
         this.moderationService = moderationService;
         this.openAIService = openAIService;
+        this.webSocketService = webSocketService;
     }
 
     @Override
@@ -99,6 +106,10 @@ public class OpenAIServiceImpl implements OpenAIService {
 
         final ModerationResponse moderationResponse = moderationFuture.get();
 
+        if (response != null) {
+            webSocketService.sendNotification(OPENAI_CHAT_CLIENT_TARGET, "OpenAI request:\n" + message + RESPONSE + response.getResult().getOutput().getContent());
+        }
+
         return AIChatResponse.builder()
                 .chatResponse(response)
                 .moderationResponse(moderationResponse)
@@ -117,6 +128,8 @@ public class OpenAIServiceImpl implements OpenAIService {
         if (image == null || image.getUrl() == null) {
             throw new ApiException(ErrorCode.EMPTY_FILE);
         }
+
+        webSocketService.sendNotification(OPENAI_IMAGE_CLIENT_TARGET, "OpenAI request image generation:\n" + imageGenerationRequestDTO.getPrompt() + RESPONSE + image.getUrl());
 
         try {
             final URL specUrl = URI.create(image.getUrl()).toURL();
@@ -137,7 +150,7 @@ public class OpenAIServiceImpl implements OpenAIService {
 
         final ImageResponse response = openAIService.getImageResponse(imageGenerationRequestDTO, imageGenerationRequestDTO.getNumber()).get();
 
-        return response.getResults() == null ?
+        final List<String> urls = response.getResults() == null ?
                 new ArrayList<>() :
                 response.getResults()
                         .stream()
@@ -147,6 +160,10 @@ public class OpenAIServiceImpl implements OpenAIService {
                         .map(Image::getUrl)
                         .filter(Objects::nonNull)
                         .toList();
+
+        urls.forEach(url -> webSocketService.sendNotification(OPENAI_IMAGE_CLIENT_TARGET, "OpenAI request image generation:\n" + imageGenerationRequestDTO.getPrompt() + RESPONSE + url));
+
+        return urls;
     }
 
     @Async("asyncExecutor")
@@ -189,6 +206,8 @@ public class OpenAIServiceImpl implements OpenAIService {
 
         log.info("Finished analyzing speech file: {}", file.getOriginalFilename());
 
+        webSocketService.sendNotification(OPENAI_SPEECH_TO_TEXT_CLIENT_TARGET, "OpenAI request text from speech generation:\n" + response.getResult().getOutput());
+
         return response.getResult().getOutput();
     }
 
@@ -209,6 +228,8 @@ public class OpenAIServiceImpl implements OpenAIService {
         log.info("Finished generating audio from speech..");
 
         final byte[] responseAsBytes = response.getResult().getOutput();
+
+        webSocketService.sendNotification(OPENAI_TEXT_TO_SPEECH_CLIENT_TARGET, "OpenAI request speech from text generation:\n" + "Request:\n" + message);
 
         return ResponseEntity.ok()
                 .header("content-disposition", "attachment; filename=output.mp3")

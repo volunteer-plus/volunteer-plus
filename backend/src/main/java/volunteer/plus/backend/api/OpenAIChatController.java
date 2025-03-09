@@ -16,6 +16,9 @@ import volunteer.plus.backend.service.ai.OpenAIService;
 
 import java.util.List;
 
+import static volunteer.plus.backend.config.websocket.WebSocketConfig.OPENAI_MESSAGE_MAPPING;
+import static volunteer.plus.backend.config.websocket.WebSocketConfig.OPENAI_RESPONSE_TARGET;
+
 @Validated
 @RestController
 @RequestMapping("/api/ai")
@@ -30,8 +33,8 @@ public class OpenAIChatController {
         return ResponseEntity.ok(openAIService.chat(aiChatClient, message));
     }
 
-    @MessageMapping("/openai-message")
-    @SendTo("/topic/openai-response")
+    @MessageMapping(OPENAI_MESSAGE_MAPPING)
+    @SendTo(OPENAI_RESPONSE_TARGET)
     public String chat(@Payload final String message) {
         return openAIService.chat(AIChatClient.DEFAULT, message)
                 .getChatResponse()

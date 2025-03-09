@@ -12,6 +12,9 @@ import volunteer.plus.backend.domain.dto.AIChatResponse;
 import volunteer.plus.backend.domain.enums.AIChatClient;
 import volunteer.plus.backend.service.ai.OllamaAIService;
 
+import static volunteer.plus.backend.config.websocket.WebSocketConfig.OLLAMA_MESSAGE_MAPPING;
+import static volunteer.plus.backend.config.websocket.WebSocketConfig.OLLAMA_RESPONSE_TARGET;
+
 @Validated
 @RestController
 @RequestMapping("/api/ai")
@@ -26,8 +29,8 @@ public class OllamaAIChatController {
         return ResponseEntity.ok(ollamaAIService.chat(aiChatClient, message));
     }
 
-    @MessageMapping("/ollama-message")
-    @SendTo("/topic/ollama-response")
+    @MessageMapping(OLLAMA_MESSAGE_MAPPING)
+    @SendTo(OLLAMA_RESPONSE_TARGET)
     public String chat(@Payload final String message) {
        return ollamaAIService.chat(AIChatClient.DEFAULT, message)
                 .getChatResponse()
