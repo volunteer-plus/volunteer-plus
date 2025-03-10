@@ -3,6 +3,7 @@ package volunteer.plus.backend.service.ai.patterns.impl;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
+import volunteer.plus.backend.domain.enums.AIAgentPatternType;
 import volunteer.plus.backend.exceptions.ApiException;
 import volunteer.plus.backend.service.ai.patterns.AIAgentPattern;
 
@@ -18,6 +19,11 @@ public class ParallelizationWorkflow implements AIAgentPattern {
 
     public ParallelizationWorkflow(ChatClient chatClient) {
         this.chatClient = chatClient;
+    }
+
+    @Override
+    public AIAgentPatternType getType() {
+        return AIAgentPatternType.PARALLELIZATION_WORKFLOW;
     }
 
     public List<String> parallel(final String prompt,
