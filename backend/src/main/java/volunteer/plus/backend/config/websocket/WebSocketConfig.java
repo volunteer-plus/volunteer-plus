@@ -1,9 +1,11 @@
 package volunteer.plus.backend.config.websocket;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
@@ -29,9 +31,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public static final String OPENAI_SPEECH_TO_TEXT_CLIENT_TARGET = WS_DESTINATION_PREFIX + "/openai-speech-to-text-client";
 
     private final WebSocketAuthenticationInterceptor authenticationInterceptor;
+    private final ThreadPoolTaskScheduler threadPoolTaskScheduler;
 
-    public WebSocketConfig(@Autowired(required = false) final WebSocketAuthenticationInterceptor authenticationInterceptor) {
+    public WebSocketConfig(@Autowired(required = false) final WebSocketAuthenticationInterceptor authenticationInterceptor,
+                           @Qualifier("wsTaskScheduler") final ThreadPoolTaskScheduler threadPoolTaskScheduler) {
         this.authenticationInterceptor = authenticationInterceptor;
+        this.threadPoolTaskScheduler = threadPoolTaskScheduler;
     }
 
     @Override
@@ -46,8 +51,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        registry.enableSimpleBroker(WS_DESTINATION_PREFIX);
-        registry.setApplicationDestinationPrefixes(APP_MAPPING_PREFIX);
+        registry
+                .setApplicationDestinationPrefixes(APP_MAPPING_PREFIX)
+                .enableSimpleBroker(WS_DESTINATION_PREFIX)
+                .setTaskScheduler(threadPoolTaskScheduler)
+                .setHeartbeatValue(new long[] {10000L, 10000L});
     }
 
     @Override
