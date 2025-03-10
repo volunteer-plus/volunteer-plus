@@ -3,9 +3,6 @@ package volunteer.plus.backend.api;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,8 +13,6 @@ import volunteer.plus.backend.service.ai.OpenAIService;
 
 import java.util.List;
 
-import static volunteer.plus.backend.config.websocket.WebSocketConfig.OPENAI_MESSAGE_MAPPING;
-import static volunteer.plus.backend.config.websocket.WebSocketConfig.OPENAI_RESPONSE_TARGET;
 
 @Validated
 @RestController
@@ -31,16 +26,6 @@ public class OpenAIChatController {
     public ResponseEntity<AIChatResponse> chat(@RequestParam final AIChatClient aiChatClient,
                                                @RequestBody final String message) {
         return ResponseEntity.ok(openAIService.chat(aiChatClient, message));
-    }
-
-    @MessageMapping(OPENAI_MESSAGE_MAPPING)
-    @SendTo(OPENAI_RESPONSE_TARGET)
-    public String chat(@Payload final String message) {
-        return openAIService.chat(AIChatClient.DEFAULT, message)
-                .getChatResponse()
-                .getResult()
-                .getOutput()
-                .getContent();
     }
 
     @PostMapping("/open-ai/generate/image")

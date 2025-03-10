@@ -1,6 +1,8 @@
 package volunteer.plus.backend.config.websocket;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
@@ -26,9 +28,16 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public static final String OPENAI_TEXT_TO_SPEECH_CLIENT_TARGET = WS_DESTINATION_PREFIX + "/openai-text-to-speech-client";
     public static final String OPENAI_SPEECH_TO_TEXT_CLIENT_TARGET = WS_DESTINATION_PREFIX + "/openai-speech-to-text-client";
 
+    private final WebSocketAuthenticationInterceptor authenticationInterceptor;
+
+    public WebSocketConfig(@Autowired(required = false) final WebSocketAuthenticationInterceptor authenticationInterceptor) {
+        this.authenticationInterceptor = authenticationInterceptor;
+    }
+
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint(WS_ENDPOINT);
+        registry.addEndpoint(WS_ENDPOINT)
+                .setAllowedOriginPatterns("*");
 
         registry.addEndpoint(WS_ENDPOINT)
                 .setAllowedOriginPatterns("*")
@@ -39,5 +48,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.enableSimpleBroker(WS_DESTINATION_PREFIX);
         registry.setApplicationDestinationPrefixes(APP_MAPPING_PREFIX);
+    }
+
+    @Override
+    public void configureClientInboundChannel(final ChannelRegistration registration) {
+        if (authenticationInterceptor != null) {
+            registration.interceptors(authenticationInterceptor);
+        }
     }
 }
