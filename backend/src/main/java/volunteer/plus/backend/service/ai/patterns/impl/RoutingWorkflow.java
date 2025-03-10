@@ -3,6 +3,7 @@ package volunteer.plus.backend.service.ai.patterns.impl;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
+import volunteer.plus.backend.domain.enums.AIAgentPatternType;
 import volunteer.plus.backend.exceptions.ApiException;
 import volunteer.plus.backend.service.ai.patterns.AIAgentPattern;
 
@@ -15,6 +16,11 @@ public class RoutingWorkflow implements AIAgentPattern {
 
     public RoutingWorkflow(final ChatClient chatClient) {
         this.chatClient = chatClient;
+    }
+
+    @Override
+    public AIAgentPatternType getType() {
+        return AIAgentPatternType.ROUTING_WORKFLOW;
     }
 
     public String route(final String input,
@@ -42,9 +48,8 @@ public class RoutingWorkflow implements AIAgentPattern {
                 First explain your reasoning, then provide your selection in this JSON format:
 
                 \\{
-                    "reasoning": "Brief explanation of why this ticket should be routed to a specific team.
-                                Consider key terms, user intent, and urgency level.",
-                    "selection": "The chosen team name"
+                    "reasoning": "Brief explanation of why",
+                    "selection": "The resulted selection"
                 \\}
 
                 Input: %s""", availableRoutes, input);

@@ -3,6 +3,7 @@ package volunteer.plus.backend.service.ai.patterns.impl;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
+import volunteer.plus.backend.domain.enums.AIAgentPatternType;
 import volunteer.plus.backend.exceptions.ApiException;
 import volunteer.plus.backend.service.ai.patterns.AIAgentPattern;
 
@@ -24,6 +25,11 @@ public class EvaluationOptimizer implements AIAgentPattern {
         this.chatClient = chatClient;
         this.generatorPrompt = generatorPrompt;
         this.evaluatorPrompt = evaluatorPrompt;
+    }
+
+    @Override
+    public AIAgentPatternType getType() {
+        return AIAgentPatternType.EVALUATION_OPTIMIZER;
     }
 
     public record Generation(String thoughts, String response) {
