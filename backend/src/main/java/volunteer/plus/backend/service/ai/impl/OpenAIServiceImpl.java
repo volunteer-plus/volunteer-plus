@@ -12,6 +12,7 @@ import org.springframework.ai.image.Image;
 import org.springframework.ai.image.ImageGeneration;
 import org.springframework.ai.image.ImagePrompt;
 import org.springframework.ai.image.ImageResponse;
+import org.springframework.ai.model.function.FunctionCallingOptions;
 import org.springframework.ai.moderation.ModerationResponse;
 import org.springframework.ai.openai.*;
 import org.springframework.ai.openai.api.OpenAiAudioApi;
@@ -100,7 +101,7 @@ public class OpenAIServiceImpl implements OpenAIService {
 
         final Prompt prompt = new Prompt(
                 um,
-                OpenAiChatOptions
+                FunctionCallingOptions
                         .builder()
                         .withFunctions(functionMethodNames)
                         .build()

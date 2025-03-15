@@ -6,8 +6,8 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.model.function.FunctionCallingOptions;
 import org.springframework.ai.moderation.ModerationResponse;
-import org.springframework.ai.ollama.api.OllamaOptions;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -56,7 +56,7 @@ public class OllamaAIServiceImpl implements OllamaAIService {
                 getAIMediaList(multipartFiles)
         );
 
-        final Prompt prompt = new Prompt(um, OllamaOptions.builder().build());
+        final Prompt prompt = new Prompt(um, FunctionCallingOptions.builder().build());
 
         final ChatClient chatClient = ollamaChatClientMap.get(aiChatClient);
         final ChatResponse chatResponse = chatClient
