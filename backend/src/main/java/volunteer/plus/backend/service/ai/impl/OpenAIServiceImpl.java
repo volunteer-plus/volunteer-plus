@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.audio.transcription.AudioTranscriptionPrompt;
 import org.springframework.ai.audio.transcription.AudioTranscriptionResponse;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.image.Image;
@@ -43,6 +44,7 @@ import java.util.concurrent.Future;
 
 import static volunteer.plus.backend.config.websocket.WebSocketConfig.*;
 import static volunteer.plus.backend.domain.enums.FileType.MP3;
+import static volunteer.plus.backend.util.AIUtil.getAIMediaList;
 
 @Slf4j
 @Service
@@ -81,7 +83,8 @@ public class OpenAIServiceImpl implements OpenAIService {
     @Override
     @SneakyThrows
     public AIChatResponse chat(final AIChatClient chatClient,
-                               final String message) {
+                               final String message,
+                               final List<MultipartFile> multipartFiles) {
         log.info("Asking GPT: {}", message);
 
         // call async process of message moderation
@@ -90,8 +93,13 @@ public class OpenAIServiceImpl implements OpenAIService {
         // this is prompt configuration that is why we need it in this service
         final Set<String> functionMethodNames = functionMethodNameCollector.getFunctionBeanMethodNames(FunctionalAIConfiguration.class);
 
-        final Prompt prompt = new Prompt(
+        final UserMessage um = new UserMessage(
                 message,
+                getAIMediaList(multipartFiles)
+        );
+
+        final Prompt prompt = new Prompt(
+                um,
                 OpenAiChatOptions
                         .builder()
                         .withFunctions(functionMethodNames)

@@ -12,7 +12,7 @@ import java.util.concurrent.Future;
 
 
 public interface OpenAIService {
-    AIChatResponse chat(AIChatClient aiChatClient, String message);
+    AIChatResponse chat(AIChatClient aiChatClient, String message, List<MultipartFile> multipartFiles);
 
     ResponseEntity<byte[]> generateImage(ImageGenerationRequestDTO imageGenerationRequestDTO);
 

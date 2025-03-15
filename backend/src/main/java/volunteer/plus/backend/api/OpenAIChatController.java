@@ -24,8 +24,9 @@ public class OpenAIChatController {
     @PostMapping("/open-ai/generate/chat")
     @Operation(description = "Chat with OpenAI model chat")
     public ResponseEntity<AIChatResponse> chat(@RequestParam final AIChatClient aiChatClient,
-                                               @RequestBody final String message) {
-        return ResponseEntity.ok(openAIService.chat(aiChatClient, message));
+                                               @RequestPart("message") final String message,
+                                               @RequestPart(name = "file", required = false) List<MultipartFile> multipartFiles) {
+        return ResponseEntity.ok(openAIService.chat(aiChatClient, message, multipartFiles));
     }
 
     @PostMapping("/open-ai/generate/image")
