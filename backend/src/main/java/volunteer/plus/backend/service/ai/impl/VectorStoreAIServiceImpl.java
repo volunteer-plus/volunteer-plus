@@ -7,8 +7,8 @@ import org.springframework.ai.document.DocumentReader;
 import org.springframework.ai.reader.pdf.PagePdfDocumentReader;
 import org.springframework.ai.reader.tika.TikaDocumentReader;
 import org.springframework.ai.transformer.splitter.TextSplitter;
-import org.springframework.ai.vectorstore.RedisVectorStore;
 import org.springframework.ai.vectorstore.SearchRequest;
+import org.springframework.ai.vectorstore.redis.RedisVectorStore;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -74,8 +74,13 @@ public class VectorStoreAIServiceImpl implements VectorStoreAIService {
 
     @Override
     public List<Document> getData(final AIProvider aiProvider,
+                                  final int topK,
                                   final String query) {
-        final SearchRequest searchRequest = SearchRequest.query(query != null ? query : DEFAULT_QUERY_PATTERN);
+        final SearchRequest searchRequest = SearchRequest.builder()
+                .topK(topK)
+                .query(query != null ? query : DEFAULT_QUERY_PATTERN)
+                .build();
+
         return redisVectorStoreMap.get(aiProvider).similaritySearch(searchRequest);
     }
 
@@ -83,7 +88,7 @@ public class VectorStoreAIServiceImpl implements VectorStoreAIService {
     @Override
     public void injectData(final AIProvider aiProvider,
                            final MultipartFile multipartFile) {
-        if (multipartFile == null || multipartFile.getOriginalFilename() == null) {
+        if (multipartFile == null) {
             throw new ApiException(ErrorCode.EMPTY_FILE);
         }
         injectFileToVectorStore(aiProvider, multipartFile.getResource());
@@ -91,7 +96,7 @@ public class VectorStoreAIServiceImpl implements VectorStoreAIService {
 
     private void injectFileToVectorStore(final AIProvider aiProvider,
                                          final Resource resource) {
-        if (resource == null || resource.getFilename() == null) {
+        if (resource == null) {
             throw new ApiException(ErrorCode.EMPTY_FILE);
         }
 

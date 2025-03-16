@@ -22,8 +22,9 @@ public class VectorStoreAIController {
     @GetMapping("/list-data")
     @Operation(description = "Inject file data to vector stores")
     public ResponseEntity<List<Document>> getData(@RequestParam final AIProvider aiProvider,
+                                                  @RequestParam(defaultValue = "100") final int topK,
                                                   @RequestBody(required = false) final String query) {
-        return ResponseEntity.ok(vectorStoreAIService.getData(aiProvider, query));
+        return ResponseEntity.ok(vectorStoreAIService.getData(aiProvider, topK, query));
     }
 
     @PostMapping("/inject-documents")

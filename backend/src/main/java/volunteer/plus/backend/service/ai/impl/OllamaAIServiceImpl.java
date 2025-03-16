@@ -4,9 +4,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.UserMessage;
-import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.model.function.FunctionCallingOptions;
 import org.springframework.ai.moderation.ModerationResponse;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -56,19 +54,15 @@ public class OllamaAIServiceImpl implements OllamaAIService {
                 getAIMediaList(multipartFiles)
         );
 
-        final Prompt prompt = new Prompt(um, FunctionCallingOptions.builder().build());
-
         final ChatClient chatClient = ollamaChatClientMap.get(aiChatClient);
-        final ChatResponse chatResponse = chatClient
-                .prompt(prompt)
+        final String chatResponse = chatClient
+                .prompt(new Prompt(um))
                 .call()
-                .chatResponse();
+                .content();
 
         final ModerationResponse moderationResponse = moderationFuture.get();
 
-        if (chatResponse != null) {
-            webSocketService.sendNotification(OLLAMA_CHAT_CLIENT_TARGET, "Ollama request:\n" + message + "\nResponse:\n" + chatResponse.getResult().getOutput().getContent());
-        }
+        webSocketService.sendNotification(OLLAMA_CHAT_CLIENT_TARGET, "Ollama request:\n" + message + "\nResponse:\n" + chatResponse);
 
         return AIChatResponse.builder()
                 .chatResponse(chatResponse)

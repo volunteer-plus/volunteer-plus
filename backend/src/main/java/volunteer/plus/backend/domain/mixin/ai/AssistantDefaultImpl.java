@@ -3,6 +3,8 @@ package volunteer.plus.backend.domain.mixin.ai;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.ai.chat.messages.AssistantMessage;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -10,19 +12,25 @@ public class AssistantDefaultImpl extends AssistantMessage {
 
     @JsonCreator
     public AssistantDefaultImpl(
-            @JsonProperty("content") String content,
+            @JsonProperty("text") String textContent,
             @JsonProperty("metadata") Map<String, Object> properties,
             @JsonProperty("toolCalls") List<?> toolCalls
     ) {
-        super(content, properties, toolCalls == null ? null :
-                toolCalls.stream().map(ToolCall.class::cast).toList());
+        super(
+                textContent,
+                properties,
+                toolCalls == null ? new ArrayList<>() :
+                        toolCalls.stream()
+                                .map(ToolCall.class::cast)
+                                .toList()
+        );
     }
 
-    public AssistantDefaultImpl(String content) {
-        super(content);
+    public AssistantDefaultImpl(String textContent) {
+        super(textContent);
     }
 
-    public AssistantDefaultImpl(String content, Map<String, Object> properties) {
-        super(content, properties);
+    public AssistantDefaultImpl(String textContent, Map<String, Object> properties) {
+        super(textContent, properties);
     }
 }

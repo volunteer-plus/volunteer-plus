@@ -25,21 +25,13 @@ public class WebSocketChatController {
     @MessageMapping(OLLAMA_MESSAGE_MAPPING)
     @SendTo(OLLAMA_RESPONSE_TARGET)
     public String chatOllamaAI(@Payload final String message) {
-        return ollamaAIService.chat(AIChatClient.DEFAULT, message, List.of())
-                .getChatResponse()
-                .getResult()
-                .getOutput()
-                .getContent();
+        return ollamaAIService.chat(AIChatClient.DEFAULT, message, List.of()).getChatResponse();
     }
 
 
     @MessageMapping(OPENAI_MESSAGE_MAPPING)
     @SendTo(OPENAI_RESPONSE_TARGET)
     public String chatOpenAI(@Payload final String message) {
-        return openAIService.chat(AIChatClient.DEFAULT, message, List.of())
-                .getChatResponse()
-                .getResult()
-                .getOutput()
-                .getContent();
+        return openAIService.chat(AIChatClient.DEFAULT, message, List.of()).getChatResponse();
     }
 }

@@ -15,7 +15,7 @@ public class UserDefaultImpl extends UserMessage {
 
     @JsonCreator
     public UserDefaultImpl(
-            @JsonProperty("content") String textContent,
+            @JsonProperty("text") String textContent,
             @JsonProperty("media") List<Media> media,
             @JsonProperty("metadata") Map<String, Object> metadata
     ) {
