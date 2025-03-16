@@ -3,8 +3,9 @@ package volunteer.plus.backend.service.ai.patterns.impl;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.context.annotation.Bean;
 import volunteer.plus.backend.domain.enums.AIAgentPatternType;
-import volunteer.plus.backend.exceptions.ApiException;
 import volunteer.plus.backend.service.ai.patterns.AIAgentPattern;
 
 import java.util.List;
@@ -12,10 +13,6 @@ import java.util.List;
 @Slf4j
 @Builder
 public class OrchestratorWorkers implements AIAgentPattern {
-
-    private final ChatClient chatClient;
-    private final String orchestratorPrompt;
-    private final String workerPrompt;
 
     @Override
     public AIAgentPatternType getType() {
@@ -31,30 +28,23 @@ public class OrchestratorWorkers implements AIAgentPattern {
     public record FinalResponse(String analysis, List<String> workerResponses) {
     }
 
-    public OrchestratorWorkers(final ChatClient chatClient,
-                               final String orchestratorPrompt,
-                               final String workerPrompt) {
-        this.chatClient = chatClient;
-        this.orchestratorPrompt = orchestratorPrompt;
-        this.workerPrompt = workerPrompt;
-    }
-
-    public FinalResponse process(final String taskDescription) {
-        final OrchestratorResponse orchestratorResponse = this.chatClient.prompt()
-                .user(u -> u.text(this.orchestratorPrompt).param("task", taskDescription))
+    @Bean
+    @Tool(name = "patternOrchestrator")
+    public static FinalResponse process(final String taskDescription,
+                                        final ChatClient chatClient,
+                                        final String orchestratorPrompt,
+                                        final String workerPrompt) {
+        final OrchestratorResponse orchestratorResponse = chatClient.prompt()
+                .user(u -> u.text(orchestratorPrompt).param("task", taskDescription))
                 .call()
                 .entity(OrchestratorResponse.class);
-
-        if (orchestratorResponse == null) {
-            throw new ApiException("Undefined Orchestrator Response");
-        }
 
         log.info("\n=== ORCHESTRATOR OUTPUT ===\nANALYSIS: {}\n\nTASKS: {}\n", orchestratorResponse.analysis(), orchestratorResponse.tasks());
 
         final List<String> workerResponses = orchestratorResponse.tasks()
                 .stream()
-                .map(task -> this.chatClient.prompt()
-                .user(u -> u.text(this.workerPrompt)
+                .map(task -> chatClient.prompt()
+                .user(u -> u.text(workerPrompt)
                         .param("original_task", taskDescription)
                         .param("task_type", task.type())
                         .param("task_description", task.description()))
