@@ -9,6 +9,7 @@ import volunteer.plus.backend.service.ai.tools.AIAgentPattern;
 
 import java.util.List;
 
+@SuppressWarnings("unused")
 @Slf4j
 @Service
 public class PromptChainWorkflow implements AIAgentPattern {

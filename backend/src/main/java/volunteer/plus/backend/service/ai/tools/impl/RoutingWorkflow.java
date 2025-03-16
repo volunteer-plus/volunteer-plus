@@ -10,6 +10,7 @@ import volunteer.plus.backend.service.ai.tools.AIAgentPattern;
 
 import java.util.Map;
 
+@SuppressWarnings("unused")
 @Slf4j
 @Service
 public class RoutingWorkflow implements AIAgentPattern {
