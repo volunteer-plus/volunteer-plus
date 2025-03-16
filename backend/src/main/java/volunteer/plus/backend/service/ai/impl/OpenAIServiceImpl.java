@@ -23,7 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import volunteer.plus.backend.config.ai.AITools;
+import volunteer.plus.backend.service.ai.tools.AIMilitaryTools;
 import volunteer.plus.backend.domain.dto.AIChatResponse;
 import volunteer.plus.backend.domain.dto.ImageGenerationRequestDTO;
 import volunteer.plus.backend.domain.enums.AIChatClient;
@@ -31,6 +31,7 @@ import volunteer.plus.backend.exceptions.ApiException;
 import volunteer.plus.backend.exceptions.ErrorCode;
 import volunteer.plus.backend.service.ai.AIModerationService;
 import volunteer.plus.backend.service.ai.OpenAIService;
+import volunteer.plus.backend.service.ai.tools.AIAgentPattern;
 import volunteer.plus.backend.service.websocket.WebSocketService;
 
 import java.io.InputStream;
@@ -56,7 +57,8 @@ public class OpenAIServiceImpl implements OpenAIService {
     private final OpenAiAudioSpeechModel openAiAudioSpeechModel;
     private final AIModerationService moderationService;
     private final OpenAIService openAIService;
-    private final AITools aiTools;
+    private final AIMilitaryTools aiMilitaryTools;
+    private final List<AIAgentPattern> aiAgentPatterns;
     private final WebSocketService webSocketService;
 
     @SneakyThrows
@@ -66,7 +68,8 @@ public class OpenAIServiceImpl implements OpenAIService {
                              final OpenAiAudioSpeechModel openAiAudioSpeechModel,
                              final AIModerationService moderationService,
                              final @Lazy OpenAIService openAIService,
-                             final AITools aiTools,
+                             final AIMilitaryTools aiMilitaryTools,
+                             final List<AIAgentPattern> aiAgentPatterns,
                              final WebSocketService webSocketService) {
         this.openAIChatClientMap = openAIChatClientMap;
         this.imageModel = imageModel;
@@ -74,7 +77,8 @@ public class OpenAIServiceImpl implements OpenAIService {
         this.openAiAudioSpeechModel = openAiAudioSpeechModel;
         this.moderationService = moderationService;
         this.openAIService = openAIService;
-        this.aiTools = aiTools;
+        this.aiMilitaryTools = aiMilitaryTools;
+        this.aiAgentPatterns = aiAgentPatterns;
         this.webSocketService = webSocketService;
     }
 
@@ -96,7 +100,7 @@ public class OpenAIServiceImpl implements OpenAIService {
         final ChatClient client = openAIChatClientMap.get(chatClient);
 
         final String response = client.prompt(new Prompt(um))
-                .tools(aiTools)
+                .tools(aiMilitaryTools, aiAgentPatterns)
                 .call()
                 .content();
 

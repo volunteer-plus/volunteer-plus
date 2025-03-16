@@ -1,17 +1,16 @@
-package volunteer.plus.backend.service.ai.patterns.impl;
+package volunteer.plus.backend.service.ai.tools.impl;
 
-import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.tool.annotation.Tool;
-import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Service;
 import volunteer.plus.backend.domain.enums.AIAgentPatternType;
-import volunteer.plus.backend.service.ai.patterns.AIAgentPattern;
+import volunteer.plus.backend.service.ai.tools.AIAgentPattern;
 
 import java.util.List;
 
 @Slf4j
-@Builder
+@Service
 public class OrchestratorWorkers implements AIAgentPattern {
 
     @Override
@@ -28,7 +27,6 @@ public class OrchestratorWorkers implements AIAgentPattern {
     public record FinalResponse(String analysis, List<String> workerResponses) {
     }
 
-    @Bean
     @Tool(name = "patternOrchestrator")
     public static FinalResponse process(final String taskDescription,
                                         final ChatClient chatClient,

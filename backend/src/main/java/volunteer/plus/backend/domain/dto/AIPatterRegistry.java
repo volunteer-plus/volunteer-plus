@@ -3,7 +3,7 @@ package volunteer.plus.backend.domain.dto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import volunteer.plus.backend.domain.enums.AIAgentPatternType;
-import volunteer.plus.backend.service.ai.patterns.AIAgentPattern;
+import volunteer.plus.backend.service.ai.tools.AIAgentPattern;
 
 import java.util.List;
 import java.util.Map;

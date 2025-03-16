@@ -1,8 +1,8 @@
-package volunteer.plus.backend.config.ai;
+package volunteer.plus.backend.service.ai.tools;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.tool.annotation.Tool;
-import org.springframework.context.annotation.Bean;
+import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Component;
 import volunteer.plus.backend.domain.dto.BrigadeCodesDateDTO;
 import volunteer.plus.backend.domain.dto.BrigadeCreationRequestDTO;
@@ -16,31 +16,26 @@ import volunteer.plus.backend.service.general.MilitaryPersonnelService;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
+@SuppressWarnings("unused")
 @Component
 @RequiredArgsConstructor
-public class AITools {
+public class AIMilitaryTools {
     private final BrigadeCodesService brigadeCodesService;
     private final BrigadeService brigadeService;
     private final MilitaryPersonnelService militaryPersonnelService;
 
-    @Bean
     @Tool(description = "Get Army all valid brigade regiment codes in the system based on given date criteria.")
-    public Function<BrigadeCodesDateDTO, List<BrigadeCodes>> getArmyBrigadeValidCodes() {
-        return brigadeCodesService::getCodesCreatedAt;
+    public List<BrigadeCodes> getArmyBrigadeValidCodes(@ToolParam final BrigadeCodesDateDTO codeDTO) {
+        return brigadeCodesService.getCodesCreatedAt(codeDTO);
     }
 
-    @Bean
     @Tool(description = "Get Army brigade details by name")
-    public Function<BrigadeNameDTO, BrigadeDTO> getArmyBrigadeDetailsByName() {
-        return brigadeName -> {
-            final BrigadeDTO brigade = brigadeService.getBrigade(brigadeName.getName());
-            return brigade == null ? new BrigadeDTO() : brigade;
-        };
+    public BrigadeDTO getArmyBrigadeDetailsByName(@ToolParam final BrigadeNameDTO nameDTO) {
+        final BrigadeDTO brigade = brigadeService.getBrigade(nameDTO.getName());
+        return brigade == null ? new BrigadeDTO() : brigade;
     }
 
-    @Bean
     @Tool(description =
             """
             Provides a function to create or update a list of army brigades based on the given
@@ -55,12 +50,10 @@ public class AITools {
             - description: Additional details about the brigade.
             """
     )
-    public Function<BrigadeCreationRequestDTO, List<BrigadeDTO>> createOrUpdateArmyBrigade() {
-        return brigadeService::createOrUpdate;
+    public List<BrigadeDTO> createOrUpdateArmyBrigade(@ToolParam final BrigadeCreationRequestDTO creationRequestDTO) {
+        return brigadeService.createOrUpdate(creationRequestDTO);
     }
 
-
-    @Bean
     @Tool(description =
             """
             Create military personnel records for specified brigades.
@@ -69,11 +62,10 @@ public class AITools {
             typically organized by brigade or regiment code.
             """
     )
-    public Function<MilitaryPersonnelCreationRequestDTO, Map<String, List<BrigadeDTO.MilitaryPersonnelDTO>>> createMilitaryPersonnel() {
-        return militaryPersonnelService::createMilitaryPersonnel;
+    public Map<String, List<BrigadeDTO.MilitaryPersonnelDTO>> createMilitaryPersonnel(@ToolParam final MilitaryPersonnelCreationRequestDTO creationRequestDTO) {
+        return militaryPersonnelService.createMilitaryPersonnel(creationRequestDTO);
     }
 
-    @Bean
     @Tool(description =
             """
             Update existing military personnel records for specified brigades.
@@ -81,7 +73,7 @@ public class AITools {
             Returns a list of updated MilitaryPersonnelDTO objects reflecting the changes.
             """
     )
-    public Function<MilitaryPersonnelCreationRequestDTO, List<BrigadeDTO.MilitaryPersonnelDTO>> updateMilitaryPersonnel() {
-        return militaryPersonnelService::updateMilitaryPersonnel;
+    public List<BrigadeDTO.MilitaryPersonnelDTO> updateMilitaryPersonnel(@ToolParam final MilitaryPersonnelCreationRequestDTO creationRequestDTO) {
+        return militaryPersonnelService.updateMilitaryPersonnel(creationRequestDTO);
     }
 }

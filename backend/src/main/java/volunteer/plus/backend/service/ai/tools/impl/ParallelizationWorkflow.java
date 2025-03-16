@@ -1,13 +1,12 @@
-package volunteer.plus.backend.service.ai.patterns.impl;
+package volunteer.plus.backend.service.ai.tools.impl;
 
-import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.tool.annotation.Tool;
-import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Service;
 import volunteer.plus.backend.domain.enums.AIAgentPatternType;
 import volunteer.plus.backend.exceptions.ApiException;
-import volunteer.plus.backend.service.ai.patterns.AIAgentPattern;
+import volunteer.plus.backend.service.ai.tools.AIAgentPattern;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -15,7 +14,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @Slf4j
-@Builder
+@Service
 public class ParallelizationWorkflow implements AIAgentPattern {
 
     @Override
@@ -23,7 +22,6 @@ public class ParallelizationWorkflow implements AIAgentPattern {
         return AIAgentPatternType.PARALLELIZATION_WORKFLOW;
     }
 
-    @Bean
     @Tool(name = "patternParallelization")
     public static List<String> parallel(final String prompt,
                                         final List<String> inputs,

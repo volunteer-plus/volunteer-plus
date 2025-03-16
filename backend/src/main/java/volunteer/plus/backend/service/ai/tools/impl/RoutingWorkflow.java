@@ -1,18 +1,17 @@
-package volunteer.plus.backend.service.ai.patterns.impl;
+package volunteer.plus.backend.service.ai.tools.impl;
 
-import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.tool.annotation.Tool;
-import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Service;
 import volunteer.plus.backend.domain.enums.AIAgentPatternType;
 import volunteer.plus.backend.exceptions.ApiException;
-import volunteer.plus.backend.service.ai.patterns.AIAgentPattern;
+import volunteer.plus.backend.service.ai.tools.AIAgentPattern;
 
 import java.util.Map;
 
 @Slf4j
-@Builder
+@Service
 public class RoutingWorkflow implements AIAgentPattern {
 
     @Override
@@ -20,7 +19,6 @@ public class RoutingWorkflow implements AIAgentPattern {
         return AIAgentPatternType.ROUTING_WORKFLOW;
     }
 
-    @Bean
     @Tool(name = "patternRoute")
     public static String route(final String input,
                                final Map<String, String> routes,

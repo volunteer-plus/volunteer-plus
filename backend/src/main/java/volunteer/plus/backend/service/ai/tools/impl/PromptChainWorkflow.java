@@ -1,17 +1,16 @@
-package volunteer.plus.backend.service.ai.patterns.impl;
+package volunteer.plus.backend.service.ai.tools.impl;
 
-import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.tool.annotation.Tool;
-import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Service;
 import volunteer.plus.backend.domain.enums.AIAgentPatternType;
-import volunteer.plus.backend.service.ai.patterns.AIAgentPattern;
+import volunteer.plus.backend.service.ai.tools.AIAgentPattern;
 
 import java.util.List;
 
 @Slf4j
-@Builder
+@Service
 public class PromptChainWorkflow implements AIAgentPattern {
 
     @Override
@@ -19,7 +18,6 @@ public class PromptChainWorkflow implements AIAgentPattern {
         return AIAgentPatternType.PROMPT_CHAIN_WORKFLOW;
     }
 
-    @Bean
     @Tool(name = "patternChain")
     public static String chain(final String userInput,
                                final ChatClient chatClient,
