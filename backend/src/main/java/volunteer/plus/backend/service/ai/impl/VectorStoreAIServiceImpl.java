@@ -94,6 +94,14 @@ public class VectorStoreAIServiceImpl implements VectorStoreAIService {
         injectFileToVectorStore(aiProvider, multipartFile.getResource());
     }
 
+    @Override
+    public void deleteData(final AIProvider aiProvider,
+                           final List<String> ids) {
+        log.info("Deleting vectors in storage {} with ids: {}", aiProvider, ids);
+        final RedisVectorStore redisStore = redisVectorStoreMap.get(aiProvider);
+        redisStore.delete(ids);
+    }
+
     private void injectFileToVectorStore(final AIProvider aiProvider,
                                          final Resource resource) {
         if (resource == null) {

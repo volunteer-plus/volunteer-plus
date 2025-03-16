@@ -20,7 +20,7 @@ public class VectorStoreAIController {
     private final VectorStoreAIService vectorStoreAIService;
 
     @GetMapping("/list-data")
-    @Operation(description = "Inject file data to vector stores")
+    @Operation(description = "Get data from vector store")
     public ResponseEntity<List<Document>> getData(@RequestParam final AIProvider aiProvider,
                                                   @RequestParam(defaultValue = "100") final int topK,
                                                   @RequestBody(required = false) final String query) {
@@ -28,10 +28,18 @@ public class VectorStoreAIController {
     }
 
     @PostMapping("/inject-documents")
-    @Operation(description = "Inject file data to vector stores")
+    @Operation(description = "Inject file data to vector store")
     public ResponseEntity<Void> injectData(@RequestParam final AIProvider aiProvider,
                                            @RequestBody final MultipartFile file) {
         vectorStoreAIService.injectData(aiProvider, file);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/delete-data")
+    @Operation(description = "Delete data from vector store")
+    public ResponseEntity<Void> deleteData(@RequestParam final AIProvider aiProvider,
+                                           @RequestParam final List<String> ids) {
+        vectorStoreAIService.deleteData(aiProvider, ids);
         return ResponseEntity.ok().build();
     }
 }
