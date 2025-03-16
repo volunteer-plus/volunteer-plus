@@ -1,4 +1,4 @@
-package volunteer.plus.backend.service.ai.patterns;
+package volunteer.plus.backend.service.ai.tools;
 
 import volunteer.plus.backend.domain.enums.AIAgentPatternType;
 

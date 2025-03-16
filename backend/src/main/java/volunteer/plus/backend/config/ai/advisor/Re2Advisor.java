@@ -40,8 +40,8 @@ public class Re2Advisor implements CallAroundAdvisor, StreamAroundAdvisor {
         advisedUserParams.put("prompt", advisedRequest.userText());
 
         return AdvisedRequest.from(advisedRequest)
-                .withUserText("{prompt}\nRead the question again: {prompt} and try to understand it better.\n")
-                .withUserParams(advisedUserParams)
+                .userText("{prompt}\nRead the question again: {prompt} and try to understand it better.\n")
+                .userParams(advisedUserParams)
                 .build();
     }
 }

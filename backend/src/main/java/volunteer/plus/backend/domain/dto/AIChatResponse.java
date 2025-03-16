@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.moderation.ModerationResponse;
 
 @Data
@@ -12,6 +11,6 @@ import org.springframework.ai.moderation.ModerationResponse;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AIChatResponse {
-    private ChatResponse chatResponse;
+    private String chatResponse;
     private ModerationResponse moderationResponse;
 }

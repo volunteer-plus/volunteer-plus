@@ -1,64 +1,59 @@
 package volunteer.plus.backend.config.ai;
 
 import org.springframework.ai.embedding.EmbeddingModel;
-import org.springframework.ai.vectorstore.RedisVectorStore;
+import org.springframework.ai.vectorstore.redis.RedisVectorStore;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import redis.clients.jedis.JedisPooled;
+import volunteer.plus.backend.domain.enums.AIProvider;
+
+import java.util.Map;
 
 @Configuration
 public class RedisVectorStoreConfiguration {
+    private final String redisHost;
+    private final int redisPort;
+    private final RedisVectorStoreProperties redisVectorStoreProperties;
 
-    @Value("${spring.ai.vectorstore.redis-open-ai.index}")
-    private String indexOpenAi;
-
-    @Value("${spring.ai.vectorstore.redis-open-ai.prefix}")
-    private String prefixOpenAi;
-
-    @Value("${spring.ai.vectorstore.redis-ollama.index}")
-    private String indexOllama;
-
-    @Value("${spring.ai.vectorstore.redis-ollama.prefix}")
-    private String prefixOllama;
-
-    @Value("${spring.ai.vectorstore.redis.initialize-schema}")
-    private boolean initializeSchema;
-
-    @Value("${spring.data.redis.host}")
-    private String redisHost;
-
-    @Value("${spring.data.redis.port}")
-    private int redisPort;
-
-    @Bean
-    public RedisVectorStore openAiVectorStore(final @Qualifier("openAiEmbeddingModel") EmbeddingModel embeddingModel) {
-        final RedisVectorStore.RedisVectorStoreConfig config = RedisVectorStore.RedisVectorStoreConfig.builder()
-                .withIndexName(indexOpenAi)
-                .withPrefix(prefixOpenAi)
-                .build();
-
-        return getRedisVectorStore(embeddingModel, config);
+    public RedisVectorStoreConfiguration(@Value("${spring.data.redis.host}") final String redisHost,
+                                         @Value("${spring.data.redis.port}") final int redisPort,
+                                         final RedisVectorStoreProperties redisVectorStoreProperties) {
+        this.redisHost = redisHost;
+        this.redisPort = redisPort;
+        this.redisVectorStoreProperties = redisVectorStoreProperties;
     }
 
     @Bean
-    public RedisVectorStore ollamaVectorStore(final @Qualifier("ollamaEmbeddingModel") EmbeddingModel embeddingModel) {
-        // Create RedisVectorStoreConfig
-        final RedisVectorStore.RedisVectorStoreConfig config = RedisVectorStore.RedisVectorStoreConfig.builder()
-                .withIndexName(indexOllama)
-                .withPrefix(prefixOllama)
-                .build();
-
-        return getRedisVectorStore(embeddingModel, config);
+    public JedisPooled jedisPooled() {
+        return new JedisPooled(redisHost, redisPort);
     }
 
-    private RedisVectorStore getRedisVectorStore(final EmbeddingModel embeddingModel,
-                                                 final RedisVectorStore.RedisVectorStoreConfig redisConfig) {
-        // Create JedisPooled instance
-        final JedisPooled jedis = new JedisPooled(redisHost, redisPort);
+    @Bean
+    public RedisVectorStore openAiVectorStore(final @Qualifier("openAiEmbeddingModel") EmbeddingModel embeddingModel,
+                                              final JedisPooled jedisPooled) {
+        return RedisVectorStore.builder(jedisPooled, embeddingModel)
+                .indexName(redisVectorStoreProperties.getOpenAi().getIndex())
+                .prefix(redisVectorStoreProperties.getOpenAi().getPrefix())
+                .build();
+    }
 
-        // Create RedisVectorStore with required parameters
-        return new RedisVectorStore(redisConfig, embeddingModel, jedis, initializeSchema);
+    @Bean
+    public RedisVectorStore ollamaVectorStore(final @Qualifier("ollamaEmbeddingModel") EmbeddingModel embeddingModel,
+                                              final JedisPooled jedisPooled) {
+        return RedisVectorStore.builder(jedisPooled, embeddingModel)
+                .indexName(redisVectorStoreProperties.getOllama().getIndex())
+                .prefix(redisVectorStoreProperties.getOllama().getPrefix())
+                .build();
+    }
+
+    @Bean("redisVectorStoreMap")
+    public Map<AIProvider, RedisVectorStore> redisVectorStoreMap(final RedisVectorStore openAiVectorStore,
+                                                                 final RedisVectorStore ollamaVectorStore) {
+        return Map.of(
+                AIProvider.OPENAI, openAiVectorStore,
+                AIProvider.OLLAMA, ollamaVectorStore
+        );
     }
 }

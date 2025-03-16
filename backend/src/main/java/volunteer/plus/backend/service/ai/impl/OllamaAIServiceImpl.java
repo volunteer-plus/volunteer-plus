@@ -3,22 +3,24 @@ package volunteer.plus.backend.service.ai.impl;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.moderation.ModerationResponse;
-import org.springframework.ai.ollama.api.OllamaOptions;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import volunteer.plus.backend.domain.dto.AIChatResponse;
 import volunteer.plus.backend.domain.enums.AIChatClient;
 import volunteer.plus.backend.service.ai.AIModerationService;
 import volunteer.plus.backend.service.ai.OllamaAIService;
 import volunteer.plus.backend.service.websocket.WebSocketService;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
 
 import static volunteer.plus.backend.config.websocket.WebSocketConfig.OLLAMA_CHAT_CLIENT_TARGET;
+import static volunteer.plus.backend.util.AIUtil.getAIMediaList;
 
 
 @Slf4j
@@ -40,25 +42,27 @@ public class OllamaAIServiceImpl implements OllamaAIService {
     @Override
     @SneakyThrows
     public AIChatResponse chat(final AIChatClient aiChatClient,
-                               final String message) {
+                               final String message,
+                               final List<MultipartFile> multipartFiles) {
         log.info("Asking Ollama model: {}", message);
 
         // call async process of message moderation
         final Future<ModerationResponse> moderationFuture = moderationService.moderate(message);
 
-        final Prompt prompt = new Prompt(message, OllamaOptions.builder().build());
+        final UserMessage um = new UserMessage(
+                message,
+                getAIMediaList(multipartFiles)
+        );
 
         final ChatClient chatClient = ollamaChatClientMap.get(aiChatClient);
-        final ChatResponse chatResponse = chatClient
-                .prompt(prompt)
+        final String chatResponse = chatClient
+                .prompt(new Prompt(um))
                 .call()
-                .chatResponse();
+                .content();
 
         final ModerationResponse moderationResponse = moderationFuture.get();
 
-        if (chatResponse != null) {
-            webSocketService.sendNotification(OLLAMA_CHAT_CLIENT_TARGET, "Ollama request:\n" + message + "\nResponse:\n" + chatResponse.getResult().getOutput().getContent());
-        }
+        webSocketService.sendNotification(OLLAMA_CHAT_CLIENT_TARGET, "Ollama request:\n" + message + "\nResponse:\n" + chatResponse);
 
         return AIChatResponse.builder()
                 .chatResponse(chatResponse)
