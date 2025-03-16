@@ -8,5 +8,8 @@ import java.util.List;
 
 public interface VectorStoreAIService {
     List<Document> getData(AIProvider aiProvider, int topK, String query);
+
     void injectData(AIProvider aiProvider, MultipartFile multipartFile);
+
+    void deleteData(AIProvider aiProvider, List<String> ids);
 }

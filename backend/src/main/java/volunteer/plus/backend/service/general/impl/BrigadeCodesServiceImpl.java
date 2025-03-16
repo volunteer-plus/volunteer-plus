@@ -11,6 +11,9 @@ import volunteer.plus.backend.service.general.BrigadeCodesService;
 
 import java.util.List;
 
+import static volunteer.plus.backend.config.cache.RedisCacheConfig.REDIS_BROKER_CODES_CACHE_KEY;
+import static volunteer.plus.backend.config.cache.RedisCacheConfig.REDIS_BROKER_CODES_CACHE_NAMES;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -18,7 +21,11 @@ public class BrigadeCodesServiceImpl implements BrigadeCodesService {
     private final BrigadeCodesRepository brigadeCodesRepository;
 
     @Override
-    @Cacheable(value = "brigade_codes", key = "'allBrigadeCodes'")
+    @Cacheable(
+            key = REDIS_BROKER_CODES_CACHE_KEY,
+            cacheNames = REDIS_BROKER_CODES_CACHE_NAMES,
+            cacheManager = "redisCacheManager"
+    )
     public List<String> getCodes() {
         log.info("Get all validated brigade codes");
         return brigadeCodesRepository.findAll()

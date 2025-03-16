@@ -2,6 +2,7 @@ package volunteer.plus.backend.service.general.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +23,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static volunteer.plus.backend.config.cache.RedisCacheConfig.*;
 import static volunteer.plus.backend.domain.dto.BrigadeDTO.MilitaryPersonnelDTO.mapMilitaryPersonnel;
 
 @Slf4j
@@ -32,7 +34,10 @@ public class BrigadeServiceImpl implements BrigadeService {
     private final BrigadeCodesService brigadeCodesService;
 
     @Override
-    @Cacheable(value = "brigades", key = "'allBrigades'")
+    @Cacheable(
+            cacheNames = REDIS_BRIGADES_CACHE_NAMES,
+            cacheManager = "redisCacheManager"
+    )
     public List<BrigadeDTO> getBrigades(Set<Long> ids) {
         log.info("Retrieve brigades data");
         final List<Brigade> brigades;
@@ -59,6 +64,11 @@ public class BrigadeServiceImpl implements BrigadeService {
 
     @Override
     @Transactional
+    @CacheEvict(
+            value = REDIS_BRIGADES_CACHE_NAMES,
+            allEntries = true,
+            cacheManager = "redisCacheManager"
+    )
     public List<BrigadeDTO> createOrUpdate(final BrigadeCreationRequestDTO creationRequestDTO) {
         if (creationRequestDTO == null || creationRequestDTO.getBrigades() == null || creationRequestDTO.getBrigades().isEmpty() ||
                 creationRequestDTO.getBrigades().stream().anyMatch(b -> b.getRegimentCode() == null)) {
@@ -117,6 +127,11 @@ public class BrigadeServiceImpl implements BrigadeService {
 
     @Override
     @Transactional
+    @CacheEvict(
+            value = REDIS_BRIGADES_CACHE_NAMES,
+            allEntries = true,
+            cacheManager = "redisCacheManager"
+    )
     public void deleteAll(final Set<Long> ids) {
         final List<Brigade> brigades = brigadeRepository.findAllById(ids);
 

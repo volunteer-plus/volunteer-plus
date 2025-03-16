@@ -3,7 +3,6 @@ package volunteer.plus.backend.service.general.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import volunteer.plus.backend.domain.entity.AddRequest;
@@ -27,7 +26,6 @@ public class AddRequestServiceImpl implements AddRequestService {
     private final BrigadeCodesService brigadeCodesService;
 
     @Override
-    @Cacheable(value = "requests", key = "'allRequests'")
     public List<AddRequestResponseDTO> getRequests() {
         return addRequestRepository.findAll()
                 .stream()
