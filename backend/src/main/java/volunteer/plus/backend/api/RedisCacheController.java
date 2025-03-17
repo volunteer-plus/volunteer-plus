@@ -1,24 +1,26 @@
 package volunteer.plus.backend.api;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.web.bind.annotation.*;
-import volunteer.plus.backend.service.cache.RedisCacheService;
+import volunteer.plus.backend.service.cache.RedisService;
 
-import java.util.Set;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/cache-redis")
 @RequiredArgsConstructor
+@ConditionalOnProperty(value = "spring.redis.disabled", havingValue = "false")
 public class RedisCacheController {
-    private final RedisCacheService redisCacheService;
+    private final RedisService redisService;
 
     @GetMapping("/keys")
-    public Set<String> getAllKeys(@RequestParam(required = false) final String pattern) {
-        return redisCacheService.getAllKeys(pattern);
+    public List<String> getAllKeys(@RequestParam(required = false) final String cacheNamePrefix) {
+        return redisService.getAllKeys(cacheNamePrefix);
     }
 
     @PostMapping("/evict")
-    public void evictCache(@RequestParam final String name) {
-        redisCacheService.evictCache(name);
+    public void evictCache(@RequestParam(required = false, defaultValue = "") final String cacheNamePrefix) {
+        redisService.evictCache(cacheNamePrefix);
     }
 }

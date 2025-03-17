@@ -11,6 +11,7 @@ import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.redis.RedisVectorStore;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.io.Resource;
@@ -29,6 +30,7 @@ import java.util.Map;
 
 @Slf4j
 @Service
+@ConditionalOnProperty(value = "spring.redis.disabled", havingValue = "false")
 public class VectorStoreAIServiceImpl implements VectorStoreAIService {
     public static final String PDF = ".pdf";
     public static final String DEFAULT_QUERY_PATTERN = "List all data you have";

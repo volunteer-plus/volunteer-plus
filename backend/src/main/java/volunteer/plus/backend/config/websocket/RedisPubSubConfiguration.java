@@ -12,7 +12,7 @@ import volunteer.plus.backend.service.websocket.RedisPubSubMessageReceiver;
 
 @Configuration
 @RequiredArgsConstructor
-@ConditionalOnProperty(value = "redis.websocket.disabled", havingValue = "false")
+@ConditionalOnProperty(value = "spring.redis.disabled", havingValue = "false")
 public class RedisPubSubConfiguration {
     public static final String PUB_SUB_CHANNEL = "pub-sub-channel";
 

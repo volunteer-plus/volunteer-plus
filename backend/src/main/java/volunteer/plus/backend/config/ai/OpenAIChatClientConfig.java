@@ -7,7 +7,10 @@ import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.embedding.EmbeddingModel;
+import org.springframework.ai.vectorstore.SimpleVectorStore;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -27,7 +30,7 @@ public class OpenAIChatClientConfig {
     private final VectorStore openAiVectorStore;
     private final ChatMemory chatMemory;
 
-    public OpenAIChatClientConfig(final @Qualifier("openAiVectorStore") VectorStore openAiVectorStore,
+    public OpenAIChatClientConfig(final @Autowired(required = false) @Qualifier("openAiVectorStore") VectorStore openAiVectorStore,
                                   final ChatMemory chatMemory,
                                   final @Value("${ai.chat.history.window.size}") Integer chatWindowSize,
                                   final @Value("classpath:/prompts/default_system_ai_prompt.txt") Resource defaultSystemPrompt) {
@@ -65,11 +68,17 @@ public class OpenAIChatClientConfig {
 
     @Bean
     public ChatClient inMemoryChatClient(final ChatClientBuilderConfigurer chatClientBuilderConfigurer,
+                                         final @Qualifier("openAiEmbeddingModel") EmbeddingModel embeddingModel,
                                          final @Qualifier("openAiChatModel") ChatModel chatModel) {
         final ChatClient.Builder builder = ChatClient.builder(chatModel);
+
+        final VectorStore vectorStore = openAiVectorStore != null ?
+                openAiVectorStore :
+                SimpleVectorStore.builder(embeddingModel).build();
+
         return chatClientBuilderConfigurer.configure(builder)
                 .defaultAdvisors(
-                        new QuestionAnswerAdvisor(openAiVectorStore),
+                        new QuestionAnswerAdvisor(vectorStore),
                         new MessageChatMemoryAdvisor(chatMemory, DEFAULT_CHAT_MEMORY_CONVERSATION_ID, chatWindowSize),
                         new SimpleLoggerAdvisor(),
                         new Re2Advisor()

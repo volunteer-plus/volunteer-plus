@@ -3,6 +3,7 @@ package volunteer.plus.backend.api;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.document.Document;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/ai/vector-store")
 @RequiredArgsConstructor
+@ConditionalOnProperty(value = "spring.redis.disabled", havingValue = "false")
 public class VectorStoreAIController {
     private final VectorStoreAIService vectorStoreAIService;
 
