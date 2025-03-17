@@ -16,8 +16,8 @@ public class RedisPubSubMessageReceiverImpl implements RedisPubSubMessageReceive
 
     @Override
     public void receiveMessage(final String messagePayload) {
-        log.info("Send websocket message: {}", messagePayload);
         final WebSocketMessageDTO message = JacksonUtil.deserialize(messagePayload, WebSocketMessageDTO.class);
+        log.info("Send websocket message via Redis to topic: {}, with payload: {}", message.getTopic(), message.getPayload());
         messagingTemplate.convertAndSend(message.getTopic(), message.getPayload());
     }
 }

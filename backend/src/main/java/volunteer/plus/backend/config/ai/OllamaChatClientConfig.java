@@ -7,7 +7,10 @@ import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.embedding.EmbeddingModel;
+import org.springframework.ai.vectorstore.SimpleVectorStore;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -27,7 +30,7 @@ public class OllamaChatClientConfig {
     private final VectorStore ollamaVectorStore;
     private final ChatMemory chatMemory;
 
-    public OllamaChatClientConfig(final @Qualifier("ollamaVectorStore") VectorStore ollamaVectorStore,
+    public OllamaChatClientConfig(final @Autowired(required = false) @Qualifier("ollamaVectorStore") VectorStore ollamaVectorStore,
                                   final ChatMemory chatMemory,
                                   final @Value("${ai.chat.history.window.size}") Integer chatWindowSize,
                                   final @Value("classpath:/prompts/default_system_ai_prompt.txt") Resource defaultSystemPrompt) {
@@ -64,11 +67,13 @@ public class OllamaChatClientConfig {
 
     @Bean
     public ChatClient ollamaInMemoryChatClient(final ChatClientBuilderConfigurer chatClientBuilderConfigurer,
+                                               final @Qualifier("ollamaEmbeddingModel") EmbeddingModel embeddingModel,
                                                final @Qualifier("ollamaChatModel") ChatModel chatModel) {
+        final VectorStore vectorStore = ollamaVectorStore != null ? ollamaVectorStore : SimpleVectorStore.builder(embeddingModel).build();
         final ChatClient.Builder builder = ChatClient.builder(chatModel);
         return chatClientBuilderConfigurer.configure(builder)
                 .defaultAdvisors(
-                        new QuestionAnswerAdvisor(ollamaVectorStore),
+                        new QuestionAnswerAdvisor(vectorStore),
                         new MessageChatMemoryAdvisor(chatMemory, DEFAULT_CHAT_MEMORY_CONVERSATION_ID, chatWindowSize),
                         new SimpleLoggerAdvisor(),
                         new Re2Advisor()

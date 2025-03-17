@@ -41,7 +41,7 @@ public class WebSocketServiceImpl implements WebSocketService {
 
             redisTemplate.convertAndSend(PUB_SUB_CHANNEL, data);
         } else {
-            log.info("Start sending notification to WS directly: {}", destination);
+            log.info("Start sending notification to WS directly destination: {}, with payload: {}", destination, payload);
             messagingTemplate.convertAndSend(destination, payload);
         }
     }
