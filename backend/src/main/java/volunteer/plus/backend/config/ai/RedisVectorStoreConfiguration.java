@@ -38,6 +38,7 @@ public class RedisVectorStoreConfiguration {
         return RedisVectorStore.builder(jedisPooled, embeddingModel)
                 .indexName(redisVectorStoreProperties.getOpenAi().getIndex())
                 .prefix(redisVectorStoreProperties.getOpenAi().getPrefix())
+                .initializeSchema(redisVectorStoreProperties.isInitializeSchema())
                 .build();
     }
 
@@ -47,6 +48,7 @@ public class RedisVectorStoreConfiguration {
         return RedisVectorStore.builder(jedisPooled, embeddingModel)
                 .indexName(redisVectorStoreProperties.getOllama().getIndex())
                 .prefix(redisVectorStoreProperties.getOllama().getPrefix())
+                .initializeSchema(redisVectorStoreProperties.isInitializeSchema())
                 .build();
     }
 
