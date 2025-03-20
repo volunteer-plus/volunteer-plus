@@ -2,17 +2,17 @@ package volunteer.plus.backend.api;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import reactor.core.publisher.Flux;
+import volunteer.plus.backend.domain.dto.AIChatResponse;
 import volunteer.plus.backend.domain.dto.ImageGenerationRequestDTO;
-import volunteer.plus.backend.service.ai.DataInjectionService;
+import volunteer.plus.backend.domain.enums.AIChatClient;
 import volunteer.plus.backend.service.ai.OpenAIService;
 
 import java.util.List;
+
 
 @Validated
 @RestController
@@ -20,18 +20,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OpenAIChatController {
     private final OpenAIService openAIService;
-    private final DataInjectionService dataInjectionService;
 
     @PostMapping("/open-ai/generate/chat")
     @Operation(description = "Chat with OpenAI model chat")
-    public ResponseEntity<ChatResponse> chat(@RequestBody final String message) {
-        return ResponseEntity.ok(openAIService.chat(message));
-    }
-
-    @PostMapping("/open-ai/generate/streaming/chat")
-    @Operation(description = "Streaming Chat with OpenAI model chat")
-    public ResponseEntity<Flux<String>> streamingChat(@RequestBody final String message) {
-        return ResponseEntity.ok(openAIService.streamingChat(message));
+    public ResponseEntity<AIChatResponse> chat(@RequestParam final AIChatClient aiChatClient,
+                                               @RequestPart("message") final String message,
+                                               @RequestPart(name = "file", required = false) List<MultipartFile> multipartFiles) {
+        return ResponseEntity.ok(openAIService.chat(aiChatClient, message, multipartFiles));
     }
 
     @PostMapping("/open-ai/generate/image")
@@ -57,12 +52,5 @@ public class OpenAIChatController {
     @Operation(description = "Audio generation from text")
     public ResponseEntity<byte[]> generateAudioFromText(@RequestBody final String message) {
         return openAIService.generateAudioFromText(message);
-    }
-
-    @PostMapping("/open-ai/inject/vector-documents")
-    @Operation(description = "Inject file data to vector store")
-    public ResponseEntity<Void> injectData(@RequestBody final MultipartFile file) {
-        dataInjectionService.injectData(file);
-        return ResponseEntity.ok().build();
     }
 }

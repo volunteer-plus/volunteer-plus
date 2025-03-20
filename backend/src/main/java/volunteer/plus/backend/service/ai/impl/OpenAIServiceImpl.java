@@ -5,12 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.audio.transcription.AudioTranscriptionPrompt;
 import org.springframework.ai.audio.transcription.AudioTranscriptionResponse;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.image.Image;
 import org.springframework.ai.image.ImageGeneration;
 import org.springframework.ai.image.ImagePrompt;
 import org.springframework.ai.image.ImageResponse;
+import org.springframework.ai.moderation.ModerationResponse;
 import org.springframework.ai.openai.*;
 import org.springframework.ai.openai.api.OpenAiAudioApi;
 import org.springframework.ai.openai.audio.speech.SpeechPrompt;
@@ -22,13 +23,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import reactor.core.publisher.Flux;
-import volunteer.plus.backend.config.ai.FunctionalAIConfiguration;
+import volunteer.plus.backend.service.ai.tools.AIMilitaryTools;
+import volunteer.plus.backend.domain.dto.AIChatResponse;
 import volunteer.plus.backend.domain.dto.ImageGenerationRequestDTO;
+import volunteer.plus.backend.domain.enums.AIChatClient;
 import volunteer.plus.backend.exceptions.ApiException;
 import volunteer.plus.backend.exceptions.ErrorCode;
+import volunteer.plus.backend.service.ai.AIModerationService;
 import volunteer.plus.backend.service.ai.OpenAIService;
-import volunteer.plus.backend.util.FunctionMethodNameCollector;
+import volunteer.plus.backend.service.ai.tools.AIAgentPattern;
+import volunteer.plus.backend.service.websocket.WebSocketService;
 
 import java.io.InputStream;
 import java.net.URI;
@@ -37,65 +41,77 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
+import static volunteer.plus.backend.config.websocket.WebSocketConfig.*;
 import static volunteer.plus.backend.domain.enums.FileType.MP3;
+import static volunteer.plus.backend.util.AIUtil.getAIMediaList;
 
 @Slf4j
 @Service
 public class OpenAIServiceImpl implements OpenAIService {
 
-    private final ChatClient generalChatClient;
-    private final ChatClient militaryChatClient;
+    private static final String RESPONSE = "\nResponse:\n";
+
+    private final Map<AIChatClient, ChatClient> openAIChatClientMap;
     private final OpenAiImageModel imageModel;
     private final OpenAiAudioTranscriptionModel openAiAudioTranscriptionModel;
     private final OpenAiAudioSpeechModel openAiAudioSpeechModel;
-    private final FunctionMethodNameCollector functionMethodNameCollector;
+    private final AIModerationService moderationService;
     private final OpenAIService openAIService;
+    private final AIMilitaryTools aiMilitaryTools;
+    private final List<AIAgentPattern> aiAgentPatterns;
+    private final WebSocketService webSocketService;
 
     @SneakyThrows
-    public OpenAIServiceImpl(final OpenAiImageModel imageModel,
+    public OpenAIServiceImpl(final @Qualifier("openAIChatClientMap") Map<AIChatClient, ChatClient> openAIChatClientMap,
+                             final OpenAiImageModel imageModel,
                              final OpenAiAudioTranscriptionModel openAiAudioTranscriptionModel,
                              final OpenAiAudioSpeechModel openAiAudioSpeechModel,
-                             final FunctionMethodNameCollector functionMethodNameCollector,
-                             final @Qualifier("generalChatClient") ChatClient generalChatClient,
-                             final @Qualifier("militaryChatClient") ChatClient militaryChatClient,
-                             final @Lazy OpenAIService openAIService) {
+                             final AIModerationService moderationService,
+                             final @Lazy OpenAIService openAIService,
+                             final AIMilitaryTools aiMilitaryTools,
+                             final List<AIAgentPattern> aiAgentPatterns,
+                             final WebSocketService webSocketService) {
+        this.openAIChatClientMap = openAIChatClientMap;
         this.imageModel = imageModel;
         this.openAiAudioTranscriptionModel = openAiAudioTranscriptionModel;
         this.openAiAudioSpeechModel = openAiAudioSpeechModel;
-        this.functionMethodNameCollector = functionMethodNameCollector;
-        this.generalChatClient = generalChatClient;
-        this.militaryChatClient = militaryChatClient;
+        this.moderationService = moderationService;
         this.openAIService = openAIService;
+        this.aiMilitaryTools = aiMilitaryTools;
+        this.aiAgentPatterns = aiAgentPatterns;
+        this.webSocketService = webSocketService;
     }
 
     @Override
-    public ChatResponse chat(final String message) {
+    @SneakyThrows
+    public AIChatResponse chat(final AIChatClient chatClient,
+                               final String message,
+                               final List<MultipartFile> multipartFiles) {
         log.info("Asking GPT: {}", message);
 
-        // this is prompt configuration that is why we need it in this service
-        final Set<String> functionMethodNames = functionMethodNameCollector.getFunctionBeanMethodNames(FunctionalAIConfiguration.class);
+        // call async process of message moderation
+        final Future<ModerationResponse> moderationFuture = moderationService.moderate(message);
 
-        final Prompt prompt = new Prompt(
+        final UserMessage um = new UserMessage(
                 message,
-                OpenAiChatOptions
-                        .builder()
-                        .withFunctions(functionMethodNames)
-                        .build()
+                getAIMediaList(multipartFiles)
         );
 
-        return militaryChatClient.prompt(prompt)
+        final ChatClient client = openAIChatClientMap.get(chatClient);
+
+        final String response = client.prompt(new Prompt(um))
+                .tools(aiMilitaryTools, aiAgentPatterns)
                 .call()
-                .chatResponse();
-    }
-
-    @Override
-    public Flux<String> streamingChat(final String message) {
-        log.info("Asking Streaming GPT: {}", message);
-
-        return generalChatClient.prompt()
-                .user(message)
-                .stream()
                 .content();
+
+        final ModerationResponse moderationResponse = moderationFuture.get();
+
+        webSocketService.sendNotification(OPENAI_CHAT_CLIENT_TARGET, "OpenAI request:\n" + message + RESPONSE + response);
+
+        return AIChatResponse.builder()
+                .chatResponse(response)
+                .moderationResponse(moderationResponse)
+                .build();
     }
 
     @SneakyThrows
@@ -110,6 +126,8 @@ public class OpenAIServiceImpl implements OpenAIService {
         if (image == null || image.getUrl() == null) {
             throw new ApiException(ErrorCode.EMPTY_FILE);
         }
+
+        webSocketService.sendNotification(OPENAI_IMAGE_CLIENT_TARGET, "OpenAI request image generation:\n" + imageGenerationRequestDTO.getPrompt() + RESPONSE + image.getUrl());
 
         try {
             final URL specUrl = URI.create(image.getUrl()).toURL();
@@ -130,7 +148,7 @@ public class OpenAIServiceImpl implements OpenAIService {
 
         final ImageResponse response = openAIService.getImageResponse(imageGenerationRequestDTO, imageGenerationRequestDTO.getNumber()).get();
 
-        return response.getResults() == null ?
+        final List<String> urls = response.getResults() == null ?
                 new ArrayList<>() :
                 response.getResults()
                         .stream()
@@ -140,6 +158,10 @@ public class OpenAIServiceImpl implements OpenAIService {
                         .map(Image::getUrl)
                         .filter(Objects::nonNull)
                         .toList();
+
+        urls.forEach(url -> webSocketService.sendNotification(OPENAI_IMAGE_CLIENT_TARGET, "OpenAI request image generation:\n" + imageGenerationRequestDTO.getPrompt() + RESPONSE + url));
+
+        return urls;
     }
 
     @Async("asyncExecutor")
@@ -163,7 +185,7 @@ public class OpenAIServiceImpl implements OpenAIService {
     @Override
     public String generateTextFromAudio(final String lang,
                                         final MultipartFile file) {
-        if (file == null || file.getOriginalFilename() == null || !file.getOriginalFilename().contains(MP3.getName())) {
+        if (file == null || !file.getOriginalFilename().contains(MP3.getName())) {
             throw new ApiException(ErrorCode.WRONG_FILE_FORMAT);
         }
 
@@ -172,15 +194,17 @@ public class OpenAIServiceImpl implements OpenAIService {
         final OpenAiAudioApi.TranscriptResponseFormat responseFormat = OpenAiAudioApi.TranscriptResponseFormat.TEXT;
 
         final OpenAiAudioTranscriptionOptions transcriptionOptions = OpenAiAudioTranscriptionOptions.builder()
-                .withLanguage(lang)
-                .withTemperature(0.8f)
-                .withResponseFormat(responseFormat)
+                .language(lang)
+                .temperature(0.8f)
+                .responseFormat(responseFormat)
                 .build();
 
         final AudioTranscriptionPrompt transcriptionRequest = new AudioTranscriptionPrompt(file.getResource(), transcriptionOptions);
         final AudioTranscriptionResponse response = openAiAudioTranscriptionModel.call(transcriptionRequest);
 
         log.info("Finished analyzing speech file: {}", file.getOriginalFilename());
+
+        webSocketService.sendNotification(OPENAI_SPEECH_TO_TEXT_CLIENT_TARGET, "OpenAI request text from speech generation:\n" + response.getResult().getOutput());
 
         return response.getResult().getOutput();
     }
@@ -190,10 +214,10 @@ public class OpenAIServiceImpl implements OpenAIService {
         log.info("Start generating audio from speech..");
 
         final OpenAiAudioSpeechOptions speechOptions = OpenAiAudioSpeechOptions.builder()
-                .withVoice(OpenAiAudioApi.SpeechRequest.Voice.NOVA)
-                .withResponseFormat(OpenAiAudioApi.SpeechRequest.AudioResponseFormat.MP3)
-                .withSpeed(0.8f)
-                .withModel(OpenAiAudioApi.TtsModel.TTS_1.value)
+                .voice(OpenAiAudioApi.SpeechRequest.Voice.NOVA)
+                .responseFormat(OpenAiAudioApi.SpeechRequest.AudioResponseFormat.MP3)
+                .speed(0.8f)
+                .model(OpenAiAudioApi.TtsModel.TTS_1.value)
                 .build();
 
         final SpeechPrompt speechPrompt = new SpeechPrompt(message, speechOptions);
@@ -202,6 +226,8 @@ public class OpenAIServiceImpl implements OpenAIService {
         log.info("Finished generating audio from speech..");
 
         final byte[] responseAsBytes = response.getResult().getOutput();
+
+        webSocketService.sendNotification(OPENAI_TEXT_TO_SPEECH_CLIENT_TARGET, "OpenAI request speech from text generation:\n" + "Request:\n" + message);
 
         return ResponseEntity.ok()
                 .header("content-disposition", "attachment; filename=output.mp3")

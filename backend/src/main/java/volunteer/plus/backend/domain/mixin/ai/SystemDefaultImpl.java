@@ -7,7 +7,7 @@ import org.springframework.core.io.Resource;
 
 public class SystemDefaultImpl extends SystemMessage {
     @JsonCreator
-    public SystemDefaultImpl(@JsonProperty("content") String textContent) {
+    public SystemDefaultImpl(@JsonProperty("text") String textContent) {
         super(textContent);
     }
 

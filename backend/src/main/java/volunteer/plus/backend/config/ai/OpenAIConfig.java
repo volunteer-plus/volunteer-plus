@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import volunteer.plus.backend.repository.AIChatMessageRepository;
+import volunteer.plus.backend.service.ai.impl.AIMemoryServiceImpl;
 
 @Configuration
 public class OpenAIConfig {
@@ -24,22 +25,34 @@ public class OpenAIConfig {
 
     @Bean
     public ChatMemory chatMemory() {
-        return new AIMemory(aiChatMessageRepository);
+        return new AIMemoryServiceImpl(aiChatMessageRepository);
     }
 
     @Bean
     public OpenAiImageModel imageClient(@Value("${spring.ai.openai.api-key}") String apiKey) {
-        return new OpenAiImageModel(new OpenAiImageApi(apiKey));
+        return new OpenAiImageModel(
+                OpenAiImageApi.builder()
+                        .apiKey(apiKey)
+                        .build()
+        );
     }
 
     @Bean
     public OpenAiAudioTranscriptionModel openAiAudioTranscriptionModel(@Value("${spring.ai.openai.api-key}") String apiKey) {
-        return new OpenAiAudioTranscriptionModel(new OpenAiAudioApi(apiKey));
+        return new OpenAiAudioTranscriptionModel(
+                OpenAiAudioApi.builder()
+                        .apiKey(apiKey)
+                        .build()
+        );
     }
 
     @Bean
     public OpenAiAudioSpeechModel openAiAudioSpeechModel(@Value("${spring.ai.openai.api-key}") String apiKey) {
-        return new OpenAiAudioSpeechModel(new OpenAiAudioApi(apiKey));
+        return new OpenAiAudioSpeechModel(
+                OpenAiAudioApi.builder()
+                        .apiKey(apiKey)
+                        .build()
+        );
     }
 
     @Bean

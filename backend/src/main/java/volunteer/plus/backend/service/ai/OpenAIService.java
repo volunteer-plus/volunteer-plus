@@ -1,20 +1,18 @@
 package volunteer.plus.backend.service.ai;
 
-import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.image.ImageResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
-import reactor.core.publisher.Flux;
+import volunteer.plus.backend.domain.dto.AIChatResponse;
 import volunteer.plus.backend.domain.dto.ImageGenerationRequestDTO;
+import volunteer.plus.backend.domain.enums.AIChatClient;
 
 import java.util.List;
 import java.util.concurrent.Future;
 
 
 public interface OpenAIService {
-    ChatResponse chat(String message);
-
-    Flux<String> streamingChat(String message);
+    AIChatResponse chat(AIChatClient aiChatClient, String message, List<MultipartFile> multipartFiles);
 
     ResponseEntity<byte[]> generateImage(ImageGenerationRequestDTO imageGenerationRequestDTO);
 

@@ -3,6 +3,7 @@ package volunteer.plus.backend.service.email.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import volunteer.plus.backend.domain.dto.LiqPayCreationDTO;
 import volunteer.plus.backend.domain.entity.*;
 import volunteer.plus.backend.domain.enums.EmailMessageTag;
 import volunteer.plus.backend.domain.enums.EmailStatus;
@@ -30,7 +31,7 @@ public class EmailNotificationBuilderServiceImpl implements EmailNotificationBui
         final var users = userRepository.findAllByEmailNotNull();
 
         // in this case we need to generate for each user separate notification
-        users.forEach(user -> {
+        for (final UserRepository.UserMainDataProjection user : users) {
             final EmailNotification emailNotification = new EmailNotification();
             emailNotification.setSubjectData("");
             emailNotification.setTemplateData(JacksonUtil.serialize(
@@ -59,7 +60,7 @@ public class EmailNotificationBuilderServiceImpl implements EmailNotificationBui
             });
 
             emailTemplate.addNotification(emailNotification);
-        });
+        }
 
         emailTemplateRepository.save(emailTemplate);
     }
@@ -96,6 +97,63 @@ public class EmailNotificationBuilderServiceImpl implements EmailNotificationBui
                     .build();
             emailNotification.addRecipient(emailRecipient);
         }
+
+        emailTemplate.addNotification(emailNotification);
+
+        emailTemplateRepository.save(emailTemplate);
+    }
+
+    @Override
+    @Transactional
+    public void createUserRegistrationEmail(final User user) {
+        final var emailTemplate = emailTemplateRepository.findByEmailMessageTag(EmailMessageTag.EMAIL_MESSAGE_TAG_3)
+                .orElseThrow(() -> new ApiException(ErrorCode.EMAIL_TEMPLATE_NOT_FOUND));
+
+        final EmailNotification emailNotification = new EmailNotification();
+        emailNotification.setSubjectData(JacksonUtil.serialize(Map.of("name", getFullName(user))));
+        emailNotification.setTemplateData(JacksonUtil.serialize(Map.of()));
+        emailNotification.setDeleted(false);
+        emailNotification.setDraft(false);
+        emailNotification.setStatus(EmailStatus.PENDING);
+        emailNotification.setEmailRecipients(new ArrayList<>());
+        emailNotification.setEmailAttachments(new ArrayList<>());
+
+        final EmailRecipient emailRecipient = EmailRecipient.builder()
+                .fullName(getFullName(user))
+                .emailAddress(user.getEmail())
+                .toRecipient(true)
+                .build();
+
+        emailNotification.addRecipient(emailRecipient);
+
+        emailTemplate.addNotification(emailNotification);
+
+        emailTemplateRepository.save(emailTemplate);
+    }
+
+    @Override
+    @Transactional
+    public void createUserPaymentEmail(final LiqPayCreationDTO liqPayCreationDTO,
+                                       final User user) {
+        final var emailTemplate = emailTemplateRepository.findByEmailMessageTag(EmailMessageTag.EMAIL_MESSAGE_TAG_4)
+                .orElseThrow(() -> new ApiException(ErrorCode.EMAIL_TEMPLATE_NOT_FOUND));
+
+        final EmailNotification emailNotification = new EmailNotification();
+        emailNotification.setSubjectData(JacksonUtil.serialize(Map.of("name", getFullName(user))));
+        emailNotification.setTemplateData(JacksonUtil.serialize(Map.of("amount", liqPayCreationDTO.getAmount())));
+        emailNotification.setDeleted(false);
+        emailNotification.setDraft(false);
+        emailNotification.setStatus(EmailStatus.PENDING);
+        emailNotification.setEmailRecipients(new ArrayList<>());
+        emailNotification.setEmailAttachments(new ArrayList<>());
+
+        final EmailRecipient emailRecipient = EmailRecipient.builder()
+                .fullName(getFullName(user))
+                .emailAddress(user.getEmail())
+                .toRecipient(true)
+                .build();
+
+        emailNotification.addRecipient(emailRecipient);
 
         emailTemplate.addNotification(emailNotification);
 

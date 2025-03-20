@@ -1,0 +1,1 @@
+delete from ai_chat_messages where id != '0';

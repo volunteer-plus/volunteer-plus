@@ -11,6 +11,7 @@ import volunteer.plus.backend.domain.dto.RegistrationData;
 import volunteer.plus.backend.domain.dto.TokenResponse;
 import volunteer.plus.backend.domain.entity.User;
 import volunteer.plus.backend.repository.UserRepository;
+import volunteer.plus.backend.service.email.EmailNotificationBuilderService;
 import volunteer.plus.backend.service.general.AuthenticationService;
 import volunteer.plus.backend.service.security.impl.JwtServiceIml;
 
@@ -22,6 +23,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtServiceIml jwtServiceIml;
+    private final EmailNotificationBuilderService emailNotificationBuilderService;
 
     @Override
     public String registration(RegistrationData registrationData) {
@@ -38,6 +40,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .build();
 
         userRepository.saveAndFlush(user);
+
+        emailNotificationBuilderService.createUserRegistrationEmail(user);
 
         return "You have registered";
     }

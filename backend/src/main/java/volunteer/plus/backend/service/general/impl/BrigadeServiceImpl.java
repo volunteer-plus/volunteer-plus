@@ -2,6 +2,7 @@ package volunteer.plus.backend.service.general.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static volunteer.plus.backend.domain.dto.BrigadeDTO.MilitaryPersonnelDTO.mapMilitaryPersonnel;
+import static volunteer.plus.backend.util.CacheUtil.BRIGADES_CACHE;
 
 @Slf4j
 @Service
@@ -32,7 +34,7 @@ public class BrigadeServiceImpl implements BrigadeService {
     private final BrigadeCodesService brigadeCodesService;
 
     @Override
-    @Cacheable(value = "brigades", key = "'allBrigades'")
+    @Cacheable(cacheNames = {BRIGADES_CACHE})
     public List<BrigadeDTO> getBrigades(Set<Long> ids) {
         log.info("Retrieve brigades data");
         final List<Brigade> brigades;
@@ -59,6 +61,7 @@ public class BrigadeServiceImpl implements BrigadeService {
 
     @Override
     @Transactional
+    @CacheEvict(value = {BRIGADES_CACHE}, allEntries = true)
     public List<BrigadeDTO> createOrUpdate(final BrigadeCreationRequestDTO creationRequestDTO) {
         if (creationRequestDTO == null || creationRequestDTO.getBrigades() == null || creationRequestDTO.getBrigades().isEmpty() ||
                 creationRequestDTO.getBrigades().stream().anyMatch(b -> b.getRegimentCode() == null)) {
@@ -117,6 +120,7 @@ public class BrigadeServiceImpl implements BrigadeService {
 
     @Override
     @Transactional
+    @CacheEvict(value = {BRIGADES_CACHE}, allEntries = true)
     public void deleteAll(final Set<Long> ids) {
         final List<Brigade> brigades = brigadeRepository.findAllById(ids);
 

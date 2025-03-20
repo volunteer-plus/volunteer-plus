@@ -18,7 +18,7 @@ public class DefaultMessage extends AbstractMessage {
     @JsonCreator
     public DefaultMessage(
             @JsonProperty("messageType") MessageType messageType,
-            @JsonProperty("content") String textContent,
+            @JsonProperty("text") String textContent,
             @JsonProperty("metadata") Map<String, Object> metadata
     ) {
         super(messageType, textContent, metadata);

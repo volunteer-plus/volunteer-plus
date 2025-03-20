@@ -25,5 +25,13 @@ services:
     volumes:
       - redisinsight_db:/db
 
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-local:/root
+
 volumes:
+  ollama-local:
   redisinsight_db:
