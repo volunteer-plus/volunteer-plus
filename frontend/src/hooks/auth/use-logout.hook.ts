@@ -1,12 +1,12 @@
-import { useDispatch } from 'react-redux';
 import { useCallback } from 'react';
-import { clearUser } from '@/slices/user';
+import { logout } from '@/slices/user';
+import { useAppDispatch } from '@/hooks/store';
 
 const useLogout = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   return useCallback(() => {
-    dispatch(clearUser());
+    dispatch(logout());
   }, [dispatch]);
 };
 

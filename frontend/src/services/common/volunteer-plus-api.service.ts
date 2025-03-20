@@ -1,25 +1,23 @@
 import { HTTP_STATUS_TO_NAME } from '@/constants/common';
+import { accessTokenService } from '@/services/common';
 
 interface ConnectionConfig {
   basePath: string;
 }
 
-type VolunteerPlusApiErrorName = 'unknown';
-
 class VolunteerPlusApiError extends Error {
-  constructor(
-    message: string = 'Unknown API error',
-    name: VolunteerPlusApiErrorName = 'unknown'
-  ) {
+  constructor(status: number, message: string = 'Unknown API error') {
     super(message);
-    this.name = name;
+    this.status = status;
   }
 
-  public name: VolunteerPlusApiErrorName;
+  public readonly status: number;
 }
 
-class VolunteerPlusApiService {
+class VolunteerPlusApiService extends EventTarget {
   constructor(config: ConnectionConfig) {
+    super();
+
     this.basePath = config.basePath;
   }
 
@@ -59,6 +57,14 @@ class VolunteerPlusApiService {
       body: JSON.stringify(payload),
     };
 
+    const accessToken = this.getAccessToken();
+
+    if (accessToken) {
+      requestInit.headers = {
+        Authorization: `Bearer ${accessToken}`,
+      };
+    }
+
     if (payload) {
       requestInit.body = JSON.stringify(payload);
       requestInit.headers = Object.assign(requestInit.headers ?? {}, {
@@ -73,6 +79,7 @@ class VolunteerPlusApiService {
     }
 
     throw new VolunteerPlusApiError(
+      response.status,
       this.getErrorMessageByHttpStatus(response.status)
     );
   }
@@ -89,6 +96,20 @@ class VolunteerPlusApiService {
     return 'Unknown error';
   }
 
+  private getAccessToken() {
+    const token = accessTokenService.get();
+
+    if (!token) {
+      return null;
+    }
+
+    if (accessTokenService.isTokenExpired(token)) {
+      this.dispatchEvent(new Event('accessTokenExpired'));
+    }
+
+    return token;
+  }
+
   private basePath: string;
 }
 
@@ -96,4 +117,4 @@ const volunteerPlusApiService = new VolunteerPlusApiService({
   basePath: import.meta.env.VITE_VOLUNTEER_PLUS_API_BASE_URL,
 });
 
-export { volunteerPlusApiService };
+export { volunteerPlusApiService, VolunteerPlusApiError };
