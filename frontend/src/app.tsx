@@ -7,7 +7,7 @@ import { router } from '@/router';
 
 import './reset.css';
 import './index.scss';
-import { volunteerPlusApiService } from './services/common/volunteer-plus-api.service';
+import { volunteerPlusApiService } from './services/common/volunteer-plus-api/volunteer-plus-api.service';
 
 const App: React.FC = () => {
   const dispatch = useAppDispatch();

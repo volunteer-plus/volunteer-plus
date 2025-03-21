@@ -1,9 +1,6 @@
-import {
-  accessTokenService,
-  authService,
-  InvalidCredentialsError,
-} from '@/services/common';
-import { userService } from '@/services/common/user.service';
+import { accessTokenService } from '@/services/common/access-token';
+import { authService, InvalidCredentialsError } from '@/services/common/auth';
+import { userService } from '@/services/common/user/user.service';
 import { User } from '@/types/common';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';

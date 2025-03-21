@@ -3,7 +3,7 @@ import { User } from '@/types/common';
 class UserService {
   public async getMe(): Promise<User> {
     return {
-      email: 'volunteer@example.com',
+      email: 'super.admin@example.com',
       firstName: 'John',
       lastName: 'Doe',
     };

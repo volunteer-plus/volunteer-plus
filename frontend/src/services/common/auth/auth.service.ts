@@ -1,7 +1,7 @@
 import {
   VolunteerPlusApiError,
   volunteerPlusApiService,
-} from '../volunteer-plus-api.service';
+} from '../volunteer-plus-api/volunteer-plus-api.service';
 import { LoginCredentials, LoginResponse } from './types';
 
 class InvalidCredentialsError extends Error {
@@ -13,10 +13,10 @@ class InvalidCredentialsError extends Error {
 class AuthService {
   public async login(credentials: LoginCredentials): Promise<LoginResponse> {
     try {
-      return await volunteerPlusApiService.makePostRequest<LoginResponse>(
-        'login',
-        credentials
-      );
+      return await volunteerPlusApiService.makePostRequest<LoginResponse>({
+        path: 'login',
+        payload: credentials,
+      });
     } catch (error) {
       if (error instanceof VolunteerPlusApiError) {
         throw new InvalidCredentialsError();

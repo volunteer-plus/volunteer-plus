@@ -12,11 +12,14 @@ import {
 import styles from './styles.module.scss';
 import { useClickOutside } from '@/hooks/common';
 import { useLogout } from '@/hooks/auth';
+import { useAppSelector } from '@/hooks/store';
+import { getFullName } from '@/helpers/user';
 
 type Props = React.ComponentPropsWithoutRef<'button'>;
 
 const SessionUserBlock: React.FC<Props> = ({ className, ...props }) => {
   const logout = useLogout();
+  const { user } = useAppSelector((state) => state.user);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -38,7 +41,8 @@ const SessionUserBlock: React.FC<Props> = ({ className, ...props }) => {
         ref={blockRef}
       >
         <ExpandIcon isExpanded={isMenuOpen} />
-        <div>Васильченко В. І.</div>
+        {user && <div>{getFullName(user)}</div>}
+
         <Avatar size='30px' />
       </button>
       <Menu

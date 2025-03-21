@@ -12,16 +12,18 @@ import { AdminPageContent } from '@/components/admin';
 import { AddBrigadeModal, BrigadeListItem } from '@/components/brigades';
 
 import styles from './styles.module.scss';
+import { useAppDispatch, useAppSelector } from '@/hooks/store';
+import { loadBrigades } from '@/slices/brigades';
 
 const BareBrigadesPage: React.FC = () => {
+  const dispatch = useAppDispatch();
+
+  const { data, isLoading } = useAppSelector((state) => state.brigades);
   const [isAddBrigadeModalOpen, setIsAddBrigadeModalOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-  }, []);
+    dispatch(loadBrigades());
+  }, [dispatch]);
 
   return (
     <AdminPageContent className={styles.content}>
@@ -41,11 +43,13 @@ const BareBrigadesPage: React.FC = () => {
           ) : (
             <>
               <div className={styles.brigadesList}>
-                <BrigadeListItem />
-                <BrigadeListItem />
-                <BrigadeListItem />
-                <BrigadeListItem />
-                <BrigadeListItem />
+                {data.map((brigade) => (
+                  <BrigadeListItem
+                    key={brigade.id}
+                    brigadeId={brigade.id}
+                    brigadeName={brigade.name}
+                  />
+                ))}
               </div>
               <Pagination
                 currentPage={1}

@@ -1,9 +1,21 @@
 import { HTTP_STATUS_TO_NAME } from '@/constants/common';
-import { accessTokenService } from '@/services/common';
+import { accessTokenService } from '@/services/common/access-token';
+import { isEmpty } from 'lodash';
 
 interface ConnectionConfig {
   basePath: string;
 }
+
+type SearchObject = Record<string, unknown>;
+
+interface RequestOptions {
+  method: string;
+  path: string;
+  payload?: unknown;
+  search?: SearchObject;
+}
+
+type RequestOptionsWithoutMethod = Omit<RequestOptions, 'method'>;
 
 class VolunteerPlusApiError extends Error {
   constructor(status: number, message: string = 'Unknown API error') {
@@ -25,33 +37,64 @@ class VolunteerPlusApiService extends EventTarget {
     return `${this.basePath}/${path}`;
   }
 
-  public makePostRequest<R = unknown>(
-    path: string,
-    payload?: unknown
-  ): Promise<R> {
-    return this.makeRequest('POST', path, payload);
+  public makePostRequest<R = unknown>({
+    path,
+    payload,
+    search,
+  }: RequestOptionsWithoutMethod): Promise<R> {
+    return this.makeRequest({
+      method: 'POST',
+      path,
+      payload,
+      search,
+    });
   }
 
-  public makeGetRequest<R = unknown>(path: string): Promise<R> {
-    return this.makeRequest('GET', path);
+  public makeGetRequest<R = unknown>({
+    path,
+    payload,
+    search,
+  }: RequestOptionsWithoutMethod): Promise<R> {
+    return this.makeRequest({
+      method: 'GET',
+      path,
+      payload,
+      search,
+    });
   }
 
-  public makePutRequest<R = unknown>(
-    path: string,
-    payload?: unknown
-  ): Promise<R> {
-    return this.makeRequest('PUT', path, payload);
+  public makePutRequest<R = unknown>({
+    path,
+    payload,
+    search,
+  }: RequestOptionsWithoutMethod): Promise<R> {
+    return this.makeRequest({
+      method: 'PUT',
+      path,
+      payload,
+      search,
+    });
   }
 
-  public makeDeleteRequest<R = unknown>(path: string): Promise<R> {
-    return this.makeRequest('DELETE', path);
+  public makeDeleteRequest<R = unknown>({
+    path,
+    payload,
+    search,
+  }: RequestOptionsWithoutMethod): Promise<R> {
+    return this.makeRequest({
+      method: 'DELETE',
+      path,
+      payload,
+      search,
+    });
   }
 
-  private async makeRequest<R = unknown>(
-    method: string,
-    path: string,
-    payload?: unknown
-  ): Promise<R> {
+  private async makeRequest<R = unknown>({
+    method,
+    path,
+    payload,
+    search,
+  }: RequestOptions): Promise<R> {
     const requestInit: RequestInit = {
       method,
       body: JSON.stringify(payload),
@@ -72,7 +115,13 @@ class VolunteerPlusApiService extends EventTarget {
       });
     }
 
-    const response = await fetch(this.getFullUrl(path), requestInit);
+    let url = this.getFullUrl(path);
+
+    if (search && !isEmpty(search)) {
+      url = this.addSearchToUrl(url, search);
+    }
+
+    const response = await fetch(url, requestInit);
 
     if (response.ok) {
       return (await response.json()) as R;
@@ -82,6 +131,20 @@ class VolunteerPlusApiService extends EventTarget {
       response.status,
       this.getErrorMessageByHttpStatus(response.status)
     );
+  }
+
+  private addSearchToUrl(url: string, search: SearchObject) {
+    const params = new URLSearchParams();
+
+    for (const [key, value] of Object.entries(search)) {
+      if (Array.isArray(value)) {
+        params.set(key, value.join(','));
+      } else {
+        params.set(key, String(value));
+      }
+    }
+
+    return `${url}?${params.toString()}`;
   }
 
   private getErrorMessageByHttpStatus(status: number): string {
