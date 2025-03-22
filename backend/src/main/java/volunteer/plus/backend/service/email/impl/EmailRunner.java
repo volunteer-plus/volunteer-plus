@@ -18,11 +18,11 @@ public class EmailRunner implements Job {
 
     @Override
     public void execute(final JobExecutionContext jobExecutionContext) {
-        log.info("Executing scheduled task: {}", this.getClass().getSimpleName());
+        log.info("Executing scheduled job: {}", this.getClass().getSimpleName());
         try {
             emailNotificationService.processEmailNotifications();
         } catch (Exception e) {
-            log.error("Error executing scheduled task", e);
+            log.error("Error executing scheduled job", e);
         }
     }
 }

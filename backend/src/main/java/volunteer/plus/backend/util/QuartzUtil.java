@@ -22,7 +22,7 @@ public class QuartzUtil {
         }
 
         if (trigger.getJobKey() != null) {
-            def.setTaskName(trigger.getJobKey().getName());
+            def.setJobName(trigger.getJobKey().getName());
         }
 
         return def;

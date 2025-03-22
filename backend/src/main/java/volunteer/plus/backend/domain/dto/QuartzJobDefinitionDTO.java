@@ -12,9 +12,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class TaskDefinitionDTO {
+public class QuartzJobDefinitionDTO {
     @NotBlank
-    private String taskName;
+    private String jobName;
 
     @NotNull
     @Valid

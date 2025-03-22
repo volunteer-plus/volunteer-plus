@@ -18,7 +18,7 @@ public class TriggerDefinitionDTO {
     @NotBlank
     private String cronExpression;
 
-    private String taskName;
+    private String jobName;
 
     private Trigger.TriggerState state;
 }
