@@ -13,9 +13,9 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class TaskDTO {
+public class QuartzJobDTO {
     @NotBlank
     private String name;
 
-    private List<TriggerDefinitionDTO> schedulers = new ArrayList<>();
+    private List<TriggerDefinitionDTO> triggers = new ArrayList<>();
 }

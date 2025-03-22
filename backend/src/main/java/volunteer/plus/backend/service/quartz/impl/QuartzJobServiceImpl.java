@@ -10,11 +10,11 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.quartz.utils.Key;
 import org.springframework.transaction.annotation.Transactional;
-import volunteer.plus.backend.domain.dto.TaskDTO;
-import volunteer.plus.backend.domain.dto.TaskDefinitionDTO;
+import volunteer.plus.backend.domain.dto.QuartzJobDTO;
+import volunteer.plus.backend.domain.dto.QuartzJobDefinitionDTO;
 import volunteer.plus.backend.domain.dto.TriggerDefinitionDTO;
 import volunteer.plus.backend.exceptions.ApiException;
-import volunteer.plus.backend.service.quartz.TaskService;
+import volunteer.plus.backend.service.quartz.QuartzJobService;
 import volunteer.plus.backend.util.QuartzUtil;
 
 import java.util.ArrayList;
@@ -25,20 +25,20 @@ import java.util.Set;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class TaskServiceImpl implements TaskService {
+public class QuartzJobServiceImpl implements QuartzJobService {
     private final ApplicationContext context;
     private final Scheduler scheduler;
 
     @Override
-    public List<TaskDTO> findAvailableTasks() {
+    public List<QuartzJobDTO> findAvailableJobs() {
         log.info("Getting all quartz jobs...");
         final Map<String, Job> jobs = context.getBeansOfType(Job.class);
         return jobs.keySet()
                 .stream()
                 .map(job ->
-                        TaskDTO.builder()
+                        QuartzJobDTO.builder()
                                 .name(job)
-                                .schedulers(getTriggerDefinitions(job))
+                                .triggers(getTriggerDefinitions(job))
                                 .build()
                 )
                 .toList();
@@ -46,15 +46,15 @@ public class TaskServiceImpl implements TaskService {
 
     @SneakyThrows
     @Override
-    public void launchTask(final TaskDTO taskDTO) {
-        log.info("Launching task {}", taskDTO);
+    public void launchJob(final QuartzJobDTO quartzJobDTO) {
+        log.info("Launching job {}", quartzJobDTO);
 
-        final Class<? extends Job> jobClass = getJobTargetClass(taskDTO.getName());
+        final Class<? extends Job> jobClass = getJobTargetClass(quartzJobDTO.getName());
 
-        JobDetail detail = findDetailByTaskName(taskDTO.getName());
+        JobDetail detail = findDetailByJobName(quartzJobDTO.getName());
 
         if (detail == null) {
-            detail = createNewJobDetail(taskDTO.getName(), jobClass);
+            detail = createNewJobDetail(quartzJobDTO.getName(), jobClass);
         }
 
         scheduler.triggerJob(detail.getKey());
@@ -63,20 +63,20 @@ public class TaskServiceImpl implements TaskService {
     @SneakyThrows
     @Override
     @Transactional
-    public void scheduleTask(final TaskDefinitionDTO taskDefinitionDTO) {
-        log.info("Scheduling task {}", taskDefinitionDTO);
+    public void scheduleJob(final QuartzJobDefinitionDTO quartzJobDefinitionDTO) {
+        log.info("Scheduling job {}", quartzJobDefinitionDTO);
 
-        final Class<? extends Job> jobClass = getJobTargetClass(taskDefinitionDTO.getTaskName());
+        final Class<? extends Job> jobClass = getJobTargetClass(quartzJobDefinitionDTO.getJobName());
 
-        JobDetail detail = findDetailByTaskName(taskDefinitionDTO.getTaskName());
+        JobDetail detail = findDetailByJobName(quartzJobDefinitionDTO.getJobName());
 
         if (detail == null) {
-            detail = createNewJobDetail(taskDefinitionDTO.getTaskName(), jobClass);
+            detail = createNewJobDetail(quartzJobDefinitionDTO.getJobName(), jobClass);
         }
 
         final CronTrigger cronTrigger = TriggerBuilder.newTrigger()
-                .withIdentity(taskDefinitionDTO.getTrigger().getName(), Key.DEFAULT_GROUP)
-                .withSchedule(CronScheduleBuilder.cronSchedule(taskDefinitionDTO.getTrigger().getCronExpression()))
+                .withIdentity(quartzJobDefinitionDTO.getTrigger().getName(), Key.DEFAULT_GROUP)
+                .withSchedule(CronScheduleBuilder.cronSchedule(quartzJobDefinitionDTO.getTrigger().getCronExpression()))
                 .forJob(detail.getKey())
                 .build();
 
@@ -85,7 +85,7 @@ public class TaskServiceImpl implements TaskService {
         }
 
         for (final Trigger trigger : scheduler.getTriggersOfJob(detail.getKey())) {
-            if (trigger instanceof CronTrigger cron && taskDefinitionDTO.getTrigger().getCronExpression().equalsIgnoreCase(cron.getCronExpression())) {
+            if (trigger instanceof CronTrigger cron && quartzJobDefinitionDTO.getTrigger().getCronExpression().equalsIgnoreCase(cron.getCronExpression())) {
                 throw new ApiException("Trigger with cron " + cron.getCronExpression() + " already exists");
             }
         }
@@ -95,12 +95,12 @@ public class TaskServiceImpl implements TaskService {
 
     @SneakyThrows
     @Override
-    public List<TriggerDefinitionDTO> getTriggerDefinitions(final String taskName) {
-        log.info("Getting schedulers for task(s)");
+    public List<TriggerDefinitionDTO> getTriggerDefinitions(final String jobName) {
+        log.info("Getting schedulers for job(s)");
 
         final List<TriggerDefinitionDTO> result = new ArrayList<>();
 
-        final List<? extends Trigger> triggers = getTriggers(taskName);
+        final List<? extends Trigger> triggers = getTriggers(jobName);
 
         for (final Trigger trigger : triggers) {
             final var state = scheduler.getTriggerState(trigger.getKey());
@@ -113,10 +113,10 @@ public class TaskServiceImpl implements TaskService {
     @SneakyThrows
     @Override
     @Transactional
-    public void pauseTrigger(final String triggerName) {
-        log.info("Pause trigger {}", triggerName);
+    public void pauseTrigger(final String jobName) {
+        log.info("Pause trigger {}", jobName);
 
-        final TriggerKey key = findTriggerKey(triggerName);
+        final TriggerKey key = findTriggerKey(jobName);
         final Trigger.TriggerState state = scheduler.getTriggerState(key);
 
         if (state == Trigger.TriggerState.PAUSED) {
@@ -129,10 +129,10 @@ public class TaskServiceImpl implements TaskService {
     @SneakyThrows
     @Override
     @Transactional
-    public void resumeTrigger(final String triggerName) {
-        log.info("Resume trigger {}", triggerName);
+    public void resumeTrigger(final String jobName) {
+        log.info("Resume trigger {}", jobName);
 
-        final TriggerKey key = findTriggerKey(triggerName);
+        final TriggerKey key = findTriggerKey(jobName);
         final Trigger.TriggerState state = scheduler.getTriggerState(key);
 
         if (state == Trigger.TriggerState.NORMAL) {
@@ -145,9 +145,9 @@ public class TaskServiceImpl implements TaskService {
     @SneakyThrows
     @Override
     @Transactional
-    public void deleteTrigger(final String triggerName) {
-        log.info("Delete trigger {}", triggerName);
-        final TriggerKey key = findTriggerKey(triggerName);
+    public void deleteTrigger(final String jobName) {
+        log.info("Delete trigger {}", jobName);
+        final TriggerKey key = findTriggerKey(jobName);
         if (!scheduler.unscheduleJob(key)) {
             throw new ApiException("Cannot delete trigger");
         }
@@ -163,9 +163,9 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @SneakyThrows
-    private List<? extends Trigger> getTriggers(final String taskName) {
-        if (taskName != null) {
-            return scheduler.getTriggersOfJob(QuartzUtil.buildJobKey(taskName));
+    private List<? extends Trigger> getTriggers(final String jobName) {
+        if (jobName != null) {
+            return scheduler.getTriggersOfJob(QuartzUtil.buildJobKey(jobName));
         }
 
         final Set<TriggerKey> triggerKeys = scheduler.getTriggerKeys(GroupMatcher.anyGroup());
@@ -179,26 +179,26 @@ public class TaskServiceImpl implements TaskService {
         return result;
     }
 
-    private Class<? extends Job> getJobTargetClass(final String taskName) {
+    private Class<? extends Job> getJobTargetClass(final String jobName) {
         final Map<String, Job> jobs = context.getBeansOfType(Job.class);
 
-        if (!jobs.containsKey(taskName)) {
+        if (!jobs.containsKey(jobName)) {
             throw new ApiException("Cannot find job class");
         }
 
-        final Job job = context.getBean(taskName, Job.class);
-        final Class<?> taskClass = AopUtils.getTargetClass(job);
+        final Job job = context.getBean(jobName, Job.class);
+        final Class<?> targetClass = AopUtils.getTargetClass(job);
 
         @SuppressWarnings("unchecked")
-        final Class<? extends Job> jobClass = (Class<? extends Job>) taskClass;
+        final Class<? extends Job> jobClass = (Class<? extends Job>) targetClass;
 
         return jobClass;
     }
 
-    private JobDetail createNewJobDetail(final String taskName,
+    private JobDetail createNewJobDetail(final String jobName,
                                          final Class<? extends Job> jobClass) throws SchedulerException {
 
-        final JobKey key = QuartzUtil.buildJobKey(taskName);
+        final JobKey key = QuartzUtil.buildJobKey(jobName);
 
         log.info("Creating new job detail with key {}", key);
 
@@ -213,8 +213,8 @@ public class TaskServiceImpl implements TaskService {
         return jobDetail;
     }
 
-    private JobDetail findDetailByTaskName(final String taskName) throws SchedulerException {
-        final JobKey key = QuartzUtil.buildJobKey(taskName);
+    private JobDetail findDetailByJobName(final String jobName) throws SchedulerException {
+        final JobKey key = QuartzUtil.buildJobKey(jobName);
         return scheduler.getJobDetail(key);
     }
 }
