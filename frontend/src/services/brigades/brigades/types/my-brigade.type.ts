@@ -1,3 +1,4 @@
+import { MyBrigadeMilitaryPersonnel } from './my-brigade-military-personnel.type';
 interface MyBrigade {
   id: number;
   createDate: string;
@@ -10,6 +11,7 @@ interface MyBrigade {
   websiteLink: string;
   currentCommander: string;
   description: string;
+  militaryPersonnel: MyBrigadeMilitaryPersonnel[];
 }
 
 export type { MyBrigade };

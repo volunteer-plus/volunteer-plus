@@ -6,16 +6,25 @@ import {
   TableRow,
   TableUserCell,
 } from '@/components/common';
+import { getFullName } from '@/helpers/user';
 import { useState } from 'react';
 
-const BrigadeMemberRow = () => {
+interface Props {
+  data: {
+    firstName: string;
+    lastName: string;
+    requestsCount?: number;
+  };
+}
+
+const BrigadeMemberRow: React.FC<Props> = ({ data }) => {
   const [isDeactivateModalOpen, setIsDeactivateModalOpen] = useState(false);
 
   return (
     <TableRow>
-      <TableUserCell />
-      <TableDataCell>petrenko@gmail.com</TableDataCell>
-      <TableDataCell>123</TableDataCell>
+      <TableUserCell name={getFullName(data)} />
+      <TableDataCell>a@a.com</TableDataCell>
+      <TableDataCell>{data.requestsCount ?? '-'}</TableDataCell>
       <TableActionsCell>
         <TableAction onClick={() => setIsDeactivateModalOpen(true)}>
           delete

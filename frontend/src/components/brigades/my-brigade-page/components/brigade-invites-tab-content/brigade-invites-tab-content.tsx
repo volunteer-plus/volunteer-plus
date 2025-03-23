@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Form, Formik } from 'formik';
 import {
   GrayContainer,
@@ -12,14 +13,25 @@ import {
   Button,
   FormikMultiselectField,
 } from '@/components/common';
-import styles from './styles.module.scss';
+import { AddInvitesModal } from '@/components/brigades';
+import { useAppDispatch, useAppSelector } from '@/hooks/store';
+import { loadMyBrigadeInvitesIfNotLoaded } from '@/slices/my-brigade-invites';
 
 import { BrigadeInviteRow } from '../brigade-invite-row';
-import { useState } from 'react';
-import { AddInvitesModal } from '@/components/brigades/add-invites-modal';
+import styles from './styles.module.scss';
 
 const BrigadeInvitesTabContent: React.FC = () => {
+  const dispatch = useAppDispatch();
+
+  const myBrigadeInvitesState = useAppSelector(
+    (state) => state.myBrigadeInvites
+  );
+
   const [isAddInvitesModalOpen, setIsAddInvitesModalOpen] = useState(false);
+
+  useEffect(() => {
+    dispatch(loadMyBrigadeInvitesIfNotLoaded());
+  }, []);
 
   return (
     <GrayContainer isUnderTabs className={styles.container}>
@@ -33,7 +45,6 @@ const BrigadeInvitesTabContent: React.FC = () => {
                   placeholder='Статус'
                   label='Статус'
                   name='status'
-                  value={[]}
                   options={[
                     { label: 'Нове', value: 'new' },
                     { label: 'Відкликане', value: 'canceled' },
@@ -60,9 +71,9 @@ const BrigadeInvitesTabContent: React.FC = () => {
           </TableRow>
         </TableHead>
         <TableBody>
-          <BrigadeInviteRow />
-          <BrigadeInviteRow />
-          <BrigadeInviteRow />
+          {myBrigadeInvitesState.data?.value.map((invite) => (
+            <BrigadeInviteRow key={invite.id} data={invite} />
+          ))}
         </TableBody>
       </Table>
       <Pagination currentPage={1} totalPages={10} getPageUrl={() => '/'} />

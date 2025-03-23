@@ -16,7 +16,7 @@
 
     &.centerAlignment {
       left: var(--menu-left);
-      transform: translateX(-50%), var(--scale-transform);
+      transform: translateX(-50%) var(--scale-transform);
     }
 
     &.stretchAlignment {

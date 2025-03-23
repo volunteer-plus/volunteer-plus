@@ -1,25 +1,39 @@
+import { useState } from 'react';
 import {
   ConfirmationModal,
+  SecretKeyField,
   TableAction,
   TableActionsCell,
   TableDataCell,
   TableRow,
 } from '@/components/common';
-import { useState } from 'react';
 import { InviteStatusTag } from '../invite-status-tag';
 
-const BrigadeInviteRow = () => {
+type Props = {
+  data: {
+    code: string;
+    executed: boolean;
+    servicemanEmail?: string | null;
+  };
+};
+
+const BrigadeInviteRow: React.FC<Props> = ({ data }) => {
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
 
   return (
     <TableRow>
-      <TableDataCell>2323232323</TableDataCell>
       <TableDataCell>
-        <InviteStatusTag status='accepted' size='medium' />
+        <SecretKeyField value={data.code} />
+      </TableDataCell>
+      <TableDataCell>
+        <InviteStatusTag
+          status={data.executed ? 'accepted' : 'new'}
+          size='medium'
+        />
       </TableDataCell>
       <TableDataCell>12:40 12.01.2025</TableDataCell>
       <TableDataCell>12:40 12.01.2025</TableDataCell>
-      <TableDataCell>petrenko@gmail.com</TableDataCell>
+      <TableDataCell>{data.servicemanEmail || '-'}</TableDataCell>
       <TableActionsCell>
         <TableAction onClick={() => setIsCancelModalOpen(true)}>
           delete

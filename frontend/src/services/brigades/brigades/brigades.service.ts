@@ -5,6 +5,7 @@ import {
   GetBrigadesOptions,
   ListBrigade,
   MyBrigade,
+  MyBrigadeInvite,
 } from './types';
 
 class BrigadesService {
@@ -46,6 +47,12 @@ class BrigadesService {
     });
 
     return brigades[0];
+  }
+
+  async getMyBrigadeInvites(): Promise<MyBrigadeInvite[]> {
+    return await volunteerPlusApiService.makeGetRequest<MyBrigadeInvite[]>({
+      path: 'add-requests',
+    });
   }
 }
 

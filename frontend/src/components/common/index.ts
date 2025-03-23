@@ -65,3 +65,5 @@ export * from './page-back-button';
 export * from './user-item';
 export * from './pie-progress-indicator';
 export * from './progress-tag';
+export * from './tooltip';
+export * from './secret-key-field';
