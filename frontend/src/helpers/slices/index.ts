@@ -1,1 +1,1 @@
-export * from './make-loaded-list-slice.helper';
+export * from './make-loaded-slice.helper';

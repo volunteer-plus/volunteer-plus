@@ -10,10 +10,10 @@ import {
 import { Authenticated } from '@/components/auth';
 import { AdminPageContent } from '@/components/admin';
 import { AddBrigadeModal, BrigadeListItem } from '@/components/brigades';
-
-import styles from './styles.module.scss';
 import { useAppDispatch, useAppSelector } from '@/hooks/store';
 import { loadBrigades } from '@/slices/brigades';
+
+import styles from './styles.module.scss';
 
 const BareBrigadesPage: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -36,14 +36,14 @@ const BareBrigadesPage: React.FC = () => {
         </div>
         <div className={styles.brigadesListAndSearch}>
           <TextInputField placeholder='Пошук' />
-          {isLoading ? (
+          {isLoading || !data ? (
             <div className={styles.loaderContainer}>
               <BarsLoader size='50px' />
             </div>
           ) : (
             <>
               <div className={styles.brigadesList}>
-                {data.map((brigade) => (
+                {data.value.map((brigade) => (
                   <BrigadeListItem
                     key={brigade.id}
                     brigadeId={brigade.id}
@@ -64,6 +64,7 @@ const BareBrigadesPage: React.FC = () => {
       <AddBrigadeModal
         isOpen={isAddBrigadeModalOpen}
         onClose={() => setIsAddBrigadeModalOpen(false)}
+        onAfterSubmit={() => setIsAddBrigadeModalOpen(false)}
       />
     </AdminPageContent>
   );

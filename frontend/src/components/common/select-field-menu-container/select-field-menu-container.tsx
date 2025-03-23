@@ -1,6 +1,8 @@
+import classNames from 'classnames';
+
 import { MenuContainer } from '@/components/common';
 
-import classNames from 'classnames';
+import styles from './styles.module.scss';
 
 const SelectFieldMenuContainer: React.FC<
   React.ComponentPropsWithoutRef<typeof MenuContainer>
@@ -8,7 +10,7 @@ const SelectFieldMenuContainer: React.FC<
   return (
     <MenuContainer
       {...props}
-      className={classNames(className)}
+      className={classNames(className, styles.container)}
       borderColor='var(--color-gray-100)'
     />
   );

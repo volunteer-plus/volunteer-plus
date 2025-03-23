@@ -1,8 +1,8 @@
-import { makeLoadedListSlice } from '@/helpers/slices';
+import { makeLoadedSlice } from '@/helpers/slices';
 import { brigadesService } from '@/services/brigades/brigades';
 
 const { brigadesReducer, clearBrigades, loadBrigades, reloadBrigades } =
-  makeLoadedListSlice({
+  makeLoadedSlice({
     name: 'brigades',
     load: brigadesService.getBrigades.bind(brigadesService),
   });

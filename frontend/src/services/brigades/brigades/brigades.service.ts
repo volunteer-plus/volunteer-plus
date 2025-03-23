@@ -1,10 +1,11 @@
+import { pickBy } from 'lodash';
 import { volunteerPlusApiService } from '@/services/common/volunteer-plus-api/volunteer-plus-api.service';
 import {
   CreateOrUpdateBrigadesPayload,
   GetBrigadesOptions,
   ListBrigade,
+  MyBrigade,
 } from './types';
-import { pickBy } from 'lodash';
 
 class BrigadesService {
   async createOrUpdateBrigades(
@@ -12,7 +13,9 @@ class BrigadesService {
   ): Promise<unknown> {
     return await volunteerPlusApiService.makePostRequest({
       path: 'brigade/create-or-update',
-      payload,
+      payload: {
+        brigades: payload,
+      },
     });
   }
 
@@ -26,6 +29,23 @@ class BrigadesService {
         Boolean
       ),
     });
+  }
+
+  async getBrigadeCodes(): Promise<string[]> {
+    return await volunteerPlusApiService.makeGetRequest({
+      path: 'brigades-codes',
+    });
+  }
+
+  async getMyBrigade(): Promise<MyBrigade> {
+    const brigades = await volunteerPlusApiService.makeGetRequest<MyBrigade[]>({
+      path: 'brigades',
+      search: {
+        ids: [1],
+      },
+    });
+
+    return brigades[0];
   }
 }
 

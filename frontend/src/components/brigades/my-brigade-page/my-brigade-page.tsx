@@ -1,8 +1,9 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import { AdminPageContent } from '@/components/admin';
 import { Authenticated } from '@/components/auth';
 import { TabConfig, Tabs, PageTitle } from '@/components/common';
+import { useAppDispatch } from '@/hooks/store';
 
 import {
   BrigadeInvitesTabContent,
@@ -11,8 +12,11 @@ import {
 } from './components';
 import { MyBrigadeTableTab } from './enums';
 import styles from './styles.module.scss';
+import { loadMyBrigadeIfNotLoaded } from '@/slices/my-brigade';
 
 const BareMyBrigadePage: React.FC = () => {
+  const dispatch = useAppDispatch();
+
   const [activeTab, setActiveTab] = useState<MyBrigadeTableTab>(
     MyBrigadeTableTab.BRIGADE_MEMBERS
   );
@@ -29,6 +33,10 @@ const BareMyBrigadePage: React.FC = () => {
       },
     ];
   }, []);
+
+  useEffect(() => {
+    dispatch(loadMyBrigadeIfNotLoaded());
+  }, [dispatch]);
 
   return (
     <AdminPageContent>

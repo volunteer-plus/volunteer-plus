@@ -32,6 +32,7 @@ type Props = {
   onBlur?: () => void;
   placeholder?: string;
   isClearable?: boolean;
+  isDisabled?: boolean;
 };
 
 const SelectField: React.FC<Props> = ({
@@ -45,6 +46,7 @@ const SelectField: React.FC<Props> = ({
   onBlur,
   placeholder,
   isClearable = false,
+  isDisabled = false,
 }) => {
   const fieldRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -123,6 +125,7 @@ const SelectField: React.FC<Props> = ({
         description={description}
         onFocus={onInputFocus}
         {...clickOutsideSelectHandlers}
+        isDisabled={isDisabled}
       >
         {({ className, ...props }) => {
           return (
@@ -134,6 +137,7 @@ const SelectField: React.FC<Props> = ({
                 value={isFocused ? searchQuery : selectedOption?.label || ''}
                 onChange={onInputChange}
                 placeholder={placeholder}
+                disabled={isDisabled}
               />
               <Menu isOpen={isFocused} targetRef={fieldRef} alignment='stretch'>
                 <SelectFieldMenuContainer>
