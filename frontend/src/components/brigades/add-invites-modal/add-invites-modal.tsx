@@ -5,6 +5,8 @@ import {
   ModalContainer,
   ModalTitle,
 } from '@/components/common';
+import { brigadesService } from '@/services/brigades/brigades';
+
 import { FormModalContent, ListModalContent } from './components';
 
 interface Props {
@@ -14,6 +16,13 @@ interface Props {
 
 const AddInvitesModal: React.FC<Props> = ({ isOpen, onClose }) => {
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
+
+  const addInvites = async (count: number) => {
+    const receivedInvites = await brigadesService.createBrigadeInvites({
+      brigadeRegimentCode: '123',
+      count,
+    });
+  };
 
   return (
     <Modal
@@ -28,7 +37,9 @@ const AddInvitesModal: React.FC<Props> = ({ isOpen, onClose }) => {
           <ListModalContent onClose={onClose} />
         ) : (
           <FormModalContent
-            onSubmit={() => setIsFormSubmitted(true)}
+            onSubmit={async ({ invitesNumber }) => {
+              await addInvites(Number(invitesNumber));
+            }}
             onCancel={() => onClose()}
           />
         )}

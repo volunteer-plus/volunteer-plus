@@ -5,7 +5,8 @@ import {
   GetBrigadesOptions,
   ListBrigade,
   MyBrigade,
-  MyBrigadeInvite,
+  BrigadeInvite,
+  CreateBrigadeInvitesPayload,
 } from './types';
 
 class BrigadesService {
@@ -49,9 +50,22 @@ class BrigadesService {
     return brigades[0];
   }
 
-  async getMyBrigadeInvites(): Promise<MyBrigadeInvite[]> {
-    return await volunteerPlusApiService.makeGetRequest<MyBrigadeInvite[]>({
+  async getMyBrigadeInvites(): Promise<BrigadeInvite[]> {
+    return await volunteerPlusApiService.makeGetRequest<BrigadeInvite[]>({
       path: 'add-requests',
+    });
+  }
+
+  async createBrigadeInvites({
+    brigadeRegimentCode,
+    count,
+  }: CreateBrigadeInvitesPayload): Promise<BrigadeInvite[]> {
+    return await volunteerPlusApiService.makePostRequest<BrigadeInvite[]>({
+      path: 'add-request/generate',
+      search: {
+        regimentCode: brigadeRegimentCode,
+        count,
+      },
     });
   }
 }

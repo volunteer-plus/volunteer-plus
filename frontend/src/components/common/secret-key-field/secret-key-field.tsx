@@ -32,6 +32,18 @@ const SecretKeyField: React.FC<Props> = ({
     return () => clearTimeout(timeout);
   }, [shouldShowCopiedTooltip]);
 
+  useEffect(() => {
+    if (!isShown) {
+      return;
+    }
+
+    const timeout = setTimeout(() => {
+      setIsShown(false);
+    }, 10000);
+
+    return () => clearTimeout(timeout);
+  }, [isShown]);
+
   const onCopyButtonClick = () => {
     if (value) {
       navigator.clipboard.writeText(value);

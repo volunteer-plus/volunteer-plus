@@ -1,12 +1,15 @@
 import { Form, Formik } from 'formik';
 import { useMemo } from 'react';
+
 import { Button, FormikTextInputField } from '@/components/common';
 import { Yup } from '@/yup';
 
 import styles from './styles.module.scss';
+import { ADD_INVITES_FORM_INITIAL_VALUES } from './constants';
+import { AddInvitesFormValues } from './types';
 
 interface Props {
-  onSubmit: () => void;
+  onSubmit: (values: AddInvitesFormValues) => void;
   onCancel: () => void;
 }
 
@@ -23,9 +26,7 @@ const FormModalContent: React.FC<Props> = ({ onCancel, onSubmit }) => {
 
   return (
     <Formik
-      initialValues={{
-        invitesNumber: '',
-      }}
+      initialValues={ADD_INVITES_FORM_INITIAL_VALUES}
       onSubmit={onSubmit}
       validationSchema={validationSchema}
     >
