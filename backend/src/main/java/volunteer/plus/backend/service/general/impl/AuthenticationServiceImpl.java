@@ -6,9 +6,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import volunteer.plus.backend.domain.dto.LoginData;
+import volunteer.plus.backend.domain.dto.LoginRequestDTO;
 import volunteer.plus.backend.domain.dto.RegistrationData;
-import volunteer.plus.backend.domain.dto.TokenResponse;
+import volunteer.plus.backend.domain.dto.TokenPairResponse;
 import volunteer.plus.backend.domain.entity.User;
 import volunteer.plus.backend.repository.UserRepository;
 import volunteer.plus.backend.service.email.EmailNotificationBuilderService;
@@ -48,16 +48,16 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     @Transactional
-    public TokenResponse login(LoginData loginData) {
+    public TokenPairResponse login(LoginRequestDTO loginRequestDTO) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                        loginData.getEmail(),
-                        loginData.getPassword()
+                        loginRequestDTO.getEmail(),
+                        loginRequestDTO.getPassword()
                 )
         );
-        var user = userRepository.findUserByEmail(loginData.getEmail())
+        var user = userRepository.findUserByEmail(loginRequestDTO.getEmail())
                 .orElseThrow(() -> new RuntimeException("User was not found"));
 
-        return TokenResponse
+        return TokenPairResponse
                 .builder()
                 .token(jwtServiceIml.generateToken(user))
                 .build();

@@ -6,9 +6,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import volunteer.plus.backend.domain.dto.LoginData;
+import volunteer.plus.backend.domain.dto.LoginRequestDTO;
 import volunteer.plus.backend.domain.dto.RegistrationData;
-import volunteer.plus.backend.domain.dto.TokenResponse;
+import volunteer.plus.backend.domain.dto.TokenPairResponse;
 import volunteer.plus.backend.service.general.impl.AuthenticationServiceImpl;
 
 @RestController
@@ -24,7 +24,7 @@ public class AuthorizeController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<TokenResponse> login(@RequestBody LoginData loginData){
-        return ResponseEntity.ok(authenticationServiceImpl.login(loginData));
+    public ResponseEntity<TokenPairResponse> login(@RequestBody LoginRequestDTO loginRequestDTO){
+        return ResponseEntity.ok(authenticationServiceImpl.login(loginRequestDTO));
     }
 }

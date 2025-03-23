@@ -1,20 +1,39 @@
 package volunteer.plus.backend.handler;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.*;
+import org.springframework.lang.Nullable;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.LockedException;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.util.WebUtils;
 import volunteer.plus.backend.exceptions.ApiException;
 import volunteer.plus.backend.exceptions.EmailException;
+
+import java.io.IOException;
 
 
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionTranslator {
+
+    public static final ObjectMapper OBJECT_MAPPER = JsonMapper.builder()
+            .addModule(new Jdk8Module())
+            .build();
 
     @ExceptionHandler(value = {ApiException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
