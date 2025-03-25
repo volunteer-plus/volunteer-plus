@@ -10,6 +10,7 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
 import volunteer.plus.backend.domain.dto.WSChatMessageDTO;
 import volunteer.plus.backend.domain.enums.AIChatClient;
+import volunteer.plus.backend.domain.enums.OllamaAIModel;
 import volunteer.plus.backend.service.ai.OllamaAIService;
 import volunteer.plus.backend.service.ai.OpenAIService;
 import volunteer.plus.backend.service.websocket.WSChatService;
@@ -38,7 +39,7 @@ public class WebSocketChatController {
     @MessageMapping(OLLAMA_MESSAGE_MAPPING)
     @SendTo(OLLAMA_RESPONSE_TARGET)
     public String chatOllamaAI(@Payload final String message) {
-        return ollamaAIService.chat(AIChatClient.DEFAULT, message, List.of()).getChatResponse();
+        return ollamaAIService.chat(AIChatClient.DEFAULT, OllamaAIModel.TINY_LLAMA, message, List.of()).getChatResponse();
     }
 
 
