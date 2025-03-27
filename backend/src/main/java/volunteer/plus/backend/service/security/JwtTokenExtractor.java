@@ -5,4 +5,5 @@ import jakarta.servlet.http.HttpServletRequest;
 public interface JwtTokenExtractor {
 
     String extract(HttpServletRequest request);
+
 }

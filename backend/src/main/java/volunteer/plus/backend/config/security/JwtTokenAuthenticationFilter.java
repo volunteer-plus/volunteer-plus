@@ -4,7 +4,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContext;
@@ -32,7 +31,7 @@ public class JwtTokenAuthenticationFilter extends AbstractAuthenticationProcessi
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
-            throws AuthenticationException, IOException, ServletException {
+            throws AuthenticationException {
         AccessJwtToken token = new AccessJwtToken(jwtTokenExtractor.extract(request));
         return getAuthenticationManager().authenticate(new JwtAuthenticationToken(token));
     }

@@ -16,6 +16,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 import volunteer.plus.backend.domain.dto.TokenPairResponse;
 import volunteer.plus.backend.domain.entity.User;
+import volunteer.plus.backend.service.security.JwtTokenService;
 
 import java.io.IOException;
 
@@ -23,7 +24,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class RestAuthenticationSuccessHandler implements AuthenticationSuccessHandler  {
 
-    private final JwtTokenFactory tokenFactory;
+    private final JwtTokenService tokenFactory;
     public static final ObjectMapper OBJECT_MAPPER = JsonMapper.builder()
             .addModule(new Jdk8Module())
             .build();
@@ -32,7 +33,7 @@ public class RestAuthenticationSuccessHandler implements AuthenticationSuccessHa
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
         User securityUser = (User) authentication.getPrincipal();
-        TokenPairResponse tokenPair = tokenFactory.createTokenPair(securityUser);
+        TokenPairResponse tokenPair = tokenFactory.generateTokenPair(securityUser);
 
         response.setStatus(HttpStatus.OK.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);

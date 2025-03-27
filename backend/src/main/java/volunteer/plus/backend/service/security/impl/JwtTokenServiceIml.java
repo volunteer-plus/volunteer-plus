@@ -5,21 +5,27 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Component;
-import volunteer.plus.backend.service.security.JwtSecurity;
+import org.springframework.stereotype.Service;
+import volunteer.plus.backend.domain.dto.TokenPairResponse;
+import volunteer.plus.backend.service.security.JwtTokenService;
 
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.function.Function;
 
-@Component
-@NoArgsConstructor
-public class JwtServiceIml implements JwtSecurity {
+@Service
+@RequiredArgsConstructor
+public class JwtTokenServiceIml implements JwtTokenService {
 
+    private static final String ROLES = "authority";
     private static final String SECRET_KEY = "462D4A614E645267556B58703273357638792F423F4528482B4B6250655368566D597133743677397A24432646294A404E635166546A576E5A72347537782141";
+    private static final Long JWT_TOKEN_EXPIRATION_TIME = 43200000L;
+    private static final Long REFRESH_TOKEN_EXPIRATION_TIME = 86400000L;
+
     @Override
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -40,10 +46,28 @@ public class JwtServiceIml implements JwtSecurity {
     }
 
     @Override
-    public String generateToken(UserDetails userDetails) {
-        HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put("roles", userDetails.getAuthorities());
-        return generateToken(hashMap, userDetails);
+    public TokenPairResponse generateTokenPair(UserDetails userDetails) {
+        String accessToken = generateJwtToken(userDetails);
+        String refreshToken = generateRefreshToken(userDetails);
+        return TokenPairResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+    }
+
+    private String generateJwtToken(UserDetails userDetails) {
+        HashMap<String, Object> claims = new HashMap<>();
+        claims.put(ROLES, userDetails.getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList());
+
+        return generateToken(claims, userDetails, System.currentTimeMillis() + JWT_TOKEN_EXPIRATION_TIME);
+    }
+
+    private String generateRefreshToken(UserDetails userDetails) {
+        HashMap<String, Object> claims = new HashMap<>();
+        return generateToken(claims, userDetails, System.currentTimeMillis() + REFRESH_TOKEN_EXPIRATION_TIME);
     }
 
     @Override
@@ -51,20 +75,23 @@ public class JwtServiceIml implements JwtSecurity {
         return (userDetails.getUsername().equals(extractUsername(token)) &&
                 isTokenNonExpired(token));
     }
+
     private Date extractExpiration(String token){
         return extractClaim(token, Claims::getExpiration);
     }
+
     private boolean isTokenNonExpired(String token){
         return extractExpiration(token).after(new Date(System.currentTimeMillis()));
     }
+
     private String generateToken(HashMap<String, Object> hashMap
-            , UserDetails userDetails){
+            , UserDetails userDetails, long expirationTime){
         return Jwts
                 .builder()
                 .setClaims(hashMap)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000*60*60*24))
+                .setExpiration(new Date(expirationTime))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS512)
                 .compact();
     }
@@ -73,4 +100,5 @@ public class JwtServiceIml implements JwtSecurity {
         byte[] keysBytes = Decoders.BASE64.decode(SECRET_KEY);
         return Keys.hmacShaKeyFor(keysBytes);
     }
+
 }

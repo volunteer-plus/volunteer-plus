@@ -17,12 +17,12 @@ public class LoginRequestDTO {
     private String password;
 
     @JsonCreator
-    public LoginRequestDTO(@JsonProperty("username") String username, @JsonProperty("password") String password) {
+    public LoginRequestDTO(@JsonProperty("email") String username, @JsonProperty("password") String password) {
         this.username = username;
         this.password = password;
     }
 
-    @Schema(requiredMode = Schema.RequiredMode.REQUIRED, description = "User email", example = "tenant@thingsboard.org")
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED, description = "User email", example = "kurwa@org.ua")
     public String getUsername() {
         return username;
     }

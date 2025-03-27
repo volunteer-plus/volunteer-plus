@@ -65,7 +65,7 @@ public class RestLoginProcessingFilter extends AbstractAuthenticationProcessingF
             throw new AuthenticationServiceException("Username or Password not provided");
         }
 
-        User userPrincipal = userService.getUserByEmail(loginRequestDTO.getUsername());
+        User userPrincipal = (User) userService.loadUserByUsername(loginRequestDTO.getUsername());
 
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(userPrincipal,
                 loginRequestDTO.getPassword(), userPrincipal.getAuthorities());

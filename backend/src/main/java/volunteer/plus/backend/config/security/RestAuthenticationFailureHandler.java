@@ -3,7 +3,6 @@ package volunteer.plus.backend.config.security;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -24,9 +23,10 @@ public class RestAuthenticationFailureHandler implements AuthenticationFailureHa
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
-                                        AuthenticationException e) throws IOException, ServletException {
+                                        AuthenticationException e) throws IOException {
 
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         OBJECT_MAPPER.writeValue(response.getWriter(), e.getMessage());
     }
+
 }

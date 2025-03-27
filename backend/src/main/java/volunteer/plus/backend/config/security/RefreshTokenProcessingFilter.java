@@ -42,7 +42,7 @@ public class RefreshTokenProcessingFilter extends AbstractAuthenticationProcessi
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
-            throws AuthenticationException, IOException, ServletException {
+            throws AuthenticationException {
         if (!HttpMethod.POST.name().equals(request.getMethod())) {
             if(log.isDebugEnabled()) {
                 log.debug("Authentication method not supported. Request method: " + request.getMethod());

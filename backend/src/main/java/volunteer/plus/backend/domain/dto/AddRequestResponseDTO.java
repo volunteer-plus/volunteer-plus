@@ -10,7 +10,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AddRequestResponseDTO {
+
     private Long id;
     private String code;
     private boolean executed;
+
 }
