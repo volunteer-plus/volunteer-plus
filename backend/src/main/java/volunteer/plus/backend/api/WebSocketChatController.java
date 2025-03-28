@@ -1,12 +1,12 @@
 package volunteer.plus.backend.api;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
 import volunteer.plus.backend.domain.dto.WSChatMessageDTO;
 import volunteer.plus.backend.domain.enums.AIChatClient;
@@ -29,10 +29,9 @@ public class WebSocketChatController {
     private final WSChatService wsChatService;
 
     @MessageMapping(CHAT_MESSAGE_MAPPING)
-    public WSChatMessageDTO sendMessageToConvId(@Payload final WSChatMessageDTO wsChatMessageDTO,
-                                                final SimpMessageHeaderAccessor headerAccessor,
-                                                @DestinationVariable("convId") final String conversationId) {
-        wsChatService.sendMessageToConvId(wsChatMessageDTO, conversationId, headerAccessor);
+    public WSChatMessageDTO sendMessageToConvId(@Valid @Payload final WSChatMessageDTO wsChatMessageDTO,
+                                                @DestinationVariable("convId") final Long conversationId) {
+        wsChatService.sendMessageToConvId(wsChatMessageDTO, conversationId);
         return wsChatMessageDTO;
     }
 

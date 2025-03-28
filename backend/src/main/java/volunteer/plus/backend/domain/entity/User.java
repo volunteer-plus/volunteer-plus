@@ -19,7 +19,8 @@ import java.util.List;
         "requests",
         "volunteerFeedbacks",
         "liqPayOrders",
-        "militaryPersonnel"
+        "militaryPersonnel",
+        "conversationRooms"
 })
 @Entity
 @Table(name = "user")
@@ -60,6 +61,9 @@ public class User extends BaseEntity implements UserDetails {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<LiqPayOrder> liqPayOrders = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "users")
+    private List<ConversationRoom> conversationRooms = new ArrayList<>();
 
     private boolean enabled;
     private boolean accountNonExpired;
