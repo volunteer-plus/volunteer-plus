@@ -26,9 +26,16 @@ public class AddRequestServiceImpl implements AddRequestService {
     private final BrigadeCodesService brigadeCodesService;
 
     @Override
-    public List<AddRequestResponseDTO> getRequests() {
-        return addRequestRepository.findAll()
-                .stream()
+    public List<AddRequestResponseDTO> getRequests(final String regimentCode) {
+        final List<AddRequest> addRequests;
+
+        if (regimentCode == null) {
+            addRequests = addRequestRepository.findAll();
+        } else {
+            addRequests = addRequestRepository.findAllByRegimentCode(regimentCode);
+        }
+
+        return addRequests.stream()
                 .map(request ->
                         AddRequestResponseDTO.builder()
                                 .id(request.getId())

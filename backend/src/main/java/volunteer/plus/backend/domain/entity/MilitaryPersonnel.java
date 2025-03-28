@@ -39,6 +39,10 @@ public class MilitaryPersonnel extends BaseEntity {
     @JoinColumn(name = "brigade_id", nullable = false)
     private Brigade brigade;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
     @OneToMany(mappedBy = "militaryPersonnel", cascade = CascadeType.ALL)
     private List<Request> requests = new ArrayList<>();
 

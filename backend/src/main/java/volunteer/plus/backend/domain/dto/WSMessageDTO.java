@@ -1,20 +1,20 @@
 package volunteer.plus.backend.domain.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class WSChatMessageDTO {
-    @NotBlank
+public class WSMessageDTO {
+    private Long id;
     private String content;
-
-    @NotNull
-    private Long senderId;
+    private Long fromUser;
+    private LocalDateTime createDate;
+    private LocalDateTime updateDate;
 }
