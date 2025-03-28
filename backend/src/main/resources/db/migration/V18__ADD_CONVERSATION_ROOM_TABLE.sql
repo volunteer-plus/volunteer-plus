@@ -3,6 +3,7 @@ alter table `ws_message` drop column if exists `conversation_id`;
 
 CREATE TABLE IF NOT EXISTS conversation_room (
     `id`                BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `is_deleted`        BIT NOT NULL,
     `name`              VARCHAR(255) NOT NULL,
     `create_date`       datetime default null,
     `update_date`       datetime default null

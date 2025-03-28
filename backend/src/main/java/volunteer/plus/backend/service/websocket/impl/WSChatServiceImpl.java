@@ -32,11 +32,11 @@ public class WSChatServiceImpl implements WSChatService {
     @Override
     @Transactional
     public void sendMessageToConvId(final WSChatMessageDTO chatMessage,
-                                    final Long conversationId) {
+                                    final Long conversationRoomId) {
         final User userDetails = userRepository.findById(chatMessage.getSenderId())
                 .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
 
-        final ConversationRoom conversationRoom = conversationRoomRepository.findById(conversationId)
+        final ConversationRoom conversationRoom = conversationRoomRepository.findByIdAndDeletedFalse(conversationRoomId)
                 .orElseThrow(() -> new ApiException(ErrorCode.CONVERSATION_ROOM_NOT_FOUND));
 
         final WSMessage wsMessage = WSMessage.builder()
@@ -50,6 +50,6 @@ public class WSChatServiceImpl implements WSChatService {
 
         conversationRoomRepository.save(conversationRoom);
 
-        webSocketService.sendNotification(WS_DESTINATION_PREFIX + "/" + conversationId, savedMessage);
+        webSocketService.sendNotification(WS_DESTINATION_PREFIX + "/" + conversationRoomId, savedMessage);
     }
 }

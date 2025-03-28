@@ -11,13 +11,16 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = false, exclude = {"users", "messages"})
 @Entity
 @Table(name = "conversation_room")
 public class ConversationRoom extends BaseEntity {
 
     @Column(name = "name")
     private String name;
+
+    @Column(name = "is_deleted")
+    private boolean deleted;
 
     @ManyToMany
     @JoinTable(
@@ -36,6 +39,14 @@ public class ConversationRoom extends BaseEntity {
         }
         this.users.add(user);
         user.getConversationRooms().add(this);
+    }
+
+    public void removeUser(User user) {
+        if (this.users == null) {
+            this.users = new ArrayList<>();
+        }
+        this.users.remove(user);
+        user.getConversationRooms().remove(this);
     }
 
     public void addMessage(WSMessage message) {

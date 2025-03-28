@@ -30,8 +30,8 @@ public class WebSocketChatController {
 
     @MessageMapping(CHAT_MESSAGE_MAPPING)
     public WSChatMessageDTO sendMessageToConvId(@Valid @Payload final WSChatMessageDTO wsChatMessageDTO,
-                                                @DestinationVariable("convId") final Long conversationId) {
-        wsChatService.sendMessageToConvId(wsChatMessageDTO, conversationId);
+                                                @DestinationVariable("conversationRoomId") final Long conversationRoomId) {
+        wsChatService.sendMessageToConvId(wsChatMessageDTO, conversationRoomId);
         return wsChatMessageDTO;
     }
 
