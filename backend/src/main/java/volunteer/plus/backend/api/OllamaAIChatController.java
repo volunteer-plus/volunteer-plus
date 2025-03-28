@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import volunteer.plus.backend.domain.dto.AIChatResponse;
 import volunteer.plus.backend.domain.enums.AIChatClient;
+import volunteer.plus.backend.domain.enums.OllamaAIModel;
 import volunteer.plus.backend.service.ai.OllamaAIService;
 
 import java.util.List;
@@ -23,8 +24,9 @@ public class OllamaAIChatController {
     @PostMapping("/ollama/generate/chat")
     @Operation(description = "Chat with Ollama model chat")
     public ResponseEntity<AIChatResponse> chat(@RequestParam final AIChatClient aiChatClient,
+                                               @RequestParam final OllamaAIModel ollamaModel,
                                                @RequestPart("message") final String message,
                                                @RequestPart(name = "file", required = false) List<MultipartFile> multipartFiles) {
-        return ResponseEntity.ok(ollamaAIService.chat(aiChatClient, message, multipartFiles));
+        return ResponseEntity.ok(ollamaAIService.chat(aiChatClient, ollamaModel, message, multipartFiles));
     }
 }
