@@ -16,9 +16,8 @@ public class UserInfo {
     private String firstName;
     private String lastName;
     private String email;
-    private String password;
 
     public UserInfo(User user) {
-        this(user.getId(), user.getFirstName(), user.getLastName(), user.getEmail(), user.getPassword());
+        this(user.getId(), user.getFirstName(), user.getLastName(), user.getEmail());
     }
 }
