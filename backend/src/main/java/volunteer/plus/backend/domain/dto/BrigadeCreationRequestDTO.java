@@ -12,6 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BrigadeCreationRequestDTO {
+
     @Valid
     private List<BrigadeCreationDTO> brigades = new ArrayList<>();
 }

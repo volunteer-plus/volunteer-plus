@@ -31,5 +31,6 @@ public enum ErrorCode {
     VOLUNTEER_IS_ALREADY_ASSIGNED_TO_USER("Volunteer is already assigned to user"),
     VOLUNTEER_FEEDBACK_NOT_FOUND("Volunteer feedback not found"),
     CANNOT_DOWNLOAD_OUTPUT_FILE("Cannot download output file");
-    private final String data;
+
+    private final String description;
 }

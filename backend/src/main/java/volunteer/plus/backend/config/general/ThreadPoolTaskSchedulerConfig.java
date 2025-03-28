@@ -11,7 +11,7 @@ public class ThreadPoolTaskSchedulerConfig {
     private Integer corePoolSize;
 
     @Bean(name = "wsTaskScheduler")
-    public ThreadPoolTaskScheduler threadPoolTaskScheduler(){
+    public ThreadPoolTaskScheduler threadPoolTaskScheduler() {
         final ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
         threadPoolTaskScheduler.setPoolSize(corePoolSize);
         threadPoolTaskScheduler.setThreadNamePrefix("ThreadPoolTaskScheduler");
