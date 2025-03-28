@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 public interface AddRequestService {
-    List<AddRequestResponseDTO> getRequests();
+    List<AddRequestResponseDTO> getRequests(String regimentCode);
 
     List<AddRequestResponseDTO> generate(String regimentCode, Long amount);
 

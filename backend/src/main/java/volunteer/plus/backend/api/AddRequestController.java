@@ -20,8 +20,8 @@ public class AddRequestController {
 
     @GetMapping("/add-requests")
     @Operation(description = "Retrieve add requests")
-    public ResponseEntity<List<AddRequestResponseDTO>> getRequests() {
-        return ResponseEntity.ok(addRequestService.getRequests());
+    public ResponseEntity<List<AddRequestResponseDTO>> getRequests(@RequestParam(required = false) final String regimentCode) {
+        return ResponseEntity.ok(addRequestService.getRequests(regimentCode));
     }
 
     @PostMapping("/add-request/generate")

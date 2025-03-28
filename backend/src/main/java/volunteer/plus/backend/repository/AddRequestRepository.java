@@ -10,4 +10,5 @@ import java.util.Set;
 public interface AddRequestRepository extends JpaRepository<AddRequest, Long> {
     Optional<AddRequest> findByRequestId(String requestId);
     List<AddRequest> findByRequestIdIn(Set<String> requestIds);
+    List<AddRequest> findAllByRegimentCode(String regimentCode);
 }
