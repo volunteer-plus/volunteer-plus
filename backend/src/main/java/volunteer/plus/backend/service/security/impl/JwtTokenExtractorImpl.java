@@ -15,7 +15,7 @@ public class JwtTokenExtractorImpl implements JwtTokenExtractor {
     public String extract(HttpServletRequest request) {
         var header = request.getHeader(AUTH_HEADER);
         if (!StringUtil.isBlank(header) && header.startsWith(BEARER_PREFIX)) {
-            return request.getHeader(AUTH_HEADER);
+            return request.getHeader(AUTH_HEADER).substring(BEARER_PREFIX.length());
         }
 
         return null;
