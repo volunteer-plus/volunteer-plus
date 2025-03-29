@@ -55,11 +55,4 @@ public class Brigade extends BaseEntity {
         }
         mps.forEach(mp -> mp.setBrigade(this));
     }
-
-    public void removeMilitaryPersonnel(MilitaryPersonnel mp) {
-        if (mp != null && this.militaryPersonnel != null && !this.militaryPersonnel.isEmpty()) {
-            this.militaryPersonnel.remove(mp);
-            mp.setBrigade(null);
-        }
-    }
 }
