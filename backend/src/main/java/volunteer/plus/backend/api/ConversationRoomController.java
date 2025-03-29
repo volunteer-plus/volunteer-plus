@@ -23,6 +23,12 @@ public class ConversationRoomController {
         return conversationRoomService.findConversationRooms(userId);
     }
 
+    @GetMapping("/room")
+    @Operation(description = "Retrieve conversation room")
+    public ConversationRoomDTO getConversationRoom(@RequestParam final Long conversationRoomId) {
+        return conversationRoomService.getConversationRoom(conversationRoomId);
+    }
+
     @PostMapping("/room/create")
     @Operation(description = "Create conversation rooms")
     public ConversationRoomDTO createConversationRoom(@RequestBody @Valid final ConversationRoomDTO conversationRoomDTO) {
@@ -47,5 +53,12 @@ public class ConversationRoomController {
     @Operation(description = "Delete conversation room")
     public void deleteConversationRoom(@RequestParam final Long conversationRoomId) {
         conversationRoomService.deleteConversationRoom(conversationRoomId);
+    }
+
+    @DeleteMapping("/room/delete-message")
+    @Operation(description = "Delete conversation room message")
+    public void deleteConversationRoomMessage(@RequestParam final Long conversationRoomId,
+                                              @RequestParam final Long messageId) {
+        conversationRoomService.deleteConversationRoomMessage(conversationRoomId, messageId);
     }
 }

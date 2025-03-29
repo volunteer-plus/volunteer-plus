@@ -9,16 +9,15 @@ import volunteer.plus.backend.domain.dto.UserConversationDTO;
 import volunteer.plus.backend.domain.dto.WSMessageDTO;
 import volunteer.plus.backend.domain.entity.ConversationRoom;
 import volunteer.plus.backend.domain.entity.User;
+import volunteer.plus.backend.domain.entity.WSMessage;
 import volunteer.plus.backend.exceptions.ApiException;
 import volunteer.plus.backend.exceptions.ErrorCode;
 import volunteer.plus.backend.repository.ConversationRoomRepository;
 import volunteer.plus.backend.repository.UserRepository;
+import volunteer.plus.backend.repository.WSMessageRepository;
 import volunteer.plus.backend.service.general.ConversationRoomService;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -27,6 +26,7 @@ import java.util.stream.Collectors;
 public class ConversationRoomServiceImpl implements ConversationRoomService {
     private final ConversationRoomRepository conversationRoomRepository;
     private final UserRepository userRepository;
+    private final WSMessageRepository wsMessageRepository;
 
     @Override
     public List<ConversationRoomDTO> findConversationRooms(final Long userId) {
@@ -41,6 +41,12 @@ public class ConversationRoomServiceImpl implements ConversationRoomService {
         return allRooms.stream()
                 .map(this::mapConversationRoomToDTO)
                 .toList();
+    }
+
+    @Override
+    public ConversationRoomDTO getConversationRoom(final Long conversationRoomId) {
+        final ConversationRoom conversationRoom = findConversationRoom(conversationRoomId);
+        return mapConversationRoomToDTO(conversationRoom);
     }
 
     @Override
@@ -76,7 +82,7 @@ public class ConversationRoomServiceImpl implements ConversationRoomService {
     @Transactional
     public ConversationRoomDTO addUserToConversationRoom(final Long conversationRoomId,
                                                          final Long userId) {
-        final ConversationRoom conversationRoom = getConversationRoom(conversationRoomId);
+        final ConversationRoom conversationRoom = findConversationRoom(conversationRoomId);
         final User user = getUser(userId);
 
         conversationRoom.addUser(user);
@@ -88,7 +94,7 @@ public class ConversationRoomServiceImpl implements ConversationRoomService {
     @Transactional
     public ConversationRoomDTO removeUserFromConversationRoom(final Long conversationRoomId,
                                                               final Long userId) {
-        final ConversationRoom conversationRoom = getConversationRoom(conversationRoomId);
+        final ConversationRoom conversationRoom = findConversationRoom(conversationRoomId);
         final User user = getUser(userId);
 
         conversationRoom.removeUser(user);
@@ -107,12 +113,26 @@ public class ConversationRoomServiceImpl implements ConversationRoomService {
         conversationRoomRepository.save(conversationRoom);
     }
 
+    @Override
+    @Transactional
+    public void deleteConversationRoomMessage(final Long conversationRoomId,
+                                              final Long messageId) {
+        final ConversationRoom conversationRoom = findConversationRoom(conversationRoomId);
+
+        final WSMessage message = wsMessageRepository.findById(messageId)
+                .orElseThrow(() -> new ApiException(ErrorCode.MESSAGE_NOT_FOUND));
+
+        conversationRoom.removeMessage(message);
+
+        conversationRoomRepository.save(conversationRoom);
+    }
+
     private User getUser(final Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
     }
 
-    private ConversationRoom getConversationRoom(final Long conversationRoomId) {
+    private ConversationRoom findConversationRoom(final Long conversationRoomId) {
         return conversationRoomRepository.findByIdAndDeletedFalse(conversationRoomId)
                 .orElseThrow(() -> new ApiException(ErrorCode.CONVERSATION_ROOM_NOT_FOUND));
     }
@@ -158,6 +178,7 @@ public class ConversationRoomServiceImpl implements ConversationRoomService {
                                         .updateDate(message.getUpdateDate())
                                         .build()
                         )
+                        .sorted(Comparator.comparing(WSMessageDTO::getCreateDate))
                         .toList();
     }
 }

@@ -30,7 +30,7 @@ public class ConversationRoom extends BaseEntity {
     )
     private List<User> users = new ArrayList<>();
 
-    @OneToMany(mappedBy = "conversationRoom", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "conversationRoom", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<WSMessage> messages = new ArrayList<>();
 
     public void addUser(User user) {
@@ -55,5 +55,13 @@ public class ConversationRoom extends BaseEntity {
         }
         this.messages.add(message);
         message.setConversationRoom(this);
+    }
+
+    public void removeMessage(WSMessage message) {
+        if (this.messages == null) {
+            this.messages = new ArrayList<>();
+        }
+        this.messages.remove(message);
+        message.setConversationRoom(null);
     }
 }

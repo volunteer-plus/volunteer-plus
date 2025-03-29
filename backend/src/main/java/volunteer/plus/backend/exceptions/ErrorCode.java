@@ -31,7 +31,8 @@ public enum ErrorCode {
     VOLUNTEER_IS_ALREADY_ASSIGNED_TO_USER("Volunteer is already assigned to user"),
     VOLUNTEER_FEEDBACK_NOT_FOUND("Volunteer feedback not found"),
     CANNOT_DOWNLOAD_OUTPUT_FILE("Cannot download output file"),
-    CONVERSATION_ROOM_NOT_FOUND("Conversation room not found");
+    CONVERSATION_ROOM_NOT_FOUND("Conversation room not found"),
+    MESSAGE_NOT_FOUND("Message not found");
 
     private final String description;
 }
