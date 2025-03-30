@@ -5,6 +5,7 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Service;
+import volunteer.plus.backend.domain.dto.ai.agent.FinalResponse;
 import volunteer.plus.backend.domain.enums.AIAgentPatternType;
 import volunteer.plus.backend.service.ai.tools.AIAgentPattern;
 
@@ -24,9 +25,6 @@ public class OrchestratorWorkers implements AIAgentPattern {
     }
 
     public record OrchestratorResponse(String analysis, List<Task> tasks) {
-    }
-
-    public record FinalResponse(String analysis, List<String> workerResponses) {
     }
 
     @Tool(name = "patternOrchestrator", description = """

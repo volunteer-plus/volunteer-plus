@@ -6,9 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import volunteer.plus.backend.domain.dto.ai.agent.ChainWorkflowRequestDTO;
-import volunteer.plus.backend.domain.dto.ai.agent.ParallelizationWorkflowDTO;
-import volunteer.plus.backend.domain.dto.ai.agent.RoutingWorkflowRequestDTO;
+import volunteer.plus.backend.domain.dto.ai.agent.*;
 import volunteer.plus.backend.domain.enums.AIChatClient;
 import volunteer.plus.backend.service.ai.AgentAIPatternService;
 
@@ -41,5 +39,12 @@ public class AgentAIPatternController {
     public ResponseEntity<List<String>> applyParallelizationWorkflow(@RequestParam final AIChatClient aiChatClient,
                                                                      @RequestBody @Valid final ParallelizationWorkflowDTO parallelizationWorkflowDTO) {
         return ResponseEntity.ok(agentAIPatternService.applyParallelizationWorkflow(aiChatClient, parallelizationWorkflowDTO));
+    }
+
+    @PostMapping("/agent/orchestrator-workers-workflow")
+    @Operation(description = "Orchestrator workers workflow")
+    public ResponseEntity<FinalResponse> applyOrchestratorWorkersWorkflow(@RequestParam final AIChatClient aiChatClient,
+                                                                          @RequestBody @Valid final OrchestratorWorkersDTO orchestratorWorkersDTO) {
+        return ResponseEntity.ok(agentAIPatternService.applyOrchestratorWorkersWorkflow(aiChatClient, orchestratorWorkersDTO));
     }
 }

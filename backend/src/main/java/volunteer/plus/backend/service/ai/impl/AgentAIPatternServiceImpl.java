@@ -4,11 +4,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import volunteer.plus.backend.domain.dto.ai.agent.ChainWorkflowRequestDTO;
-import volunteer.plus.backend.domain.dto.ai.agent.ParallelizationWorkflowDTO;
-import volunteer.plus.backend.domain.dto.ai.agent.RoutingWorkflowRequestDTO;
+import volunteer.plus.backend.domain.dto.ai.agent.*;
 import volunteer.plus.backend.domain.enums.AIChatClient;
 import volunteer.plus.backend.service.ai.AgentAIPatternService;
+import volunteer.plus.backend.service.ai.tools.impl.OrchestratorWorkers;
 import volunteer.plus.backend.service.ai.tools.impl.ParallelizationWorkflow;
 import volunteer.plus.backend.service.ai.tools.impl.PromptChainWorkflow;
 import volunteer.plus.backend.service.ai.tools.impl.RoutingWorkflow;
@@ -58,6 +57,17 @@ public class AgentAIPatternServiceImpl implements AgentAIPatternService {
                 parallelizationWorkflowDTO.getInputs(),
                 parallelizationWorkflowDTO.getNWorkers(),
                 getChatClient(aiChatClient)
+        );
+    }
+
+    @Override
+    public FinalResponse applyOrchestratorWorkersWorkflow(final AIChatClient aiChatClient,
+                                                          final OrchestratorWorkersDTO orchestratorWorkersDTO) {
+        return OrchestratorWorkers.process(
+                orchestratorWorkersDTO.getMessage(),
+                getChatClient(aiChatClient),
+                orchestratorWorkersDTO.getOrchestratorPrompt(),
+                orchestratorWorkersDTO.getWorkerPrompt()
         );
     }
 
