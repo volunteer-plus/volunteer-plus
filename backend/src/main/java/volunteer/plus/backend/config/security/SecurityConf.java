@@ -46,6 +46,8 @@ public class SecurityConf {
     public static final String FORM_BASED_REGISTRATION_ENTRY_POINT = "/api/registration";
     public static final String TOKEN_REFRESH_ENTRY_POINT = "/api/auth/token";
     public static final String TOKEN_BASED_AUTH_ENTRY_POINT = "/api/**";
+    public static final String SWAGGER_UI = "/swagger-ui/**";
+    public static final String API_DOCS = "/api-docs*/**";
 
     @Bean
     public DaoAuthenticationProvider buildRestAuthenticationProvider() {
@@ -97,7 +99,9 @@ public class SecurityConf {
                         .requestMatchers(
                                 FORM_BASED_LOGIN_ENTRY_POINT,
                                 TOKEN_REFRESH_ENTRY_POINT,
-                                FORM_BASED_REGISTRATION_ENTRY_POINT
+                                FORM_BASED_REGISTRATION_ENTRY_POINT,
+                                SWAGGER_UI,
+                                API_DOCS
                         )
                         .permitAll()
                         .requestMatchers(TOKEN_BASED_AUTH_ENTRY_POINT)
@@ -114,7 +118,13 @@ public class SecurityConf {
     }
 
     private NegatedRequestMatcher negatedRequestMatcher() {
-        List<RequestMatcher> pathsToSkip = Stream.of(TOKEN_REFRESH_ENTRY_POINT, FORM_BASED_LOGIN_ENTRY_POINT, FORM_BASED_REGISTRATION_ENTRY_POINT)
+        List<RequestMatcher> pathsToSkip = Stream.of(
+                        TOKEN_REFRESH_ENTRY_POINT,
+                        FORM_BASED_LOGIN_ENTRY_POINT,
+                        FORM_BASED_REGISTRATION_ENTRY_POINT,
+                        SWAGGER_UI,
+                        API_DOCS
+                )
                 .map(AntPathRequestMatcher::new)
                 .collect(Collectors.toList());
 
