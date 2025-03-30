@@ -6,7 +6,11 @@ import org.springframework.ai.audio.transcription.AudioTranscriptionPrompt;
 import org.springframework.ai.audio.transcription.AudioTranscriptionResponse;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.evaluation.EvaluationRequest;
+import org.springframework.ai.evaluation.FactCheckingEvaluator;
+import org.springframework.ai.evaluation.RelevancyEvaluator;
 import org.springframework.ai.image.Image;
 import org.springframework.ai.image.ImageGeneration;
 import org.springframework.ai.image.ImagePrompt;
@@ -56,6 +60,7 @@ public class OpenAIServiceImpl implements OpenAIService {
     private final OpenAiAudioTranscriptionModel openAiAudioTranscriptionModel;
     private final OpenAiAudioSpeechModel openAiAudioSpeechModel;
     private final AIModerationService moderationService;
+    private final ChatModel chatModel;
     private final OpenAIService openAIService;
     private final AIMilitaryTools aiMilitaryTools;
     private final List<AIAgentPattern> aiAgentPatterns;
@@ -67,6 +72,7 @@ public class OpenAIServiceImpl implements OpenAIService {
                              final OpenAiAudioTranscriptionModel openAiAudioTranscriptionModel,
                              final OpenAiAudioSpeechModel openAiAudioSpeechModel,
                              final AIModerationService moderationService,
+                             final @Qualifier("openAiChatModel") ChatModel chatModel,
                              final @Lazy OpenAIService openAIService,
                              final AIMilitaryTools aiMilitaryTools,
                              final List<AIAgentPattern> aiAgentPatterns,
@@ -76,6 +82,7 @@ public class OpenAIServiceImpl implements OpenAIService {
         this.openAiAudioTranscriptionModel = openAiAudioTranscriptionModel;
         this.openAiAudioSpeechModel = openAiAudioSpeechModel;
         this.moderationService = moderationService;
+        this.chatModel = chatModel;
         this.openAIService = openAIService;
         this.aiMilitaryTools = aiMilitaryTools;
         this.aiAgentPatterns = aiAgentPatterns;
@@ -99,22 +106,27 @@ public class OpenAIServiceImpl implements OpenAIService {
 
         final ChatClient client = openAIChatClientMap.get(chatClient);
 
-        if (chatClient == null) {
+        if (client == null) {
             throw new ApiException(ErrorCode.CHAT_CLIENT_NOT_FOUND);
         }
+
+        final FactCheckingEvaluator factCheckingEvaluator = new FactCheckingEvaluator(ChatClient.builder(chatModel));
+        final RelevancyEvaluator relevancyEvaluator = new RelevancyEvaluator(ChatClient.builder(chatModel));
 
         final String response = client.prompt(new Prompt(um))
                 .tools(aiMilitaryTools, aiAgentPatterns)
                 .call()
                 .content();
 
-        final ModerationResponse moderationResponse = moderationFuture.get();
+        final EvaluationRequest evaluationRequest = new EvaluationRequest(message, response);
 
         webSocketService.sendNotification(OPENAI_CHAT_CLIENT_TARGET, "OpenAI request:\n" + message + RESPONSE + response);
 
         return AIChatResponse.builder()
                 .chatResponse(response)
-                .moderationResponse(moderationResponse)
+                .moderationResponse(moderationFuture.get())
+                .relevancyResponse(relevancyEvaluator.evaluate(evaluationRequest))
+                .factCheckingResponse(factCheckingEvaluator.evaluate(evaluationRequest))
                 .build();
     }
 
