@@ -1,4 +1,4 @@
-package volunteer.plus.backend.domain.dto;
+package volunteer.plus.backend.domain.dto.ai.agent;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -7,15 +7,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
+import java.util.Map;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ChainWorkflowRequestDTO {
+public class RoutingWorkflowRequestDTO {
     @NotBlank
     private String message;
     @NotNull
-    private List<String> promptList;
+    private Map<String, String> routes;
 }
