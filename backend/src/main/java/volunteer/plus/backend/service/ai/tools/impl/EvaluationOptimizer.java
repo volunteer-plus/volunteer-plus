@@ -5,13 +5,15 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Service;
+import volunteer.plus.backend.domain.dto.ai.agent.EvaluationResponse;
+import volunteer.plus.backend.domain.dto.ai.agent.Generation;
+import volunteer.plus.backend.domain.dto.ai.agent.RefinedResponse;
 import volunteer.plus.backend.domain.enums.AIAgentPatternType;
 import volunteer.plus.backend.service.ai.tools.AIAgentPattern;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings("unused")
 @Slf4j
 @Service
 public class EvaluationOptimizer implements AIAgentPattern {
@@ -19,18 +21,6 @@ public class EvaluationOptimizer implements AIAgentPattern {
     @Override
     public AIAgentPatternType getType() {
         return AIAgentPatternType.EVALUATION_OPTIMIZER;
-    }
-
-    public record Generation(String thoughts, String response) {
-    }
-
-    public record RefinedResponse(String solution, List<Generation> chainOfThought) {
-    }
-
-    public record EvaluationResponse(Evaluation evaluation, String feedback) {
-        public enum Evaluation {
-            PASS, NEEDS_IMPROVEMENT, FAIL
-        }
     }
 
     @Tool(name = "patternEvaluate", description = """

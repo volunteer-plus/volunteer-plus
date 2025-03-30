@@ -5,13 +5,13 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Service;
+import volunteer.plus.backend.domain.dto.ai.agent.RoutingResponse;
 import volunteer.plus.backend.domain.enums.AIAgentPatternType;
 import volunteer.plus.backend.exceptions.ApiException;
 import volunteer.plus.backend.service.ai.tools.AIAgentPattern;
 
 import java.util.Map;
 
-@SuppressWarnings("unused")
 @Slf4j
 @Service
 public class RoutingWorkflow implements AIAgentPattern {
@@ -68,8 +68,5 @@ public class RoutingWorkflow implements AIAgentPattern {
         log.info("Routing Analysis:{}\nSelected route: {}", routingResponse.reasoning(), routingResponse.selection());
 
         return routingResponse.selection();
-    }
-
-    public record RoutingResponse(String reasoning, String selection) {
     }
 }

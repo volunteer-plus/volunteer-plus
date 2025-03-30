@@ -14,7 +14,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@SuppressWarnings("unused")
 @Slf4j
 @Service
 public class ParallelizationWorkflow implements AIAgentPattern {

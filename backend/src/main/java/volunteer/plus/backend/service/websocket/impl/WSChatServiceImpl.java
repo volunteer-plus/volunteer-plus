@@ -16,13 +16,15 @@ import volunteer.plus.backend.repository.WSMessageRepository;
 import volunteer.plus.backend.service.websocket.WSChatService;
 import volunteer.plus.backend.service.websocket.WebSocketService;
 
-import static volunteer.plus.backend.config.websocket.WebSocketConfig.WS_DESTINATION_PREFIX;
+import static volunteer.plus.backend.config.websocket.WebSocketConfig.*;
 
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class WSChatServiceImpl implements WSChatService {
+    private static final String OLLAMA_USER_EMAIL = "ollamaai@test.com";
+    private static final String OPEN_AI_USER_EMAIL = "openai@test.com";
 
     private final WebSocketService webSocketService;
     private final WSMessageRepository wsMessageRepository;
@@ -50,6 +52,10 @@ public class WSChatServiceImpl implements WSChatService {
 
         conversationRoomRepository.save(conversationRoom);
 
-        webSocketService.sendNotification(WS_DESTINATION_PREFIX + "/" + conversationRoomId, savedMessage);
+        switch (userDetails.getEmail()) {
+            case OLLAMA_USER_EMAIL -> webSocketService.sendNotification(APP_MAPPING_PREFIX + OLLAMA_MESSAGE_MAPPING, savedMessage);
+            case OPEN_AI_USER_EMAIL -> webSocketService.sendNotification(APP_MAPPING_PREFIX + OPENAI_MESSAGE_MAPPING, savedMessage);
+            case null, default -> webSocketService.sendNotification(WS_DESTINATION_PREFIX + "/" + conversationRoomId, savedMessage);
+        }
     }
 }

@@ -32,7 +32,8 @@ public enum ErrorCode {
     VOLUNTEER_FEEDBACK_NOT_FOUND("Volunteer feedback not found"),
     CANNOT_DOWNLOAD_OUTPUT_FILE("Cannot download output file"),
     CONVERSATION_ROOM_NOT_FOUND("Conversation room not found"),
-    MESSAGE_NOT_FOUND("Message not found");
+    MESSAGE_NOT_FOUND("Message not found"),
+    CHAT_CLIENT_NOT_FOUND("Chat client not found");
 
     private final String description;
 }
