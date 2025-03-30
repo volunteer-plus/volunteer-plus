@@ -86,9 +86,9 @@ public class OllamaChatClientConfig {
                                                              final ChatClient ollamaMilitaryChatClient,
                                                              final ChatClient ollamaInMemoryChatClient) {
         return Map.of(
-                AIChatClient.DEFAULT, ollamaGeneralChatClient,
-                AIChatClient.MILITARY, ollamaMilitaryChatClient,
-                AIChatClient.IN_MEMORY, ollamaInMemoryChatClient
+                AIChatClient.OLLAMA_DEFAULT, ollamaGeneralChatClient,
+                AIChatClient.OLLAMA_MILITARY, ollamaMilitaryChatClient,
+                AIChatClient.OLLAMA_IN_MEMORY, ollamaInMemoryChatClient
         );
     }
 }

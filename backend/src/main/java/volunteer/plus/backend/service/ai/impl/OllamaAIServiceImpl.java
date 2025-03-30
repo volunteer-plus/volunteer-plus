@@ -12,6 +12,8 @@ import org.springframework.web.multipart.MultipartFile;
 import volunteer.plus.backend.domain.dto.AIChatResponse;
 import volunteer.plus.backend.domain.enums.AIChatClient;
 import volunteer.plus.backend.domain.enums.OllamaAIModel;
+import volunteer.plus.backend.exceptions.ApiException;
+import volunteer.plus.backend.exceptions.ErrorCode;
 import volunteer.plus.backend.service.ai.OllamaAIService;
 import volunteer.plus.backend.service.ai.tools.AIAgentPattern;
 import volunteer.plus.backend.service.ai.tools.AIMilitaryTools;
@@ -57,6 +59,11 @@ public class OllamaAIServiceImpl implements OllamaAIService {
         );
 
         final ChatClient chatClient = ollamaChatClientMap.get(aiChatClient);
+
+        if (chatClient == null) {
+            throw new ApiException(ErrorCode.CHAT_CLIENT_NOT_FOUND);
+        }
+
         final String chatResponse = getChatResponse(chatClient, um, ollamaModel);
 
         webSocketService.sendNotification(OLLAMA_CHAT_CLIENT_TARGET, "Ollama request:\n" + message + "\nResponse:\n" + chatResponse);

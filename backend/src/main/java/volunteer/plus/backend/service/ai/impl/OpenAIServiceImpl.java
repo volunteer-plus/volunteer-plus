@@ -99,6 +99,10 @@ public class OpenAIServiceImpl implements OpenAIService {
 
         final ChatClient client = openAIChatClientMap.get(chatClient);
 
+        if (chatClient == null) {
+            throw new ApiException(ErrorCode.CHAT_CLIENT_NOT_FOUND);
+        }
+
         final String response = client.prompt(new Prompt(um))
                 .tools(aiMilitaryTools, aiAgentPatterns)
                 .call()
