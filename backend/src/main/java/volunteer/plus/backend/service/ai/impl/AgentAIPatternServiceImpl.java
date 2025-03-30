@@ -7,10 +7,7 @@ import org.springframework.stereotype.Service;
 import volunteer.plus.backend.domain.dto.ai.agent.*;
 import volunteer.plus.backend.domain.enums.AIChatClient;
 import volunteer.plus.backend.service.ai.AgentAIPatternService;
-import volunteer.plus.backend.service.ai.tools.impl.OrchestratorWorkers;
-import volunteer.plus.backend.service.ai.tools.impl.ParallelizationWorkflow;
-import volunteer.plus.backend.service.ai.tools.impl.PromptChainWorkflow;
-import volunteer.plus.backend.service.ai.tools.impl.RoutingWorkflow;
+import volunteer.plus.backend.service.ai.tools.impl.*;
 
 import java.util.List;
 import java.util.Map;
@@ -51,23 +48,34 @@ public class AgentAIPatternServiceImpl implements AgentAIPatternService {
 
     @Override
     public List<String> applyParallelizationWorkflow(final AIChatClient aiChatClient,
-                                                     final ParallelizationWorkflowDTO parallelizationWorkflowDTO) {
+                                                     final ParallelizationWorkflowRequestDTO parallelizationWorkflowRequestDTO) {
         return ParallelizationWorkflow.parallel(
-                parallelizationWorkflowDTO.getMessage(),
-                parallelizationWorkflowDTO.getInputs(),
-                parallelizationWorkflowDTO.getNWorkers(),
+                parallelizationWorkflowRequestDTO.getMessage(),
+                parallelizationWorkflowRequestDTO.getInputs(),
+                parallelizationWorkflowRequestDTO.getNWorkers(),
                 getChatClient(aiChatClient)
         );
     }
 
     @Override
     public FinalResponse applyOrchestratorWorkersWorkflow(final AIChatClient aiChatClient,
-                                                          final OrchestratorWorkersDTO orchestratorWorkersDTO) {
+                                                          final OrchestratorWorkersRequestDTO orchestratorWorkersRequestDTO) {
         return OrchestratorWorkers.process(
-                orchestratorWorkersDTO.getMessage(),
+                orchestratorWorkersRequestDTO.getMessage(),
                 getChatClient(aiChatClient),
-                orchestratorWorkersDTO.getOrchestratorPrompt(),
-                orchestratorWorkersDTO.getWorkerPrompt()
+                orchestratorWorkersRequestDTO.getOrchestratorPrompt(),
+                orchestratorWorkersRequestDTO.getWorkerPrompt()
+        );
+    }
+
+    @Override
+    public RefinedResponse applyEvaluationOptimizerWorkflow(final AIChatClient aiChatClient,
+                                                            final EvaluationOptimizerRequestDTO evaluationOptimizerRequestDTO) {
+        return EvaluationOptimizer.loop(
+                evaluationOptimizerRequestDTO.getMessage(),
+                getChatClient(aiChatClient),
+                evaluationOptimizerRequestDTO.getGeneratorPrompt(),
+                evaluationOptimizerRequestDTO.getEvaluatorPrompt()
         );
     }
 

@@ -10,7 +10,9 @@ public interface AgentAIPatternService {
 
     String applyRoutingWorkflow(AIChatClient aiChatClient, RoutingWorkflowRequestDTO routingWorkflowRequestDTO);
 
-    List<String> applyParallelizationWorkflow(AIChatClient aiChatClient, ParallelizationWorkflowDTO parallelizationWorkflowDTO);
+    List<String> applyParallelizationWorkflow(AIChatClient aiChatClient, ParallelizationWorkflowRequestDTO parallelizationWorkflowRequestDTO);
 
-    FinalResponse applyOrchestratorWorkersWorkflow(AIChatClient aiChatClient, OrchestratorWorkersDTO orchestratorWorkersDTO);
+    FinalResponse applyOrchestratorWorkersWorkflow(AIChatClient aiChatClient, OrchestratorWorkersRequestDTO orchestratorWorkersRequestDTO);
+
+    RefinedResponse applyEvaluationOptimizerWorkflow(AIChatClient aiChatClient, EvaluationOptimizerRequestDTO evaluationOptimizerRequestDTO);
 }

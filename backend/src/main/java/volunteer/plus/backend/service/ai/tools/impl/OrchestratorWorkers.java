@@ -6,6 +6,7 @@ import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Service;
 import volunteer.plus.backend.domain.dto.ai.agent.FinalResponse;
+import volunteer.plus.backend.domain.dto.ai.agent.OrchestratorResponse;
 import volunteer.plus.backend.domain.enums.AIAgentPatternType;
 import volunteer.plus.backend.service.ai.tools.AIAgentPattern;
 
@@ -18,12 +19,6 @@ public class OrchestratorWorkers implements AIAgentPattern {
     @Override
     public AIAgentPatternType getType() {
         return AIAgentPatternType.ORCHESTRATOR_WORKERS;
-    }
-
-    public record Task(String type, String description) {
-    }
-
-    public record OrchestratorResponse(String analysis, List<Task> tasks) {
     }
 
     @Tool(name = "patternOrchestrator", description = """

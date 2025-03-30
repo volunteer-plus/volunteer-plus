@@ -37,14 +37,21 @@ public class AgentAIPatternController {
     @PostMapping("/agent/parallelization-workflow")
     @Operation(description = "Parallelization workflow")
     public ResponseEntity<List<String>> applyParallelizationWorkflow(@RequestParam final AIChatClient aiChatClient,
-                                                                     @RequestBody @Valid final ParallelizationWorkflowDTO parallelizationWorkflowDTO) {
-        return ResponseEntity.ok(agentAIPatternService.applyParallelizationWorkflow(aiChatClient, parallelizationWorkflowDTO));
+                                                                     @RequestBody @Valid final ParallelizationWorkflowRequestDTO parallelizationWorkflowRequestDTO) {
+        return ResponseEntity.ok(agentAIPatternService.applyParallelizationWorkflow(aiChatClient, parallelizationWorkflowRequestDTO));
     }
 
     @PostMapping("/agent/orchestrator-workers-workflow")
     @Operation(description = "Orchestrator workers workflow")
     public ResponseEntity<FinalResponse> applyOrchestratorWorkersWorkflow(@RequestParam final AIChatClient aiChatClient,
-                                                                          @RequestBody @Valid final OrchestratorWorkersDTO orchestratorWorkersDTO) {
-        return ResponseEntity.ok(agentAIPatternService.applyOrchestratorWorkersWorkflow(aiChatClient, orchestratorWorkersDTO));
+                                                                          @RequestBody @Valid final OrchestratorWorkersRequestDTO orchestratorWorkersRequestDTO) {
+        return ResponseEntity.ok(agentAIPatternService.applyOrchestratorWorkersWorkflow(aiChatClient, orchestratorWorkersRequestDTO));
+    }
+
+    @PostMapping("/agent/evaluation-optimizer-workflow")
+    @Operation(description = "Evaluation optimizer workflow")
+    public ResponseEntity<RefinedResponse> applyEvaluationOptimizerWorkflow(@RequestParam final AIChatClient aiChatClient,
+                                                                            @RequestBody @Valid final EvaluationOptimizerRequestDTO evaluationOptimizerRequestDTO) {
+        return ResponseEntity.ok(agentAIPatternService.applyEvaluationOptimizerWorkflow(aiChatClient, evaluationOptimizerRequestDTO));
     }
 }
