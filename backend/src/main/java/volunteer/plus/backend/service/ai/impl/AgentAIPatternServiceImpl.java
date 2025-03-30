@@ -5,12 +5,15 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import volunteer.plus.backend.domain.dto.ai.agent.ChainWorkflowRequestDTO;
+import volunteer.plus.backend.domain.dto.ai.agent.ParallelizationWorkflowDTO;
 import volunteer.plus.backend.domain.dto.ai.agent.RoutingWorkflowRequestDTO;
 import volunteer.plus.backend.domain.enums.AIChatClient;
 import volunteer.plus.backend.service.ai.AgentAIPatternService;
+import volunteer.plus.backend.service.ai.tools.impl.ParallelizationWorkflow;
 import volunteer.plus.backend.service.ai.tools.impl.PromptChainWorkflow;
 import volunteer.plus.backend.service.ai.tools.impl.RoutingWorkflow;
 
+import java.util.List;
 import java.util.Map;
 
 import static volunteer.plus.backend.domain.enums.AIChatClient.*;
@@ -30,13 +33,32 @@ public class AgentAIPatternServiceImpl implements AgentAIPatternService {
     @Override
     public String applyPromptChainWorkflow(final AIChatClient aiChatClient,
                                            final ChainWorkflowRequestDTO chainWorkflowRequestDTO) {
-        return PromptChainWorkflow.chain(chainWorkflowRequestDTO.getMessage(), getChatClient(aiChatClient), chainWorkflowRequestDTO.getPromptList());
+        return PromptChainWorkflow.chain(
+                chainWorkflowRequestDTO.getMessage(),
+                getChatClient(aiChatClient),
+                chainWorkflowRequestDTO.getPromptList()
+        );
     }
 
     @Override
     public String applyRoutingWorkflow(final AIChatClient aiChatClient,
                                        final RoutingWorkflowRequestDTO routingWorkflowRequestDTO) {
-        return RoutingWorkflow.route(routingWorkflowRequestDTO.getMessage(), routingWorkflowRequestDTO.getRoutes(), getChatClient(aiChatClient));
+        return RoutingWorkflow.route(
+                routingWorkflowRequestDTO.getMessage(),
+                routingWorkflowRequestDTO.getRoutes(),
+                getChatClient(aiChatClient)
+        );
+    }
+
+    @Override
+    public List<String> applyParallelizationWorkflow(final AIChatClient aiChatClient,
+                                                     final ParallelizationWorkflowDTO parallelizationWorkflowDTO) {
+        return ParallelizationWorkflow.parallel(
+                parallelizationWorkflowDTO.getMessage(),
+                parallelizationWorkflowDTO.getInputs(),
+                parallelizationWorkflowDTO.getNWorkers(),
+                getChatClient(aiChatClient)
+        );
     }
 
     private ChatClient getChatClient(final AIChatClient aiChatClient) {
