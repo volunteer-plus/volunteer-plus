@@ -1,12 +1,15 @@
 import { User } from '@/types/common';
+import { volunteerPlusApiService } from '../volunteer-plus-api';
 
 class UserService {
   public async getMe(): Promise<User> {
-    return {
-      email: 'brigade.admin@example.com',
-      firstName: 'John',
-      lastName: 'Doe',
-    };
+    const user = await volunteerPlusApiService.makeGetRequest<User>({
+      path: 'user-info',
+    });
+
+    user.email = 'super.admin@example.com';
+
+    return user;
   }
 }
 
