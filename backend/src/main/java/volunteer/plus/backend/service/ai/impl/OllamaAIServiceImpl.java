@@ -10,6 +10,7 @@ import org.springframework.ai.evaluation.EvaluationRequest;
 import org.springframework.ai.evaluation.FactCheckingEvaluator;
 import org.springframework.ai.evaluation.RelevancyEvaluator;
 import org.springframework.ai.ollama.api.OllamaOptions;
+import org.springframework.ai.tool.ToolCallback;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,8 +21,6 @@ import volunteer.plus.backend.exceptions.ApiException;
 import volunteer.plus.backend.exceptions.ErrorCode;
 import volunteer.plus.backend.service.ai.AIModerationService;
 import volunteer.plus.backend.service.ai.OllamaAIService;
-import volunteer.plus.backend.service.ai.tools.AIAgentPattern;
-import volunteer.plus.backend.service.ai.tools.AIMilitaryTools;
 import volunteer.plus.backend.service.websocket.WebSocketService;
 
 import java.util.List;
@@ -36,22 +35,19 @@ import static volunteer.plus.backend.util.AIUtil.getAIMediaList;
 public class OllamaAIServiceImpl implements OllamaAIService {
     private final Map<AIChatClient, ChatClient> ollamaChatClientMap;
     private final WebSocketService webSocketService;
-    private final AIMilitaryTools aiMilitaryTools;
-    private final List<AIAgentPattern> aiAgentPatterns;
     private final AIModerationService moderationService;
+    private final List<ToolCallback> tools;
     private final ChatModel chatModel;
 
 
     public OllamaAIServiceImpl(final @Qualifier("ollamaChatClientMap") Map<AIChatClient, ChatClient> ollamaChatClientMap,
                                final WebSocketService webSocketService,
-                               final AIMilitaryTools aiMilitaryTools,
-                               final List<AIAgentPattern> aiAgentPatterns,
                                final AIModerationService moderationService,
+                               final List<ToolCallback> tools,
                                final @Qualifier("openAiChatModel") ChatModel chatModel) {
         this.ollamaChatClientMap = ollamaChatClientMap;
         this.webSocketService = webSocketService;
-        this.aiMilitaryTools = aiMilitaryTools;
-        this.aiAgentPatterns = aiAgentPatterns;
+        this.tools = tools;
         this.moderationService = moderationService;
         this.chatModel = chatModel;
     }
@@ -105,7 +101,7 @@ public class OllamaAIServiceImpl implements OllamaAIService {
                                     .model(ollamaModel.getModelName())
                                     .build()
                     )
-                    .tools(aiMilitaryTools, aiAgentPatterns)
+                    .tools(tools)
                     .call()
                     .content();
         }

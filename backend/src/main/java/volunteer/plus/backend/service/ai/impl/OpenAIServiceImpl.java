@@ -20,6 +20,7 @@ import org.springframework.ai.openai.*;
 import org.springframework.ai.openai.api.OpenAiAudioApi;
 import org.springframework.ai.openai.audio.speech.SpeechPrompt;
 import org.springframework.ai.openai.audio.speech.SpeechResponse;
+import org.springframework.ai.tool.ToolCallback;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.MediaType;
@@ -27,7 +28,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import volunteer.plus.backend.service.ai.tools.AIMilitaryTools;
 import volunteer.plus.backend.domain.dto.AIChatResponse;
 import volunteer.plus.backend.domain.dto.ImageGenerationRequestDTO;
 import volunteer.plus.backend.domain.enums.AIChatClient;
@@ -35,7 +35,6 @@ import volunteer.plus.backend.exceptions.ApiException;
 import volunteer.plus.backend.exceptions.ErrorCode;
 import volunteer.plus.backend.service.ai.AIModerationService;
 import volunteer.plus.backend.service.ai.OpenAIService;
-import volunteer.plus.backend.service.ai.tools.AIAgentPattern;
 import volunteer.plus.backend.service.websocket.WebSocketService;
 
 import java.io.InputStream;
@@ -62,8 +61,7 @@ public class OpenAIServiceImpl implements OpenAIService {
     private final AIModerationService moderationService;
     private final ChatModel chatModel;
     private final OpenAIService openAIService;
-    private final AIMilitaryTools aiMilitaryTools;
-    private final List<AIAgentPattern> aiAgentPatterns;
+    private final List<ToolCallback> tools;
     private final WebSocketService webSocketService;
 
     @SneakyThrows
@@ -74,8 +72,7 @@ public class OpenAIServiceImpl implements OpenAIService {
                              final AIModerationService moderationService,
                              final @Qualifier("openAiChatModel") ChatModel chatModel,
                              final @Lazy OpenAIService openAIService,
-                             final AIMilitaryTools aiMilitaryTools,
-                             final List<AIAgentPattern> aiAgentPatterns,
+                             final List<ToolCallback> tools,
                              final WebSocketService webSocketService) {
         this.openAIChatClientMap = openAIChatClientMap;
         this.imageModel = imageModel;
@@ -84,8 +81,7 @@ public class OpenAIServiceImpl implements OpenAIService {
         this.moderationService = moderationService;
         this.chatModel = chatModel;
         this.openAIService = openAIService;
-        this.aiMilitaryTools = aiMilitaryTools;
-        this.aiAgentPatterns = aiAgentPatterns;
+        this.tools = tools;
         this.webSocketService = webSocketService;
     }
 
@@ -114,7 +110,7 @@ public class OpenAIServiceImpl implements OpenAIService {
         final RelevancyEvaluator relevancyEvaluator = new RelevancyEvaluator(ChatClient.builder(chatModel));
 
         final String response = client.prompt(new Prompt(um))
-                .tools(aiMilitaryTools, aiAgentPatterns)
+                .tools(tools)
                 .call()
                 .content();
 
