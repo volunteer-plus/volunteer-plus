@@ -15,9 +15,15 @@ import { useLogout } from '@/hooks/auth';
 import { useAppSelector } from '@/hooks/store';
 import { getFullName } from '@/helpers/user';
 
-type Props = React.ComponentPropsWithoutRef<'button'>;
+type Props = React.ComponentPropsWithoutRef<'button'> & {
+  menuItems?: React.ReactNode;
+};
 
-const SessionUserBlock: React.FC<Props> = ({ className, ...props }) => {
+const SessionUserBlock: React.FC<Props> = ({
+  className,
+  menuItems,
+  ...props
+}) => {
   const logout = useLogout();
   const { user } = useAppSelector((state) => state.user);
 
@@ -41,7 +47,7 @@ const SessionUserBlock: React.FC<Props> = ({ className, ...props }) => {
         ref={blockRef}
       >
         <ExpandIcon isExpanded={isMenuOpen} />
-        {user && <div>{getFullName(user)}</div>}
+        {user && <div className={styles.name}>{getFullName(user)}</div>}
 
         <Avatar size='30px' />
       </button>
@@ -52,6 +58,7 @@ const SessionUserBlock: React.FC<Props> = ({ className, ...props }) => {
         alignment='stretch'
       >
         <MenuContainer {...clickOutsideHandlers}>
+          {menuItems}
           <MenuItem
             leftIcon={<MenuItemIconMaterial>logout</MenuItemIconMaterial>}
             onClick={() => logout()}

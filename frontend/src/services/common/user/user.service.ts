@@ -7,7 +7,7 @@ class UserService {
       path: 'user-info',
     });
 
-    user.email = 'super.admin@example.com';
+    user.email = 'brigade.admin@example.com';
 
     return user;
   }

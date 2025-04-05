@@ -1,0 +1,1 @@
+export { ServicemanRegistrationForm } from './serviceman-registration-form';

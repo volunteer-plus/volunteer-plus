@@ -1,5 +1,5 @@
-import { Link } from 'react-router-dom';
 import Logo from '@/assets/logo.svg?react';
+
 import styles from './styles.module.scss';
 
 interface Props {
@@ -10,9 +10,9 @@ const AuthPageLayout: React.FC<Props> = ({ children }) => {
   return (
     <div className={styles.root}>
       <main className={styles.main}>
-        <Link className={styles.logoWrapper} to='/'>
+        <div className={styles.logoWrapper}>
           <Logo className={styles.logo} />
-        </Link>
+        </div>
         <div className={styles.content}>{children}</div>
       </main>
     </div>

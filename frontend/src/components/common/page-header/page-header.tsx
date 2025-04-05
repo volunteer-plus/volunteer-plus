@@ -1,13 +1,20 @@
-import { Link } from 'react-router-dom';
-import { ButtonBase, SessionUserBlock } from '@/components/common';
+import { Link, useNavigate } from 'react-router-dom';
+import {
+  ButtonBase,
+  MenuItem,
+  MenuItemIconMaterial,
+  SessionUserBlock,
+} from '@/components/common';
 
 import Logo from '@/assets/logo.svg?react';
 
 import styles from './styles.module.scss';
 import { useAppSelector } from '@/hooks/store';
+import { getUserHomepage } from '@/helpers/user';
 
 const PageHeader: React.FC = () => {
   const userState = useAppSelector((state) => state.user);
+  const navigate = useNavigate();
 
   return (
     <header className={styles.header}>
@@ -16,7 +23,24 @@ const PageHeader: React.FC = () => {
       </Link>
 
       {userState.user ? (
-        <SessionUserBlock />
+        <SessionUserBlock
+          menuItems={
+            <>
+              <MenuItem
+                onClick={() => {
+                  if (!userState.user) return;
+
+                  navigate(getUserHomepage(userState.user));
+                }}
+                leftIcon={
+                  <MenuItemIconMaterial>arrow_back</MenuItemIconMaterial>
+                }
+              >
+                Назад
+              </MenuItem>
+            </>
+          }
+        />
       ) : (
         <div className={styles.actions}>
           <ButtonBase
