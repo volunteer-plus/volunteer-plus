@@ -1,7 +1,12 @@
 package volunteer.plus.backend.domain.enums;
 
 public enum AIChatClient {
-    DEFAULT,
-    IN_MEMORY,
-    MILITARY
+    OPENAI_DEFAULT,
+    OLLAMA_DEFAULT,
+
+    OPENAI_IN_MEMORY,
+    OLLAMA_IN_MEMORY,
+
+    OPENAI_MILITARY,
+    OLLAMA_MILITARY
 }

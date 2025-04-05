@@ -1,13 +1,12 @@
 package volunteer.plus.backend.domain.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-import lombok.*;
-
-@Getter
-@Setter
-@NoArgsConstructor
+@Data
 @AllArgsConstructor
-@Builder
-public class TokenResponse {
+public class AccessJwtToken {
+
     private String token;
+
 }

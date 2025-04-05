@@ -91,9 +91,9 @@ public class OpenAIChatClientConfig {
                                                              final ChatClient militaryChatClient,
                                                              final ChatClient inMemoryChatClient) {
         return Map.of(
-                AIChatClient.DEFAULT, generalChatClient,
-                AIChatClient.MILITARY, militaryChatClient,
-                AIChatClient.IN_MEMORY, inMemoryChatClient
+                AIChatClient.OPENAI_DEFAULT, generalChatClient,
+                AIChatClient.OPENAI_MILITARY, militaryChatClient,
+                AIChatClient.OPENAI_IN_MEMORY, inMemoryChatClient
         );
     }
 }

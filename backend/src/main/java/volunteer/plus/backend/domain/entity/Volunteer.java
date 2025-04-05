@@ -31,7 +31,7 @@ public class Volunteer extends BaseEntity {
     )
     private List<Levy> levies = new ArrayList<>();
 
-    @OneToMany(mappedBy = "volunteer", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "volunteer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<VolunteerFeedback> volunteerFeedbacks = new ArrayList<>();
 
     public void addFeedback(VolunteerFeedback volunteerFeedback) {

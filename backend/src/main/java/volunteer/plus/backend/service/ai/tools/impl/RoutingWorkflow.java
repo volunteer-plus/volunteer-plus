@@ -3,14 +3,15 @@ package volunteer.plus.backend.service.ai.tools.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Service;
+import volunteer.plus.backend.domain.dto.ai.agent.RoutingResponse;
 import volunteer.plus.backend.domain.enums.AIAgentPatternType;
 import volunteer.plus.backend.exceptions.ApiException;
 import volunteer.plus.backend.service.ai.tools.AIAgentPattern;
 
 import java.util.Map;
 
-@SuppressWarnings("unused")
 @Slf4j
 @Service
 public class RoutingWorkflow implements AIAgentPattern {
@@ -20,10 +21,18 @@ public class RoutingWorkflow implements AIAgentPattern {
         return AIAgentPatternType.ROUTING_WORKFLOW;
     }
 
-    @Tool(name = "patternRoute")
-    public static String route(final String input,
-                               final Map<String, String> routes,
-                               final ChatClient chatClient) {
+    @Tool(name = "patternRoute", description = """
+        This tool implements a routing workflow for processing an input based on dynamically selected routes.
+        The tool works as follows:
+          1. It determines the most appropriate route by sending the input along with available route keys to the chatClient.
+          2. The chatClient returns a JSON response with reasoning and a selection, indicating the best matching route.
+          3. The tool retrieves the prompt associated with the selected route from the routes map.
+          4. The input is then processed using the selected prompt, and the resulting output is returned.
+        If the selected route is not found in the routes map, an ApiException is thrown.
+        """)
+    public static String route(@ToolParam(description = "input: A String representing the user's input that needs to be routed.") final String input,
+                               @ToolParam(description = "A Map<String, String> where keys represent possible route identifiers and values are the corresponding prompts.") final Map<String, String> routes,
+                               @ToolParam(description = "An instance of ChatClient used to interact with the AI chat engine.") final ChatClient chatClient) {
         // Determine the appropriate route for the input
         final String routeKey = determineRoute(input, chatClient, routes.keySet());
 
@@ -59,8 +68,5 @@ public class RoutingWorkflow implements AIAgentPattern {
         log.info("Routing Analysis:{}\nSelected route: {}", routingResponse.reasoning(), routingResponse.selection());
 
         return routingResponse.selection();
-    }
-
-    public record RoutingResponse(String reasoning, String selection) {
     }
 }

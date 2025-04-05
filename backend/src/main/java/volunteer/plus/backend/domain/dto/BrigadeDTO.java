@@ -48,6 +48,8 @@ public class BrigadeDTO {
     public static class MilitaryPersonnelDTO {
         private Long id;
 
+        private Long userId;
+
         private LocalDateTime createDate;
 
         private LocalDateTime updateDate;
@@ -69,6 +71,7 @@ public class BrigadeDTO {
                     .map(person ->
                             BrigadeDTO.MilitaryPersonnelDTO.builder()
                                     .id(person.getId())
+                                    .userId(person.getUser() == null ? null : person.getUser().getId())
                                     .createDate(person.getCreateDate())
                                     .updateDate(person.getUpdateDate())
                                     .firstName(person.getFirstName())
