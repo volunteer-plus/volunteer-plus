@@ -141,5 +141,7 @@ services:
 volumes:
   ollama-local:
   redisinsight_db:
+
+networks:
   otel-network:
     driver: bridge

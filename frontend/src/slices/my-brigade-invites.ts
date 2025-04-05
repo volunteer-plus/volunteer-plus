@@ -9,7 +9,7 @@ const {
   reloadMyBrigadeInvites,
 } = makeLoadedSlice({
   name: 'myBrigadeInvites',
-  load: brigadesService.getMyBrigadeInvites.bind(brigadesService),
+  load: brigadesService.getBrigadeInvites.bind(brigadesService),
 });
 
 export {

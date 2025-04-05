@@ -16,9 +16,9 @@ const login = createAsyncThunk(
     thunkApi.dispatch(setIsLoginFailed(false));
 
     try {
-      const { token } = await authService.login(payload);
+      const { accessToken } = await authService.login(payload);
 
-      accessTokenService.set(token);
+      accessTokenService.set(accessToken);
 
       await thunkApi.dispatch(restoreSession());
     } catch (error) {

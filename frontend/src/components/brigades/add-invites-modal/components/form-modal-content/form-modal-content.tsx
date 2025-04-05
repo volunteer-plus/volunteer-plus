@@ -30,7 +30,7 @@ const FormModalContent: React.FC<Props> = ({ onCancel, onSubmit }) => {
       onSubmit={onSubmit}
       validationSchema={validationSchema}
     >
-      {({ isValid }) => {
+      {({ isValid, isSubmitting }) => {
         return (
           <Form>
             <FormikTextInputField
@@ -49,7 +49,7 @@ const FormModalContent: React.FC<Props> = ({ onCancel, onSubmit }) => {
               >
                 Скасувати
               </Button>
-              <Button type='submit' disabled={!isValid}>
+              <Button type='submit' disabled={!isValid || isSubmitting}>
                 Додати запрошення
               </Button>
             </div>

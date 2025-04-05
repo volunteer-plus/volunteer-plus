@@ -27,11 +27,21 @@ const BrigadeInvitesTabContent: React.FC = () => {
     (state) => state.myBrigadeInvites
   );
 
+  const myBrigadeState = useAppSelector((state) => state.myBrigade);
+
   const [isAddInvitesModalOpen, setIsAddInvitesModalOpen] = useState(false);
 
   useEffect(() => {
-    dispatch(loadMyBrigadeInvitesIfNotLoaded());
-  }, []);
+    if (!myBrigadeState.data) {
+      return;
+    }
+
+    dispatch(
+      loadMyBrigadeInvitesIfNotLoaded({
+        regimentCode: myBrigadeState.data.value.regimentCode,
+      })
+    );
+  }, [myBrigadeState.data, dispatch]);
 
   return (
     <GrayContainer isUnderTabs className={styles.container}>
@@ -55,7 +65,10 @@ const BrigadeInvitesTabContent: React.FC = () => {
             </Formik>
           </FilterButton>
         </div>
-        <Button onClick={() => setIsAddInvitesModalOpen(true)}>
+        <Button
+          onClick={() => setIsAddInvitesModalOpen(true)}
+          disabled={!myBrigadeState.data}
+        >
           Додати запрошення
         </Button>
       </div>

@@ -2,6 +2,7 @@ import {
   Button,
   GrayContainer,
   Pagination,
+  SecretKeyField,
   Table,
   TableAction,
   TableActionsCell,
@@ -18,9 +19,10 @@ import { ExportModal } from '../export-modal';
 
 interface Props {
   onClose: () => void;
+  data: { id: number; code: string }[];
 }
 
-const ListModalContent: React.FC<Props> = ({ onClose }) => {
+const ListModalContent: React.FC<Props> = ({ onClose, data }) => {
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
   return (
@@ -43,33 +45,18 @@ const ListModalContent: React.FC<Props> = ({ onClose }) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            <TableRow>
-              <TableDataCell>2323232323</TableDataCell>
-              <TableActionsCell>
-                <TableAction>delete</TableAction>
-              </TableActionsCell>
-            </TableRow>
-
-            <TableRow>
-              <TableDataCell>2323232323</TableDataCell>
-              <TableActionsCell>
-                <TableAction>delete</TableAction>
-              </TableActionsCell>
-            </TableRow>
-
-            <TableRow>
-              <TableDataCell>2323232323</TableDataCell>
-              <TableActionsCell>
-                <TableAction>delete</TableAction>
-              </TableActionsCell>
-            </TableRow>
-
-            <TableRow>
-              <TableDataCell>2323232323</TableDataCell>
-              <TableActionsCell>
-                <TableAction>delete</TableAction>
-              </TableActionsCell>
-            </TableRow>
+            {data.map((invite) => {
+              return (
+                <TableRow key={invite.id}>
+                  <TableDataCell>
+                    <SecretKeyField value={invite.code} />
+                  </TableDataCell>
+                  <TableActionsCell>
+                    <TableAction>delete</TableAction>
+                  </TableActionsCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
         <Pagination

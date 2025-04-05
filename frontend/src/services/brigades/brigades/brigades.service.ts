@@ -7,6 +7,7 @@ import {
   MyBrigade,
   BrigadeInvite,
   CreateBrigadeInvitesPayload,
+  GetBrigadeInvitesPayload,
 } from './types';
 
 class BrigadesService {
@@ -50,9 +51,14 @@ class BrigadesService {
     return brigades[0];
   }
 
-  async getMyBrigadeInvites(): Promise<BrigadeInvite[]> {
+  async getBrigadeInvites({
+    regimentCode,
+  }: GetBrigadeInvitesPayload): Promise<BrigadeInvite[]> {
     return await volunteerPlusApiService.makeGetRequest<BrigadeInvite[]>({
       path: 'add-requests',
+      search: {
+        regimentCode,
+      },
     });
   }
 
@@ -64,7 +70,7 @@ class BrigadesService {
       path: 'add-request/generate',
       search: {
         regimentCode: brigadeRegimentCode,
-        count,
+        amount: count,
       },
     });
   }
