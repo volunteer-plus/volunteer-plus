@@ -1,6 +1,9 @@
 package volunteer.plus.backend.service.email.impl;
 
-import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import volunteer.plus.backend.domain.dto.LiqPayCreationDTO;
@@ -14,21 +17,32 @@ import volunteer.plus.backend.repository.UserRepository;
 import volunteer.plus.backend.service.email.EmailNotificationBuilderService;
 import volunteer.plus.backend.util.JacksonUtil;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
-@RequiredArgsConstructor
 public class EmailNotificationBuilderServiceImpl implements EmailNotificationBuilderService {
+    private final Resource reportAnalysisResource;
     private final UserRepository userRepository;
     private final EmailTemplateRepository emailTemplateRepository;
+
+    public EmailNotificationBuilderServiceImpl(final @Value("classpath:/prompts/report_analysis.txt") Resource reportAnalysisResource,
+                                               final UserRepository userRepository,
+                                               final EmailTemplateRepository emailTemplateRepository) {
+        this.reportAnalysisResource = reportAnalysisResource;
+        this.userRepository = userRepository;
+        this.emailTemplateRepository = emailTemplateRepository;
+    }
 
     @Override
     @Transactional
     public void createReportEmails(final Report report) {
         final var emailTemplate = emailTemplateRepository.findByEmailMessageTag(EmailMessageTag.EMAIL_MESSAGE_TAG_1)
                 .orElseThrow(() -> new ApiException(ErrorCode.EMAIL_TEMPLATE_NOT_FOUND));
-        final var users = userRepository.findAllByEmailNotNull();
+        final var users = userRepository.findAllByEmailNotNullAndPasswordNotNull();
 
         // in this case we need to generate for each user separate notification
         for (final UserRepository.UserMainDataProjection user : users) {
@@ -58,6 +72,61 @@ public class EmailNotificationBuilderServiceImpl implements EmailNotificationBui
                         .build();
                 emailNotification.addAttachment(emailAttachment);
             });
+
+            emailTemplate.addNotification(emailNotification);
+        }
+
+        emailTemplateRepository.save(emailTemplate);
+    }
+
+    @SneakyThrows
+    @Override
+    @Transactional
+    public void createReportAnalysisEmails(final ChatClient chatClient,
+                                           final List<Report> reports) {
+        final var emailTemplate = emailTemplateRepository.findByEmailMessageTag(EmailMessageTag.EMAIL_MESSAGE_TAG_5)
+                .orElseThrow(() -> new ApiException(ErrorCode.EMAIL_TEMPLATE_NOT_FOUND));
+
+        final var users = userRepository.findAllByEmailNotNullAndPasswordNotNull();
+
+        if (reports == null) {
+            return;
+        }
+
+        final List<String> reportDetails = reports.stream()
+                .map(Report::getData)
+                .filter(Objects::nonNull)
+                .toList();
+
+        final String prompt = reportAnalysisResource.getContentAsString(Charset.defaultCharset()) + reportDetails;
+
+        final String response = chatClient.prompt(prompt)
+                .call()
+                .content();
+
+        // in this case we need to generate for each user separate notification
+        for (final UserRepository.UserMainDataProjection user : users) {
+            final EmailNotification emailNotification = new EmailNotification();
+            emailNotification.setSubjectData("");
+            emailNotification.setTemplateData(JacksonUtil.serialize(
+                    Map.of(
+                            "userName", getFullName(user),
+                            "data", response
+                    )
+            ));
+
+            updateEmailNotification(emailNotification, getFullName(user), user.getEmail());
+
+            reports.stream()
+                    .filter(el -> el.getAttachments() != null)
+                    .flatMap(el -> el.getAttachments().stream())
+                    .forEach(attachment -> {
+                        final EmailAttachment emailAttachment = EmailAttachment.builder()
+                                .filename(attachment.getFilename())
+                                .s3Link(attachment.getFilepath())
+                                .build();
+                        emailNotification.addAttachment(emailAttachment);
+                    });
 
             emailTemplate.addNotification(emailNotification);
         }
@@ -112,19 +181,7 @@ public class EmailNotificationBuilderServiceImpl implements EmailNotificationBui
         final EmailNotification emailNotification = new EmailNotification();
         emailNotification.setSubjectData(JacksonUtil.serialize(Map.of("name", getFullName(user))));
         emailNotification.setTemplateData(JacksonUtil.serialize(Map.of()));
-        emailNotification.setDeleted(false);
-        emailNotification.setDraft(false);
-        emailNotification.setStatus(EmailStatus.PENDING);
-        emailNotification.setEmailRecipients(new ArrayList<>());
-        emailNotification.setEmailAttachments(new ArrayList<>());
-
-        final EmailRecipient emailRecipient = EmailRecipient.builder()
-                .fullName(getFullName(user))
-                .emailAddress(user.getEmail())
-                .toRecipient(true)
-                .build();
-
-        emailNotification.addRecipient(emailRecipient);
+        updateEmailNotification(emailNotification, getFullName(user), user.getEmail());
 
         emailTemplate.addNotification(emailNotification);
 
@@ -141,6 +198,16 @@ public class EmailNotificationBuilderServiceImpl implements EmailNotificationBui
         final EmailNotification emailNotification = new EmailNotification();
         emailNotification.setSubjectData(JacksonUtil.serialize(Map.of("name", getFullName(user))));
         emailNotification.setTemplateData(JacksonUtil.serialize(Map.of("amount", liqPayCreationDTO.getAmount())));
+        updateEmailNotification(emailNotification, getFullName(user), user.getEmail());
+
+        emailTemplate.addNotification(emailNotification);
+
+        emailTemplateRepository.save(emailTemplate);
+    }
+
+    private void updateEmailNotification(final EmailNotification emailNotification,
+                                         final String fullName,
+                                         final String email) {
         emailNotification.setDeleted(false);
         emailNotification.setDraft(false);
         emailNotification.setStatus(EmailStatus.PENDING);
@@ -148,16 +215,12 @@ public class EmailNotificationBuilderServiceImpl implements EmailNotificationBui
         emailNotification.setEmailAttachments(new ArrayList<>());
 
         final EmailRecipient emailRecipient = EmailRecipient.builder()
-                .fullName(getFullName(user))
-                .emailAddress(user.getEmail())
+                .fullName(fullName)
+                .emailAddress(email)
                 .toRecipient(true)
                 .build();
 
         emailNotification.addRecipient(emailRecipient);
-
-        emailTemplate.addNotification(emailNotification);
-
-        emailTemplateRepository.save(emailTemplate);
     }
 
     private String getFullName(final UserRepository.UserMainDataProjection user) {

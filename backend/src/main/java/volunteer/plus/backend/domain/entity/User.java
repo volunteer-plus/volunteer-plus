@@ -14,7 +14,14 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@EqualsAndHashCode(callSuper = false, exclude = {"volunteer", "requests", "volunteerFeedbacks"})
+@EqualsAndHashCode(callSuper = false, exclude = {
+        "volunteer",
+        "requests",
+        "volunteerFeedbacks",
+        "liqPayOrders",
+        "militaryPersonnel",
+        "conversationRooms"
+})
 @Entity
 @Table(name = "user")
 public class User extends BaseEntity implements UserDetails {
@@ -55,6 +62,9 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "twoFa_token_expiration_time")
     private Long twoFaTokenExpTime;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private MilitaryPersonnel militaryPersonnel;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Request> requests = new ArrayList<>();
 
@@ -63,6 +73,9 @@ public class User extends BaseEntity implements UserDetails {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<LiqPayOrder> liqPayOrders = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "users")
+    private List<ConversationRoom> conversationRooms = new ArrayList<>();
 
     private boolean enabled;
     private boolean accountNonExpired;

@@ -1,8 +1,6 @@
 package volunteer.plus.backend.domain.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Getter
@@ -10,19 +8,17 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = false, exclude = "conversationRoom")
 @Entity
 @Table(name = "ws_message")
 public class WSMessage extends BaseEntity {
-    @Column(name = "conversation_id")
-    private String convId;
+    @Column(name = "content")
+    private String content;
 
     @Column(name = "from_user")
     private Long fromUser;
 
-    @Column(name = "to_user")
-    private Long toUser;
-
-    @Column(name = "content")
-    private String content;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "conversation_room_id")
+    private ConversationRoom conversationRoom;
 }

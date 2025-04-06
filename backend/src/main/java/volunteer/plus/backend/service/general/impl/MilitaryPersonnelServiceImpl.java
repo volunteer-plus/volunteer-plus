@@ -10,11 +10,13 @@ import volunteer.plus.backend.domain.entity.AddRequest;
 import volunteer.plus.backend.domain.entity.Brigade;
 import volunteer.plus.backend.domain.dto.BrigadeDTO;
 import volunteer.plus.backend.domain.entity.MilitaryPersonnel;
+import volunteer.plus.backend.domain.entity.User;
 import volunteer.plus.backend.exceptions.ApiException;
 import volunteer.plus.backend.exceptions.ErrorCode;
 import volunteer.plus.backend.repository.AddRequestRepository;
 import volunteer.plus.backend.repository.BrigadeRepository;
 import volunteer.plus.backend.repository.MilitaryPersonnelRepository;
+import volunteer.plus.backend.repository.UserRepository;
 import volunteer.plus.backend.service.general.MilitaryPersonnelService;
 
 import java.util.*;
@@ -31,6 +33,7 @@ import static volunteer.plus.backend.util.HashUtil.hashValue;
 public class MilitaryPersonnelServiceImpl implements MilitaryPersonnelService {
     private final BrigadeRepository brigadeRepository;
     private final AddRequestRepository addRequestRepository;
+    private final UserRepository userRepository;
     private final MilitaryPersonnelRepository militaryPersonnelRepository;
 
     @Override
@@ -68,6 +71,10 @@ public class MilitaryPersonnelServiceImpl implements MilitaryPersonnelService {
                 .stream()
                 .collect(Collectors.toMap(AddRequest::getRequestId, Function.identity()));
 
+        final var userMap = userRepository.findAll()
+                .stream()
+                .collect(Collectors.toMap(User::getId, Function.identity()));
+
         final var regimentCodes = addRequestsMap.values()
                 .stream()
                 .map(AddRequest::getRegimentCode)
@@ -96,12 +103,13 @@ public class MilitaryPersonnelServiceImpl implements MilitaryPersonnelService {
             }
 
             final var brigade = mapOfBrigades.get(addRequest.getRegimentCode());
-            final var militaryPersonnel = getMilitaryPersonnelFromCreationDTO(creationDTO);
+            final var militaryPersonnel = getMilitaryPersonnelFromCreationDTO(creationDTO, userMap);
 
             addRequest.setExecuted(true);
             requestsToUpdate.add(addRequest);
 
             brigade.setupMilitaryPersonnel(militaryPersonnel);
+            brigadesToUpdate.add(brigade);
         }
 
         addRequestRepository.saveAll(requestsToUpdate);
@@ -172,27 +180,37 @@ public class MilitaryPersonnelServiceImpl implements MilitaryPersonnelService {
 
         brigades.forEach(brigade -> {
             final String regimentCode = brigade.getRegimentCode();
-            final List<BrigadeDTO.MilitaryPersonnelDTO> militaryPersonnel = brigade.getMilitaryPersonnel() == null ? new ArrayList<>() : mapMilitaryPersonnel(brigade.getMilitaryPersonnel());
+            final List<BrigadeDTO.MilitaryPersonnelDTO> militaryPersonnel = brigade.getMilitaryPersonnel() == null ?
+                    new ArrayList<>() :
+                    mapMilitaryPersonnel(brigade.getMilitaryPersonnel());
             result.put(regimentCode, militaryPersonnel);
         });
 
         return result;
     }
 
-    private List<MilitaryPersonnel> getMilitaryPersonnelFromCreationDTO(MilitaryPersonnelCreationDTO creationDTO) {
+    private List<MilitaryPersonnel> getMilitaryPersonnelFromCreationDTO(final MilitaryPersonnelCreationDTO creationDTO,
+                                                                        final Map<Long, User> userMap) {
         return creationDTO.getMilitaryPersonnel()
                 .stream()
-                .map(mp ->
-                        MilitaryPersonnel.builder()
-                                .firstName(mp.getFirstName())
-                                .lastName(mp.getLastName())
-                                .dateOfBirth(mp.getDateOfBirth())
-                                .placeOfBirth(mp.getPlaceOfBirth())
-                                .rank(mp.getRank())
-                                .status(mp.getStatus())
-                                .requests(new ArrayList<>())
-                                .build()
-                )
+                .map(mp -> {
+                    User user = null;
+
+                    if (mp.getUserId() != null && userMap.containsKey(mp.getUserId())) {
+                        user = userMap.get(mp.getUserId());
+                    }
+
+                    return MilitaryPersonnel.builder()
+                            .firstName(mp.getFirstName())
+                            .lastName(mp.getLastName())
+                            .dateOfBirth(mp.getDateOfBirth())
+                            .placeOfBirth(mp.getPlaceOfBirth())
+                            .rank(mp.getRank())
+                            .status(mp.getStatus())
+                            .requests(new ArrayList<>())
+                            .user(user)
+                            .build();
+                })
                 .toList();
     }
 }

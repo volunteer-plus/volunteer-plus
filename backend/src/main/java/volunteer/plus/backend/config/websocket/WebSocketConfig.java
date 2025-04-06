@@ -20,7 +20,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     public static final String OLLAMA_MESSAGE_MAPPING = "/ollama-message";
     public static final String OPENAI_MESSAGE_MAPPING = "/openai-message";
-    public static final String CHAT_MESSAGE_MAPPING = "/chat/sendMessage/{convId}";
+    public static final String CHAT_MESSAGE_MAPPING = "/chat/sendMessage/{conversationRoomId}";
 
     public static final String OLLAMA_RESPONSE_TARGET = WS_DESTINATION_PREFIX + "/ollama-response";
     public static final String OLLAMA_CHAT_CLIENT_TARGET = WS_DESTINATION_PREFIX + "/ollama-chat-client";
