@@ -11,14 +11,14 @@ import volunteer.plus.backend.domain.dto.AccessJwtToken;
 import volunteer.plus.backend.domain.dto.RefreshAuthenticationToken;
 import volunteer.plus.backend.domain.entity.User;
 import volunteer.plus.backend.service.general.UserService;
-import volunteer.plus.backend.service.security.JwtTokenService;
+import volunteer.plus.backend.service.security.TokenFactoryService;
 
 @Component
 @RequiredArgsConstructor
 public class RefreshTokenAuthenticationProvider implements AuthenticationProvider {
 
     private final UserService userService;
-    private final JwtTokenService jwtTokenService;
+    private final TokenFactoryService tokenFactoryService;
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
@@ -28,10 +28,10 @@ public class RefreshTokenAuthenticationProvider implements AuthenticationProvide
             throw new BadCredentialsException("Token is invalid");
         }
 
-        String username = jwtTokenService.extractUsername(rawAccessToken.getToken());
+        String username = tokenFactoryService.extractUsername(rawAccessToken.getToken());
         User user = (User) userService.loadUserByUsername(username);
 
-        if (jwtTokenService.isTokenValid(rawAccessToken.getToken(), user)) {
+        if (tokenFactoryService.isTokenValid(rawAccessToken.getToken(), user)) {
             throw new BadCredentialsException("Token is expired");
         }
 

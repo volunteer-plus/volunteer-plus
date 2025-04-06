@@ -12,6 +12,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -43,14 +45,14 @@ public class SecurityConf {
     private final JwtTokenExtractor jwtTokenExtractor;
     private final CorsConfigurationSource corsConfigurationSource;
     public static final String FORM_BASED_LOGIN_ENTRY_POINT = "/api/login";
-    public static final String FORM_BASED_REGISTRATION_ENTRY_POINT = "/api/registration";
+    public static final String FORM_BASED_NO_AUTH_ENTRY_POINT = "/api/no-auth/**";
     public static final String TOKEN_REFRESH_ENTRY_POINT = "/api/auth/token";
     public static final String TOKEN_BASED_AUTH_ENTRY_POINT = "/api/**";
 
     @Bean
     public DaoAuthenticationProvider buildRestAuthenticationProvider() {
         var user = new DaoAuthenticationProvider();
-        user.setPasswordEncoder(userService.getPasswordEncoder());
+        user.setPasswordEncoder(createPasswordEncoder());
         user.setUserDetailsService(userService);
         return user;
     }
@@ -71,7 +73,7 @@ public class SecurityConf {
     }
 
     @Bean
-    protected JwtTokenAuthenticationFilter buildJwtTokenAuthenticationProcessingFilter() {
+    public JwtTokenAuthenticationFilter buildJwtTokenAuthenticationProcessingFilter() {
         NegatedRequestMatcher negatedRequestMatcher = negatedRequestMatcher();
 
         JwtTokenAuthenticationFilter filter
@@ -82,10 +84,15 @@ public class SecurityConf {
     }
 
     @Bean
-    protected RefreshTokenProcessingFilter buildRefreshTokenProcessingFilter() {
+    public RefreshTokenProcessingFilter buildRefreshTokenProcessingFilter() {
         RefreshTokenProcessingFilter filter = new RefreshTokenProcessingFilter(TOKEN_REFRESH_ENTRY_POINT, successHandler, failureHandler);
         filter.setAuthenticationManager(authenticationManager());
         return filter;
+    }
+
+    @Bean
+    public PasswordEncoder createPasswordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
     @Bean
@@ -97,7 +104,7 @@ public class SecurityConf {
                         .requestMatchers(
                                 FORM_BASED_LOGIN_ENTRY_POINT,
                                 TOKEN_REFRESH_ENTRY_POINT,
-                                FORM_BASED_REGISTRATION_ENTRY_POINT
+                                FORM_BASED_NO_AUTH_ENTRY_POINT
                         )
                         .permitAll()
                         .requestMatchers(TOKEN_BASED_AUTH_ENTRY_POINT)
@@ -114,7 +121,7 @@ public class SecurityConf {
     }
 
     private NegatedRequestMatcher negatedRequestMatcher() {
-        List<RequestMatcher> pathsToSkip = Stream.of(TOKEN_REFRESH_ENTRY_POINT, FORM_BASED_LOGIN_ENTRY_POINT, FORM_BASED_REGISTRATION_ENTRY_POINT)
+        List<RequestMatcher> pathsToSkip = Stream.of(TOKEN_REFRESH_ENTRY_POINT, FORM_BASED_LOGIN_ENTRY_POINT, FORM_BASED_NO_AUTH_ENTRY_POINT)
                 .map(AntPathRequestMatcher::new)
                 .collect(Collectors.toList());
 

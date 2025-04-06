@@ -16,7 +16,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 import volunteer.plus.backend.domain.dto.TokenPairResponse;
 import volunteer.plus.backend.domain.entity.User;
-import volunteer.plus.backend.service.security.JwtTokenService;
+import volunteer.plus.backend.service.security.TokenFactoryService;
 
 import java.io.IOException;
 
@@ -24,7 +24,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class RestAuthenticationSuccessHandler implements AuthenticationSuccessHandler  {
 
-    private final JwtTokenService tokenFactory;
+    private final TokenFactoryService tokenFactory;
     public static final ObjectMapper OBJECT_MAPPER = JsonMapper.builder()
             .addModule(new Jdk8Module())
             .build();

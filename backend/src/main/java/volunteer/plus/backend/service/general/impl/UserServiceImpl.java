@@ -4,10 +4,7 @@ import org.apache.tomcat.websocket.AuthenticationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import volunteer.plus.backend.domain.dto.RegistrationData;
 import volunteer.plus.backend.domain.dto.UserInfo;
 import volunteer.plus.backend.domain.entity.User;
 import volunteer.plus.backend.repository.UserRepository;
@@ -17,11 +14,9 @@ import volunteer.plus.backend.service.general.UserService;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
 
-    private UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
-        passwordEncoder = new BCryptPasswordEncoder();
     }
 
     @Override
@@ -41,40 +36,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void registerUser(RegistrationData registrationData) {
-        String email = registrationData.getEmail();
-
-        if (checkEmail(email)) {
-            throw new RuntimeException("User with email " + email + " was not found");
-        }
-
-        var user = User
-                .builder()
-                .enabled(true)
-                .accountNonExpired(true)
-                .accountNonLocked(true)
-                .credentialsNonExpired(true)
-                .email(email)
-                .password(encodePassword(registrationData.getPassword()))
-                .firstName(registrationData.getFirstName())
-                .lastName(registrationData.getLastName())
-                .build();
-
-        userRepository.saveAndFlush(user);
-    }
-
-    @Override
     public boolean checkEmail(String email) {
         return userRepository.existsByEmail(email);
     }
 
     @Override
-    public PasswordEncoder getPasswordEncoder() {
-        return passwordEncoder;
+    public void createUser(User user) {
+        String email = user.getEmail();
+
+        if (checkEmail(email)) {
+            throw new RuntimeException("User with email " + email + " was not found");
+        }
+
+        userRepository.saveAndFlush(user);
     }
 
-    private String encodePassword(String password) {
-        return passwordEncoder.encode(password);
+    @Override
+    public User getUserByResetToken(String resetToken) {
+        return userRepository.findUserByResetToken(resetToken)
+                .orElse(null);
     }
 
 }

@@ -10,7 +10,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import volunteer.plus.backend.domain.dto.TokenPairResponse;
-import volunteer.plus.backend.service.security.JwtTokenService;
+import volunteer.plus.backend.domain.enums.TokenClaim;
+import volunteer.plus.backend.service.security.TokenFactoryService;
 
 import java.security.Key;
 import java.util.Date;
@@ -19,9 +20,8 @@ import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
-public class JwtTokenServiceIml implements JwtTokenService {
+public class TokenFactoryServiceIml implements TokenFactoryService {
 
-    private static final String ROLES = "authority";
     private static final String SECRET_KEY = "462D4A614E645267556B58703273357638792F423F4528482B4B6250655368566D597133743677397A24432646294A404E635166546A576E5A72347537782141";
     private static final Long JWT_TOKEN_EXPIRATION_TIME = 43200000L;
     private static final Long REFRESH_TOKEN_EXPIRATION_TIME = 86400000L;
@@ -57,7 +57,7 @@ public class JwtTokenServiceIml implements JwtTokenService {
 
     private String generateJwtToken(UserDetails userDetails) {
         HashMap<String, Object> claims = new HashMap<>();
-        claims.put(ROLES, userDetails.getAuthorities()
+        claims.put(TokenClaim.ROLES.getName(), userDetails.getAuthorities()
                 .stream()
                 .map(GrantedAuthority::getAuthority)
                 .toList());

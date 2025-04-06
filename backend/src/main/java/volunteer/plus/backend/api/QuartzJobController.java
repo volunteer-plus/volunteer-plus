@@ -14,7 +14,7 @@ import java.util.List;
 @Validated
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/quartz/jobs")
+@RequestMapping("/api/no-auth/quartz/jobs")
 public class QuartzJobController {
     private final QuartzJobService quartzJobService;
 
