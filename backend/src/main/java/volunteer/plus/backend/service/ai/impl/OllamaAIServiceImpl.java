@@ -8,12 +8,12 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.evaluation.EvaluationRequest;
 import org.springframework.ai.evaluation.FactCheckingEvaluator;
-import org.springframework.ai.evaluation.RelevancyEvaluator;
 import org.springframework.ai.ollama.api.OllamaOptions;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import volunteer.plus.backend.config.ai.evaluators.EnhancedRelevancyEvaluator;
 import volunteer.plus.backend.domain.dto.AIChatResponse;
 import volunteer.plus.backend.domain.enums.AIChatClient;
 import volunteer.plus.backend.domain.enums.OllamaAIModel;
@@ -73,7 +73,7 @@ public class OllamaAIServiceImpl implements OllamaAIService {
             throw new ApiException(ErrorCode.CHAT_CLIENT_NOT_FOUND);
         }
 
-        final RelevancyEvaluator relevancyEvaluator = new RelevancyEvaluator(ChatClient.builder(chatModel));
+        final EnhancedRelevancyEvaluator relevancyEvaluator = new EnhancedRelevancyEvaluator(ChatClient.builder(chatModel));
         final FactCheckingEvaluator factCheckingEvaluator = new FactCheckingEvaluator(ChatClient.builder(chatModel));
 
         final String chatResponse = getChatResponse(chatClient, um, ollamaModel);

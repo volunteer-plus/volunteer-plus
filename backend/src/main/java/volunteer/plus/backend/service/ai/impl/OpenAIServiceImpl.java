@@ -28,6 +28,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import volunteer.plus.backend.config.ai.evaluators.EnhancedRelevancyEvaluator;
 import volunteer.plus.backend.domain.dto.AIChatResponse;
 import volunteer.plus.backend.domain.dto.ImageGenerationRequestDTO;
 import volunteer.plus.backend.domain.enums.AIChatClient;
@@ -107,7 +108,7 @@ public class OpenAIServiceImpl implements OpenAIService {
         }
 
         final FactCheckingEvaluator factCheckingEvaluator = new FactCheckingEvaluator(ChatClient.builder(chatModel));
-        final RelevancyEvaluator relevancyEvaluator = new RelevancyEvaluator(ChatClient.builder(chatModel));
+        final EnhancedRelevancyEvaluator relevancyEvaluator = new EnhancedRelevancyEvaluator(ChatClient.builder(chatModel));
 
         final String response = client.prompt(new Prompt(um))
                 .tools(tools)

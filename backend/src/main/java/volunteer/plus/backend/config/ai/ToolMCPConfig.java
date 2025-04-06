@@ -6,7 +6,6 @@ import org.springframework.ai.tool.ToolCallbacks;
 import org.springframework.ai.tool.method.MethodToolCallbackProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import volunteer.plus.backend.service.ai.tools.AIAgentPattern;
 import volunteer.plus.backend.service.ai.tools.AIMilitaryTools;
 
 import java.util.Arrays;
@@ -25,9 +24,8 @@ public class ToolMCPConfig {
     }
 
     @Bean
-    public List<ToolCallback> tools(final AIMilitaryTools aiMilitaryTools,
-                                    final List<AIAgentPattern> aiAgentPatterns) {
-        return Stream.concat(Stream.of(aiMilitaryTools), aiAgentPatterns.stream())
+    public List<ToolCallback> tools(final AIMilitaryTools aiMilitaryTools) {
+        return Stream.of(aiMilitaryTools)
                 .map(ToolCallbacks::from)
                 .map(Arrays::asList)
                 .flatMap(Collection::stream)

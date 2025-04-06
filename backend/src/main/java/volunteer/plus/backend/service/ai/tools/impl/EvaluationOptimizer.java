@@ -2,8 +2,6 @@ package volunteer.plus.backend.service.ai.tools.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.tool.annotation.Tool;
-import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Service;
 import volunteer.plus.backend.domain.dto.ai.agent.EvaluationResponse;
 import volunteer.plus.backend.domain.dto.ai.agent.Generation;
@@ -23,16 +21,10 @@ public class EvaluationOptimizer implements AIAgentPattern {
         return AIAgentPatternType.EVALUATION_OPTIMIZER;
     }
 
-    @Tool(name = "patternEvaluate", description = """
-        This tool iteratively generates candidate responses for a given task using a chain-of-thought approach.
-        The tool uses the generator prompt to produce potential answers and the evaluator prompt to assess them.
-        It then iterates—accumulating previous responses and feedback—until a response passes the evaluation criteria.
-        Finally, it returns the accepted solution along with the entire chain-of-thought for review.
-        """)
-    public static RefinedResponse loop(@ToolParam(description = "A String that describes the task or problem to be solved.") final String task,
-                                       @ToolParam(description = "An instance of ChatClient used to interact with the AI chat engine.") final ChatClient chatClient,
-                                       @ToolParam(description = "A String prompt that instructs the generator on how to produce candidate responses.") final String generatorPrompt,
-                                       @ToolParam(description = "A String prompt that instructs the evaluator on how to assess the generated responses.") final String evaluatorPrompt) {
+    public static RefinedResponse loop(final String task,
+                                       final ChatClient chatClient,
+                                       final String generatorPrompt,
+                                       final String evaluatorPrompt) {
         final List<String> memory = new ArrayList<>();
         final List<Generation> chainOfThought = new ArrayList<>();
 
