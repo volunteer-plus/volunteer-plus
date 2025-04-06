@@ -11,6 +11,7 @@ import volunteer.plus.backend.config.storage.AWSProperties;
 import volunteer.plus.backend.domain.dto.ReportDTO;
 import volunteer.plus.backend.domain.entity.Attachment;
 import volunteer.plus.backend.domain.entity.Report;
+import volunteer.plus.backend.domain.enums.AIChatClient;
 import volunteer.plus.backend.exceptions.ApiException;
 import volunteer.plus.backend.exceptions.ErrorCode;
 import volunteer.plus.backend.repository.AttachmentRepository;
@@ -19,6 +20,7 @@ import volunteer.plus.backend.repository.ReportRepository;
 import volunteer.plus.backend.service.email.EmailNotificationBuilderService;
 import volunteer.plus.backend.service.general.ReportService;
 import volunteer.plus.backend.service.general.S3Service;
+import volunteer.plus.backend.util.AIClientProviderUtil;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -33,6 +35,7 @@ public class ReportServiceImpl implements ReportService {
     private final S3Service s3Service;
     private final AWSProperties awsProperties;
     private final EmailNotificationBuilderService emailNotificationBuilderService;
+    private final AIClientProviderUtil aiClientProviderUtil;
 
     @Override
     public List<ReportDTO> getReports(final Set<Long> levyIds) {
@@ -166,10 +169,19 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
+    @Transactional
     public void distribute(final Long reportId) {
         final var report = reportRepository.findById(reportId)
                 .orElseThrow(() -> new ApiException(ErrorCode.REPORT_NOT_FOUND));
         emailNotificationBuilderService.createReportEmails(report);
+    }
+
+    @Override
+    @Transactional
+    public void generateReportsAnalysis(final AIChatClient aiChatClient,
+                                        final Set<Long> reportIds) {
+        final List<Report> reports = reportRepository.findAllById(reportIds);
+        emailNotificationBuilderService.createReportAnalysisEmails(aiClientProviderUtil.getChatClient(aiChatClient), reports);
     }
 
     private ReportDTO getReportDTO(Report report) {

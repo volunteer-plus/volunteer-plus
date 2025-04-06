@@ -22,9 +22,9 @@ import volunteer.plus.backend.exceptions.ErrorCode;
 import volunteer.plus.backend.service.ai.AIModerationService;
 import volunteer.plus.backend.service.ai.OllamaAIService;
 import volunteer.plus.backend.service.websocket.WebSocketService;
+import volunteer.plus.backend.util.AIClientProviderUtil;
 
 import java.util.List;
-import java.util.Map;
 
 import static volunteer.plus.backend.config.websocket.WebSocketConfig.OLLAMA_CHAT_CLIENT_TARGET;
 import static volunteer.plus.backend.util.AIUtil.getAIMediaList;
@@ -33,19 +33,19 @@ import static volunteer.plus.backend.util.AIUtil.getAIMediaList;
 @Slf4j
 @Service
 public class OllamaAIServiceImpl implements OllamaAIService {
-    private final Map<AIChatClient, ChatClient> ollamaChatClientMap;
+    private final AIClientProviderUtil aiClientProviderUtil;
     private final WebSocketService webSocketService;
     private final AIModerationService moderationService;
     private final List<ToolCallback> tools;
     private final ChatModel chatModel;
 
 
-    public OllamaAIServiceImpl(final @Qualifier("ollamaChatClientMap") Map<AIChatClient, ChatClient> ollamaChatClientMap,
+    public OllamaAIServiceImpl(final AIClientProviderUtil aiClientProviderUtil,
                                final WebSocketService webSocketService,
                                final AIModerationService moderationService,
                                final List<ToolCallback> tools,
                                final @Qualifier("openAiChatModel") ChatModel chatModel) {
-        this.ollamaChatClientMap = ollamaChatClientMap;
+        this.aiClientProviderUtil = aiClientProviderUtil;
         this.webSocketService = webSocketService;
         this.tools = tools;
         this.moderationService = moderationService;
@@ -67,7 +67,7 @@ public class OllamaAIServiceImpl implements OllamaAIService {
                 getAIMediaList(multipartFiles)
         );
 
-        final ChatClient chatClient = ollamaChatClientMap.get(aiChatClient);
+        final ChatClient chatClient = aiClientProviderUtil.getChatClient(aiChatClient);
 
         if (chatClient == null) {
             throw new ApiException(ErrorCode.CHAT_CLIENT_NOT_FOUND);

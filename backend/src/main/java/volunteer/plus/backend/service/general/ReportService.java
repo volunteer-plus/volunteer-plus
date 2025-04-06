@@ -3,6 +3,7 @@ package volunteer.plus.backend.service.general;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 import volunteer.plus.backend.domain.dto.ReportDTO;
+import volunteer.plus.backend.domain.enums.AIChatClient;
 
 import java.util.List;
 import java.util.Set;
@@ -21,4 +22,6 @@ public interface ReportService {
     ResponseEntity<byte[]> downloadAttachment(Long attachmentId);
 
     void distribute(Long reportId);
+
+    void generateReportsAnalysis(AIChatClient aiChatClient, Set<Long> reportIds);
 }

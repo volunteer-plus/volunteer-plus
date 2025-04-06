@@ -10,7 +10,6 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.evaluation.EvaluationRequest;
 import org.springframework.ai.evaluation.FactCheckingEvaluator;
-import org.springframework.ai.evaluation.RelevancyEvaluator;
 import org.springframework.ai.image.Image;
 import org.springframework.ai.image.ImageGeneration;
 import org.springframework.ai.image.ImagePrompt;
@@ -37,6 +36,7 @@ import volunteer.plus.backend.exceptions.ErrorCode;
 import volunteer.plus.backend.service.ai.AIModerationService;
 import volunteer.plus.backend.service.ai.OpenAIService;
 import volunteer.plus.backend.service.websocket.WebSocketService;
+import volunteer.plus.backend.util.AIClientProviderUtil;
 
 import java.io.InputStream;
 import java.net.URI;
@@ -55,7 +55,7 @@ public class OpenAIServiceImpl implements OpenAIService {
 
     private static final String RESPONSE = "\nResponse:\n";
 
-    private final Map<AIChatClient, ChatClient> openAIChatClientMap;
+    private final AIClientProviderUtil aiClientProviderUtil;
     private final OpenAiImageModel imageModel;
     private final OpenAiAudioTranscriptionModel openAiAudioTranscriptionModel;
     private final OpenAiAudioSpeechModel openAiAudioSpeechModel;
@@ -66,7 +66,7 @@ public class OpenAIServiceImpl implements OpenAIService {
     private final WebSocketService webSocketService;
 
     @SneakyThrows
-    public OpenAIServiceImpl(final @Qualifier("openAIChatClientMap") Map<AIChatClient, ChatClient> openAIChatClientMap,
+    public OpenAIServiceImpl(final AIClientProviderUtil aiClientProviderUtil,
                              final OpenAiImageModel imageModel,
                              final OpenAiAudioTranscriptionModel openAiAudioTranscriptionModel,
                              final OpenAiAudioSpeechModel openAiAudioSpeechModel,
@@ -75,7 +75,7 @@ public class OpenAIServiceImpl implements OpenAIService {
                              final @Lazy OpenAIService openAIService,
                              final List<ToolCallback> tools,
                              final WebSocketService webSocketService) {
-        this.openAIChatClientMap = openAIChatClientMap;
+        this.aiClientProviderUtil = aiClientProviderUtil;
         this.imageModel = imageModel;
         this.openAiAudioTranscriptionModel = openAiAudioTranscriptionModel;
         this.openAiAudioSpeechModel = openAiAudioSpeechModel;
@@ -101,7 +101,7 @@ public class OpenAIServiceImpl implements OpenAIService {
                 getAIMediaList(multipartFiles)
         );
 
-        final ChatClient client = openAIChatClientMap.get(chatClient);
+        final ChatClient client = aiClientProviderUtil.getChatClient(chatClient);
 
         if (client == null) {
             throw new ApiException(ErrorCode.CHAT_CLIENT_NOT_FOUND);
