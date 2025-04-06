@@ -7,6 +7,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import volunteer.plus.backend.domain.dto.ReportDTO;
+import volunteer.plus.backend.domain.enums.AIChatClient;
 import volunteer.plus.backend.service.general.ReportService;
 
 import java.util.List;
@@ -23,6 +24,14 @@ public class ReportController {
     @Operation(description = "Retrieve reports by levy ids")
     public ResponseEntity<List<ReportDTO>> getReports(@RequestParam(required = false) final Set<Long> levyIds) {
         return ResponseEntity.ok(reportService.getReports(levyIds));
+    }
+
+    @PostMapping("/reports/analysis")
+    @Operation(description = "Generate report AI driven analysis")
+    public ResponseEntity<Void> generateReportsAnalysis(@RequestParam final AIChatClient aiChatClient,
+                                                        @RequestParam final Set<Long> reportIds) {
+        reportService.generateReportsAnalysis(aiChatClient, reportIds);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/report/create-or-update")

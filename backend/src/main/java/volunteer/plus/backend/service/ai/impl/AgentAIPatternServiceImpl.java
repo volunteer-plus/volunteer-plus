@@ -1,29 +1,22 @@
 package volunteer.plus.backend.service.ai.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import volunteer.plus.backend.domain.dto.ai.agent.*;
 import volunteer.plus.backend.domain.enums.AIChatClient;
 import volunteer.plus.backend.service.ai.AgentAIPatternService;
 import volunteer.plus.backend.service.ai.tools.impl.*;
+import volunteer.plus.backend.util.AIClientProviderUtil;
 
 import java.util.List;
-import java.util.Map;
-
-import static volunteer.plus.backend.domain.enums.AIChatClient.*;
 
 @Slf4j
 @Service
 public class AgentAIPatternServiceImpl implements AgentAIPatternService {
-    private final Map<AIChatClient, ChatClient> openAIChatClientMap;
-    private final Map<AIChatClient, ChatClient> ollamaChatClientMap;
+    private final AIClientProviderUtil aiClientProviderUtil;
 
-    public AgentAIPatternServiceImpl(final @Qualifier("openAIChatClientMap") Map<AIChatClient, ChatClient> openAIChatClientMap,
-                                     final @Qualifier("ollamaChatClientMap") Map<AIChatClient, ChatClient> ollamaChatClientMap) {
-        this.openAIChatClientMap = openAIChatClientMap;
-        this.ollamaChatClientMap = ollamaChatClientMap;
+    public AgentAIPatternServiceImpl(AIClientProviderUtil aiClientProviderUtil) {
+        this.aiClientProviderUtil = aiClientProviderUtil;
     }
 
     @Override
@@ -31,7 +24,7 @@ public class AgentAIPatternServiceImpl implements AgentAIPatternService {
                                            final ChainWorkflowRequestDTO chainWorkflowRequestDTO) {
         return PromptChainWorkflow.chain(
                 chainWorkflowRequestDTO.getMessage(),
-                getChatClient(aiChatClient),
+                aiClientProviderUtil.getChatClient(aiChatClient),
                 chainWorkflowRequestDTO.getPromptList()
         );
     }
@@ -42,7 +35,7 @@ public class AgentAIPatternServiceImpl implements AgentAIPatternService {
         return RoutingWorkflow.route(
                 routingWorkflowRequestDTO.getMessage(),
                 routingWorkflowRequestDTO.getRoutes(),
-                getChatClient(aiChatClient)
+                aiClientProviderUtil.getChatClient(aiChatClient)
         );
     }
 
@@ -53,7 +46,7 @@ public class AgentAIPatternServiceImpl implements AgentAIPatternService {
                 parallelizationWorkflowRequestDTO.getMessage(),
                 parallelizationWorkflowRequestDTO.getInputs(),
                 parallelizationWorkflowRequestDTO.getNWorkers(),
-                getChatClient(aiChatClient)
+                aiClientProviderUtil.getChatClient(aiChatClient)
         );
     }
 
@@ -62,7 +55,7 @@ public class AgentAIPatternServiceImpl implements AgentAIPatternService {
                                                           final OrchestratorWorkersRequestDTO orchestratorWorkersRequestDTO) {
         return OrchestratorWorkers.process(
                 orchestratorWorkersRequestDTO.getMessage(),
-                getChatClient(aiChatClient),
+                aiClientProviderUtil.getChatClient(aiChatClient),
                 orchestratorWorkersRequestDTO.getOrchestratorPrompt(),
                 orchestratorWorkersRequestDTO.getWorkerPrompt()
         );
@@ -73,22 +66,9 @@ public class AgentAIPatternServiceImpl implements AgentAIPatternService {
                                                             final EvaluationOptimizerRequestDTO evaluationOptimizerRequestDTO) {
         return EvaluationOptimizer.loop(
                 evaluationOptimizerRequestDTO.getMessage(),
-                getChatClient(aiChatClient),
+                aiClientProviderUtil.getChatClient(aiChatClient),
                 evaluationOptimizerRequestDTO.getGeneratorPrompt(),
                 evaluationOptimizerRequestDTO.getEvaluatorPrompt()
         );
-    }
-
-    private ChatClient getChatClient(final AIChatClient aiChatClient) {
-        return switch (aiChatClient) {
-            case OPENAI_DEFAULT -> openAIChatClientMap.get(OPENAI_DEFAULT);
-            case OLLAMA_DEFAULT -> ollamaChatClientMap.get(OLLAMA_DEFAULT);
-
-            case OPENAI_IN_MEMORY -> openAIChatClientMap.get(OPENAI_IN_MEMORY);
-            case OLLAMA_IN_MEMORY -> ollamaChatClientMap.get(OLLAMA_IN_MEMORY);
-
-            case OPENAI_MILITARY -> openAIChatClientMap.get(OPENAI_MILITARY);
-            case OLLAMA_MILITARY -> ollamaChatClientMap.get(OLLAMA_MILITARY);
-        };
     }
 }
