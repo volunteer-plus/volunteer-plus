@@ -50,6 +50,18 @@ public class User extends BaseEntity implements UserDetails {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Volunteer volunteer;
 
+    @Column(name = "reset_token")
+    private String resetToken;
+
+    @Column(name = "reset_token_expiration_time")
+    private Long resetTokenExpTime;
+
+    @Column(name = "twoFa_token")
+    private String twoFaToken;
+
+    @Column(name = "twoFa_token_expiration_time")
+    private Long twoFaTokenExpTime;
+
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private MilitaryPersonnel militaryPersonnel;
 

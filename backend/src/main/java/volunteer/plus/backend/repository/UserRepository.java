@@ -15,6 +15,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     boolean existsByEmail(String email);
 
+    Optional<User> findUserByResetToken(String resetToken);
+
     interface UserMainDataProjection {
         String getFirstName();
 

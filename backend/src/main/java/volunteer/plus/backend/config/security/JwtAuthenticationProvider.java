@@ -11,13 +11,13 @@ import volunteer.plus.backend.domain.dto.AccessJwtToken;
 import volunteer.plus.backend.domain.dto.JwtAuthenticationToken;
 import volunteer.plus.backend.domain.entity.User;
 import volunteer.plus.backend.service.general.UserService;
-import volunteer.plus.backend.service.security.JwtTokenService;
+import volunteer.plus.backend.service.security.TokenFactoryService;
 
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationProvider implements AuthenticationProvider {
 
-    private final JwtTokenService tokenFactory;
+    private final TokenFactoryService tokenFactory;
     private final UserService userService;
 
     @Override
