@@ -9,4 +9,5 @@ import java.util.Set;
 public interface ReportRepository extends JpaRepository<Report, Long> {
     List<Report> findAllByLevyIdIn(Set<Long> ids);
     List<Report> findAllByIdIn(Set<Long> ids);
+    List<Report> findAllByAnalyzedFalse();
 }

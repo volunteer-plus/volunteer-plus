@@ -22,6 +22,8 @@ public class ReportDTO {
 
     private String data;
 
+    private boolean analyzed;
+
     private List<AttachmentDTO> attachments = new ArrayList<>();
 
     @Data

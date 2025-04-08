@@ -1,0 +1,1 @@
+alter table `report` add `is_analyzed` bit not null default 0;

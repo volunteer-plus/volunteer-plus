@@ -190,6 +190,7 @@ public class ReportServiceImpl implements ReportService {
                 .createDate(report.getCreateDate())
                 .updateDate(report.getUpdateDate())
                 .data(report.getData())
+                .analyzed(report.isAnalyzed())
                 .attachments(report.getAttachments() == null ? new ArrayList<>() : mapAttachments(report.getAttachments()))
                 .build();
     }

@@ -20,6 +20,9 @@ public class Report extends BaseEntity {
     @Column(columnDefinition = "LONGTEXT")
     private String data;
 
+    @Column(name = "is_analyzed")
+    private boolean analyzed;
+
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "levy_id")
     private Levy levy;
