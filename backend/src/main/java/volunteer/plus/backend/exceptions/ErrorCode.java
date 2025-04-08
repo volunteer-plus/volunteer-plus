@@ -33,7 +33,11 @@ public enum ErrorCode {
     CANNOT_DOWNLOAD_OUTPUT_FILE("Cannot download output file"),
     CONVERSATION_ROOM_NOT_FOUND("Conversation room not found"),
     MESSAGE_NOT_FOUND("Message not found"),
-    CHAT_CLIENT_NOT_FOUND("Chat client not found");
+    CHAT_CLIENT_NOT_FOUND("Chat client not found"),
+    NEWS_FEED_NOT_FOUND("News Feed not found"),
+    USER_CANNOT_UPDATE_NEWS_FEED_OF_ANOTHER_USER("User cannot update news feed of another user"),
+    USER_CANNOT_UPDATE_NEWS_FEED_COMMENT_OF_ANOTHER_USER("User cannot update news feed comment of another user"),
+    NEWS_FEED_COMMENT_NOT_FOUND("News feed comment not found");
 
     private final String description;
 }

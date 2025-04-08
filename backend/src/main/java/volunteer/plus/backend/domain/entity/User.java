@@ -56,12 +56,6 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "reset_token_expiration_time")
     private Long resetTokenExpTime;
 
-    @Column(name = "twoFa_token")
-    private String twoFaToken;
-
-    @Column(name = "twoFa_token_expiration_time")
-    private Long twoFaTokenExpTime;
-
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private MilitaryPersonnel militaryPersonnel;
 
