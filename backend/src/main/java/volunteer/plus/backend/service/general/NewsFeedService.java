@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 import volunteer.plus.backend.domain.dto.NewsFeedCommentDTO;
 import volunteer.plus.backend.domain.dto.NewsFeedDTO;
+import volunteer.plus.backend.domain.enums.AIChatClient;
 
 public interface NewsFeedService {
     Page<NewsFeedDTO> getNewsFeeds(Pageable pageable);
@@ -16,7 +17,7 @@ public interface NewsFeedService {
 
     NewsFeedDTO createOrUpdateNewsFeedComment(Long userId, Long newsFeedId, NewsFeedCommentDTO newsFeedCommentDTO);
 
-    void deleteNewsFeed(Long userId, Long newsFeedId);
+    void deleteNewsFeed(Long newsFeedId);
 
     NewsFeedDTO deleteNewsFeedComment(Long userId, Long newsFeedId, Long newsFeedCommentId);
 
@@ -25,4 +26,6 @@ public interface NewsFeedService {
     NewsFeedDTO removeAttachment(Long newsFeedId, Long attachmentId);
 
     ResponseEntity<byte[]> downloadAttachment(Long attachmentId);
+
+    void generateAINewsFeed(AIChatClient aiChatClient);
 }

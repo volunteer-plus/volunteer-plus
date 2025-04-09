@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 @DisallowConcurrentExecution
-public class ReportAnalysisJob implements Job {
+public class AIReportAnalysisJob implements Job {
     @Autowired
     private ReportService reportService;
     @Autowired
@@ -30,25 +30,29 @@ public class ReportAnalysisJob implements Job {
     public void execute(final JobExecutionContext context) {
         log.info("Executing scheduled job: {}", this.getClass().getSimpleName());
 
-        final List<Report> reportsToAnalyze = reportRepository.findAllByAnalyzedFalse();
+        try {
+            final List<Report> reportsToAnalyze = reportRepository.findAllByAnalyzedFalse();
 
-        final Set<Long> reportsToAnalyzeIds = reportsToAnalyze
-                .stream()
-                .map(Report::getId)
-                .collect(Collectors.toSet());
+            final Set<Long> reportsToAnalyzeIds = reportsToAnalyze
+                    .stream()
+                    .map(Report::getId)
+                    .collect(Collectors.toSet());
 
-        if (reportsToAnalyze.isEmpty()) {
-            return;
+            if (reportsToAnalyze.isEmpty()) {
+                return;
+            }
+
+            log.info("Found {} reports to analyze...", reportsToAnalyzeIds.size());
+
+            reportService.generateReportsAnalysis(AIChatClient.OPENAI_DEFAULT, reportsToAnalyzeIds);
+
+            reportsToAnalyze.forEach(report -> report.setAnalyzed(true));
+
+            reportRepository.saveAll(reportsToAnalyze);
+
+            log.info("Executing scheduled job: {} is finished", this.getClass().getSimpleName());
+        } catch (Exception e) {
+            log.error("Error executing scheduled job", e);
         }
-
-        log.info("Found {} reports to analyze...", reportsToAnalyzeIds.size());
-
-        reportService.generateReportsAnalysis(AIChatClient.OPENAI_DEFAULT, reportsToAnalyzeIds);
-
-        reportsToAnalyze.forEach(report -> report.setAnalyzed(true));
-
-        reportRepository.saveAll(reportsToAnalyze);
-
-        log.info("Executing scheduled job: {} is finished", this.getClass().getSimpleName());
     }
 }

@@ -29,3 +29,15 @@ Unix:
 ```
 ./bin/start.sh
 ```
+
+**NOTE!**
+
+Our project is using a Quartz, so when you start your project the first time you should set  
+initialize quartz schema to always, and only then you can turn it to never so all jobs and  
+triggers after restart would be saved!!!  
+
+```
+# in order to keep records in db after restart use 'never' value here
+# in order to initialize schema on first run please switch it to 'always'
+spring.quartz.jdbc.initialize-schema=never
+```

@@ -2,6 +2,7 @@ package volunteer.plus.backend.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import volunteer.plus.backend.domain.enums.NewsFeedGenerationSource;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +21,10 @@ public class NewsFeed extends BaseEntity {
 
     @Column
     private String body;
+
+    @Column(name = "generation_source")
+    @Enumerated(EnumType.STRING)
+    private NewsFeedGenerationSource generationSource;
 
     @ManyToOne
     @JoinColumn(name = "user_id")

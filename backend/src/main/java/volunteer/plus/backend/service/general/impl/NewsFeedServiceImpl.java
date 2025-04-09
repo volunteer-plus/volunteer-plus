@@ -1,7 +1,11 @@
 package volunteer.plus.backend.service.general.impl;
 
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
@@ -14,6 +18,8 @@ import volunteer.plus.backend.domain.dto.NewsFeedAttachmentDTO;
 import volunteer.plus.backend.domain.dto.NewsFeedCommentDTO;
 import volunteer.plus.backend.domain.dto.NewsFeedDTO;
 import volunteer.plus.backend.domain.entity.*;
+import volunteer.plus.backend.domain.enums.AIChatClient;
+import volunteer.plus.backend.domain.enums.NewsFeedGenerationSource;
 import volunteer.plus.backend.exceptions.ApiException;
 import volunteer.plus.backend.exceptions.ErrorCode;
 import volunteer.plus.backend.repository.NewsFeedAttachmentRepository;
@@ -22,14 +28,15 @@ import volunteer.plus.backend.repository.NewsFeedRepository;
 import volunteer.plus.backend.repository.UserRepository;
 import volunteer.plus.backend.service.general.NewsFeedService;
 import volunteer.plus.backend.service.general.S3Service;
+import volunteer.plus.backend.util.AIClientProviderUtil;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Objects;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class NewsFeedServiceImpl implements NewsFeedService {
     private final NewsFeedRepository newsFeedRepository;
     private final NewsFeedCommentRepository newsFeedCommentRepository;
@@ -37,6 +44,29 @@ public class NewsFeedServiceImpl implements NewsFeedService {
     private final S3Service s3Service;
     private final AWSProperties awsProperties;
     private final UserRepository userRepository;
+    private final AIClientProviderUtil aiClientProviderUtil;
+    private final NewsFeedService newsFeedService;
+    private final Resource newsFeedGenerationPrompt;
+
+    public NewsFeedServiceImpl(final NewsFeedRepository newsFeedRepository,
+                               final NewsFeedCommentRepository newsFeedCommentRepository,
+                               final NewsFeedAttachmentRepository newsFeedAttachmentRepository,
+                               final S3Service s3Service,
+                               final AWSProperties awsProperties,
+                               final UserRepository userRepository,
+                               final AIClientProviderUtil aiClientProviderUtil,
+                               final @Lazy NewsFeedService newsFeedService,
+                               final @Value("classpath:/prompts/news_geed_generation.txt") Resource newsFeedGenerationPrompt) {
+        this.newsFeedRepository = newsFeedRepository;
+        this.newsFeedCommentRepository = newsFeedCommentRepository;
+        this.newsFeedAttachmentRepository = newsFeedAttachmentRepository;
+        this.s3Service = s3Service;
+        this.awsProperties = awsProperties;
+        this.userRepository = userRepository;
+        this.aiClientProviderUtil = aiClientProviderUtil;
+        this.newsFeedService = newsFeedService;
+        this.newsFeedGenerationPrompt = newsFeedGenerationPrompt;
+    }
 
     @Override
     public Page<NewsFeedDTO> getNewsFeeds(final Pageable pageable) {
@@ -62,8 +92,14 @@ public class NewsFeedServiceImpl implements NewsFeedService {
             newsFeed = NewsFeed.builder()
                     .subject(newsFeedDTO.getSubject())
                     .body(newsFeedDTO.getBody())
+                    .generationSource(
+                            newsFeedDTO.getGenerationSource() == null ?
+                                    NewsFeedGenerationSource.USER :
+                                    newsFeedDTO.getGenerationSource()
+                    )
                     .author(user)
                     .comments(new ArrayList<>())
+                    .attachments(new ArrayList<>())
                     .build();
         } else {
             newsFeed = newsFeedRepository.findById(newsFeedDTO.getId())
@@ -111,15 +147,8 @@ public class NewsFeedServiceImpl implements NewsFeedService {
 
     @Override
     @Transactional
-    public void deleteNewsFeed(final Long userId,
-                               final Long newsFeedId) {
-        final User user = getUser(userId);
-
+    public void deleteNewsFeed(final Long newsFeedId) {
         final NewsFeed newsFeed = getNewsFeedFromDB(newsFeedId);
-
-        // only author can update its news feed
-        validateNewsFeedContentChangeAvailability(newsFeed.getAuthor(), user.getId(), ErrorCode.USER_CANNOT_UPDATE_NEWS_FEED_OF_ANOTHER_USER);
-
         newsFeedRepository.delete(newsFeed);
     }
 
@@ -214,6 +243,46 @@ public class NewsFeedServiceImpl implements NewsFeedService {
                 .body(bytes);
     }
 
+    @SneakyThrows
+    @Override
+    @Transactional
+    public void generateAINewsFeed(final AIChatClient aiChatClient) {
+        final ChatClient chatClient = aiClientProviderUtil.getChatClient(aiChatClient);
+
+        final User user = userRepository.findUserByEmail(aiChatClient.getUserEmail())
+                        .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
+
+        log.info("Start of generation AI driven news feed...");
+
+        final AINewsFeedResponse response = chatClient.prompt(newsFeedGenerationPrompt.getContentAsString(Charset.defaultCharset()))
+                .call()
+                .entity(AINewsFeedResponse.class);
+
+        if (response.getSubject() == null || response.getBody() == null) {
+            throw new ApiException(ErrorCode.AI_RESPONSE_IS_EMPTY);
+        }
+
+        newsFeedService.createOrUpdateNewsFeed(
+                user.getId(),
+                NewsFeedDTO.builder()
+                        .subject(response.getSubject())
+                        .body(response.getBody())
+                        .generationSource(NewsFeedGenerationSource.AI)
+                        .build()
+        );
+
+        log.info("Finish of generation AI driven news feed...");
+    }
+
+    @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static final class AINewsFeedResponse {
+        private String subject;
+        private String body;
+    }
+
     private NewsFeedDTO saveAndReturnDTO(final NewsFeed newsFeed) {
         final NewsFeed savedNewsFeed = newsFeedRepository.save(newsFeed);
         return mapToNewsFeedDTO(savedNewsFeed);
@@ -245,6 +314,7 @@ public class NewsFeedServiceImpl implements NewsFeedService {
                 .updateDate(newsFeed.getUpdateDate())
                 .subject(newsFeed.getSubject())
                 .body(newsFeed.getBody())
+                .generationSource(newsFeed.getGenerationSource())
                 .authorEmail(newsFeed.getAuthor() == null ? null : newsFeed.getAuthor().getEmail())
                 .authorFirstName(newsFeed.getAuthor() == null ? null : newsFeed.getAuthor().getFirstName())
                 .authorLastName(newsFeed.getAuthor() == null ? null : newsFeed.getAuthor().getLastName())
