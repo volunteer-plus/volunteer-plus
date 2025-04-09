@@ -51,9 +51,8 @@ public class NewsFeedController {
 
     @DeleteMapping("/news-feed/delete")
     @Operation(description = "Delete news feed")
-    public void deleteNewsFeed(@RequestParam final Long userId,
-                               @RequestParam final Long newsFeedId) {
-        newsFeedService.deleteNewsFeed(userId, newsFeedId);
+    public void deleteNewsFeed(@RequestParam final Long newsFeedId) {
+        newsFeedService.deleteNewsFeed(newsFeedId);
     }
 
     @DeleteMapping("/news-feed-comment/delete")

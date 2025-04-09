@@ -1,0 +1,1 @@
+alter table `news_feed` add `generation_source` varchar(255) not null default 'USER';

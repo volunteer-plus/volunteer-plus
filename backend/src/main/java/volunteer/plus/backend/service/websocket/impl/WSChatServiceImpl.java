@@ -23,8 +23,8 @@ import static volunteer.plus.backend.config.websocket.WebSocketConfig.*;
 @Service
 @RequiredArgsConstructor
 public class WSChatServiceImpl implements WSChatService {
-    private static final String OLLAMA_USER_EMAIL = "ollamaai@test.com";
-    private static final String OPEN_AI_USER_EMAIL = "openai@test.com";
+    public static final String OLLAMA_USER_EMAIL = "ollamaai@test.com";
+    public static final String OPEN_AI_USER_EMAIL = "openai@test.com";
 
     private final WebSocketService webSocketService;
     private final WSMessageRepository wsMessageRepository;

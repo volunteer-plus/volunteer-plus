@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import volunteer.plus.backend.domain.enums.NewsFeedGenerationSource;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ public class NewsFeedDTO {
     @NotNull
     @NotBlank
     private String body;
+    private NewsFeedGenerationSource generationSource;
     private String authorEmail;
     private String authorFirstName;
     private String authorLastName;
