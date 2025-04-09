@@ -8,6 +8,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import volunteer.plus.backend.domain.dto.NewsFeedCommentDTO;
 import volunteer.plus.backend.domain.dto.NewsFeedDTO;
 import volunteer.plus.backend.service.general.NewsFeedService;
@@ -61,5 +62,26 @@ public class NewsFeedController {
                                                              @RequestParam final Long newsFeedId,
                                                              @RequestParam final Long newsFeedCommentId) {
         return ResponseEntity.ok(newsFeedService.deleteNewsFeedComment(userId, newsFeedId, newsFeedCommentId));
+    }
+
+    @PostMapping("/news-feed-attachment/add")
+    @Operation(description = "Add attachment to news feed")
+    public ResponseEntity<NewsFeedDTO> addAttachments(@RequestParam final Long newsFeedId,
+                                                      @RequestParam final boolean isLogo,
+                                                      @RequestBody final MultipartFile file) {
+        return ResponseEntity.ok(newsFeedService.addAttachment(newsFeedId, isLogo, file));
+    }
+
+    @PostMapping("/news-feed-attachment/remove")
+    @Operation(description = "Remove attachment from news feed")
+    public ResponseEntity<NewsFeedDTO> removeAttachments(@RequestParam final Long newsFeedId,
+                                                         @RequestParam final Long attachmentId) {
+        return ResponseEntity.ok(newsFeedService.removeAttachment(newsFeedId, attachmentId));
+    }
+
+    @PostMapping("/news-feed-attachment/download-attachment")
+    @Operation(description = "Download attachment from news feed")
+    public ResponseEntity<byte[]> downloadAttachments(@RequestParam final Long attachmentId) {
+        return newsFeedService.downloadAttachment(attachmentId);
     }
 }

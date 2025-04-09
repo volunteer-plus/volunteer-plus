@@ -29,4 +29,5 @@ public class NewsFeedDTO {
     private String authorFirstName;
     private String authorLastName;
     private List<NewsFeedCommentDTO> comments = new ArrayList<>();
+    private List<NewsFeedAttachmentDTO> attachments = new ArrayList<>();
 }

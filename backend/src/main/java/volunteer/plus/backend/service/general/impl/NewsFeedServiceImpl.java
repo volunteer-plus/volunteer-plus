@@ -4,21 +4,27 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+import volunteer.plus.backend.config.storage.AWSProperties;
+import volunteer.plus.backend.domain.dto.NewsFeedAttachmentDTO;
 import volunteer.plus.backend.domain.dto.NewsFeedCommentDTO;
 import volunteer.plus.backend.domain.dto.NewsFeedDTO;
-import volunteer.plus.backend.domain.entity.NewsFeed;
-import volunteer.plus.backend.domain.entity.NewsFeedComment;
-import volunteer.plus.backend.domain.entity.User;
+import volunteer.plus.backend.domain.entity.*;
 import volunteer.plus.backend.exceptions.ApiException;
 import volunteer.plus.backend.exceptions.ErrorCode;
+import volunteer.plus.backend.repository.NewsFeedAttachmentRepository;
 import volunteer.plus.backend.repository.NewsFeedCommentRepository;
 import volunteer.plus.backend.repository.NewsFeedRepository;
 import volunteer.plus.backend.repository.UserRepository;
 import volunteer.plus.backend.service.general.NewsFeedService;
+import volunteer.plus.backend.service.general.S3Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Objects;
 
 @Slf4j
@@ -27,6 +33,9 @@ import java.util.Objects;
 public class NewsFeedServiceImpl implements NewsFeedService {
     private final NewsFeedRepository newsFeedRepository;
     private final NewsFeedCommentRepository newsFeedCommentRepository;
+    private final NewsFeedAttachmentRepository newsFeedAttachmentRepository;
+    private final S3Service s3Service;
+    private final AWSProperties awsProperties;
     private final UserRepository userRepository;
 
     @Override
@@ -67,9 +76,7 @@ public class NewsFeedServiceImpl implements NewsFeedService {
             newsFeed.setBody(newsFeedDTO.getBody());
         }
 
-        final NewsFeed savedNewsFeed = newsFeedRepository.save(newsFeed);
-
-        return mapToNewsFeedDTO(savedNewsFeed);
+        return saveAndReturnDTO(newsFeed);
     }
 
     @Override
@@ -99,9 +106,7 @@ public class NewsFeedServiceImpl implements NewsFeedService {
                     });
         }
 
-        final NewsFeed savedNewsFeed = newsFeedRepository.save(newsFeed);
-
-        return mapToNewsFeedDTO(savedNewsFeed);
+        return saveAndReturnDTO(newsFeed);
     }
 
     @Override
@@ -135,8 +140,82 @@ public class NewsFeedServiceImpl implements NewsFeedService {
 
         newsFeed.removeComment(comment);
 
-        final NewsFeed savedNewsFeed = newsFeedRepository.save(newsFeed);
+        return saveAndReturnDTO(newsFeed);
+    }
 
+    @Override
+    @Transactional
+    public NewsFeedDTO addAttachment(final Long newsFeedId,
+                                     final boolean isLogo,
+                                     final MultipartFile file) {
+        log.info("Add news feed attachment");
+
+        final NewsFeed newsFeed = getNewsFeedFromDB(newsFeedId);
+
+        final var s3Key = s3Service.uploadFile(awsProperties.getReportBucketName(), file);
+
+        final var attachment = NewsFeedAttachment.builder()
+                .filename(file.getOriginalFilename())
+                .s3Link(s3Key)
+                .logo(isLogo)
+                .build();
+
+        // if we attach new logo previous should not be a logo
+        if (isLogo && newsFeed.getAttachments() != null) {
+            newsFeed.getAttachments().forEach(attach -> attach.setLogo(false));
+        }
+
+        newsFeed.addAttachment(attachment);
+
+        return saveAndReturnDTO(newsFeed);
+    }
+
+    @Override
+    @Transactional
+    public NewsFeedDTO removeAttachment(final Long newsFeedId,
+                                        final Long attachmentId) {
+        log.info("Remove news feed attachment");
+
+        final NewsFeed newsFeed = getNewsFeedFromDB(newsFeedId);
+
+        final var attachment = newsFeed.getAttachments()
+                .stream()
+                .filter(a -> Objects.equals(a.getId(), attachmentId))
+                .findFirst()
+                .orElseThrow(() -> new ApiException(ErrorCode.ATTACHMENT_NOT_FOUND));
+
+        s3Service.deleteFile(awsProperties.getReportBucketName(), attachment.getS3Link());
+
+        // if removed attachment is logo then set logo to the latest attachment
+        if (attachment.isLogo()) {
+            newsFeed.getAttachments()
+                    .stream()
+                    .filter(el -> !Objects.equals(el.getId(), attachment.getId()))
+                    .max(Comparator.comparing(BaseEntity::getCreateDate))
+                    .ifPresent(attach -> attach.setLogo(true));
+        }
+
+        newsFeed.removeAttachment(attachment);
+
+        return saveAndReturnDTO(newsFeed);
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<byte[]> downloadAttachment(final Long attachmentId) {
+        final var attachment = newsFeedAttachmentRepository.findById(attachmentId)
+                .orElseThrow(() -> new ApiException(ErrorCode.ATTACHMENT_NOT_FOUND));
+
+        final byte[] bytes = s3Service.downloadFile(awsProperties.getReportBucketName(), attachment.getS3Link());
+
+        return ResponseEntity.ok()
+                .header("content-disposition", "attachment; filename=" + attachment.getFilename())
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(bytes);
+    }
+
+    private NewsFeedDTO saveAndReturnDTO(final NewsFeed newsFeed) {
+        final NewsFeed savedNewsFeed = newsFeedRepository.save(newsFeed);
         return mapToNewsFeedDTO(savedNewsFeed);
     }
 
@@ -177,6 +256,14 @@ public class NewsFeedServiceImpl implements NewsFeedService {
                                         .map(this::mapToNewsFeedCommentDTO)
                                         .toList()
                 )
+                .attachments(
+                        newsFeed.getAttachments() == null ?
+                                new ArrayList<>() :
+                                newsFeed.getAttachments()
+                                        .stream()
+                                        .map(this::mapToNewsFeedAttachmentDTO)
+                                        .toList()
+                )
                 .build();
     }
 
@@ -189,6 +276,18 @@ public class NewsFeedServiceImpl implements NewsFeedService {
                 .authorEmail(newsFeedComment.getAuthor() == null ? null : newsFeedComment.getAuthor().getEmail())
                 .authorFirstName(newsFeedComment.getAuthor() == null ? null : newsFeedComment.getAuthor().getFirstName())
                 .authorLastName(newsFeedComment.getAuthor() == null ? null : newsFeedComment.getAuthor().getLastName())
+                .build();
+    }
+
+    private NewsFeedAttachmentDTO mapToNewsFeedAttachmentDTO(final NewsFeedAttachment attachment) {
+        return NewsFeedAttachmentDTO.builder()
+                .id(attachment.getId())
+                .createDate(attachment.getCreateDate())
+                .updateDate(attachment.getUpdateDate())
+                .logo(attachment.isLogo())
+                .filename(attachment.getFilename())
+                .s3Link(attachment.getS3Link())
+                .content(s3Service.downloadFile(awsProperties.getReportBucketName(), attachment.getS3Link()))
                 .build();
     }
 }

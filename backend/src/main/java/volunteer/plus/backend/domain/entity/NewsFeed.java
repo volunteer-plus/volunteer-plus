@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@EqualsAndHashCode(callSuper = false, exclude = {"comments", "author"})
+@EqualsAndHashCode(callSuper = false, exclude = {"comments", "author", "attachments"})
 @Entity
 @Table(name = "news_feed")
 public class NewsFeed extends BaseEntity {
@@ -28,6 +28,9 @@ public class NewsFeed extends BaseEntity {
     @OneToMany(mappedBy = "newsFeed", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<NewsFeedComment> comments = new ArrayList<>();
 
+    @OneToMany(mappedBy = "newsFeed", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<NewsFeedAttachment> attachments = new ArrayList<>();
+
     public void addComment(final NewsFeedComment comment) {
         if (this.comments == null) {
             this.comments = new ArrayList<>();
@@ -42,5 +45,21 @@ public class NewsFeed extends BaseEntity {
         }
         this.comments.remove(comment);
         comment.setNewsFeed(null);
+    }
+
+    public void addAttachment(final NewsFeedAttachment attachment) {
+        if (this.attachments == null) {
+            this.attachments = new ArrayList<>();
+        }
+        this.attachments.add(attachment);
+        attachment.setNewsFeed(this);
+    }
+
+    public void removeAttachment(final NewsFeedAttachment attachment) {
+        if (this.attachments == null) {
+            this.attachments = new ArrayList<>();
+        }
+        this.attachments.remove(attachment);
+        attachment.setNewsFeed(null);
     }
 }
