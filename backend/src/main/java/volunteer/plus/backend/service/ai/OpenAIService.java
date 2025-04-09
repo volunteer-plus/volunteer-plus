@@ -16,6 +16,8 @@ public interface OpenAIService {
 
     ResponseEntity<byte[]> generateImage(ImageGenerationRequestDTO imageGenerationRequestDTO);
 
+    MultipartFile generateImageAsMultipartFile(ImageGenerationRequestDTO imageGenerationRequestDTO);
+
     List<String> generateImageUrls(ImageGenerationRequestDTO imageGenerationRequestDTO);
 
     String generateTextFromAudio(String lang, MultipartFile file);

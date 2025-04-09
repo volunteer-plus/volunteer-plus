@@ -15,7 +15,6 @@ public class NewsFeedAttachmentDTO {
     private Long id;
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
-    private byte[] content;
     private String s3Link;
     private String filename;
     private boolean logo;

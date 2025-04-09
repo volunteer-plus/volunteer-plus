@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import volunteer.plus.backend.config.storage.AWSProperties;
+import volunteer.plus.backend.domain.dto.ImageGenerationRequestDTO;
 import volunteer.plus.backend.domain.dto.NewsFeedAttachmentDTO;
 import volunteer.plus.backend.domain.dto.NewsFeedCommentDTO;
 import volunteer.plus.backend.domain.dto.NewsFeedDTO;
@@ -26,6 +27,7 @@ import volunteer.plus.backend.repository.NewsFeedAttachmentRepository;
 import volunteer.plus.backend.repository.NewsFeedCommentRepository;
 import volunteer.plus.backend.repository.NewsFeedRepository;
 import volunteer.plus.backend.repository.UserRepository;
+import volunteer.plus.backend.service.ai.OpenAIService;
 import volunteer.plus.backend.service.general.NewsFeedService;
 import volunteer.plus.backend.service.general.S3Service;
 import volunteer.plus.backend.util.AIClientProviderUtil;
@@ -47,6 +49,7 @@ public class NewsFeedServiceImpl implements NewsFeedService {
     private final AIClientProviderUtil aiClientProviderUtil;
     private final NewsFeedService newsFeedService;
     private final Resource newsFeedGenerationPrompt;
+    private final OpenAIService openAIService;
 
     public NewsFeedServiceImpl(final NewsFeedRepository newsFeedRepository,
                                final NewsFeedCommentRepository newsFeedCommentRepository,
@@ -56,7 +59,8 @@ public class NewsFeedServiceImpl implements NewsFeedService {
                                final UserRepository userRepository,
                                final AIClientProviderUtil aiClientProviderUtil,
                                final @Lazy NewsFeedService newsFeedService,
-                               final @Value("classpath:/prompts/news_geed_generation.txt") Resource newsFeedGenerationPrompt) {
+                               final @Value("classpath:/prompts/news_geed_generation.txt") Resource newsFeedGenerationPrompt,
+                               final OpenAIService openAIService) {
         this.newsFeedRepository = newsFeedRepository;
         this.newsFeedCommentRepository = newsFeedCommentRepository;
         this.newsFeedAttachmentRepository = newsFeedAttachmentRepository;
@@ -66,6 +70,7 @@ public class NewsFeedServiceImpl implements NewsFeedService {
         this.aiClientProviderUtil = aiClientProviderUtil;
         this.newsFeedService = newsFeedService;
         this.newsFeedGenerationPrompt = newsFeedGenerationPrompt;
+        this.openAIService = openAIService;
     }
 
     @Override
@@ -262,7 +267,7 @@ public class NewsFeedServiceImpl implements NewsFeedService {
             throw new ApiException(ErrorCode.AI_RESPONSE_IS_EMPTY);
         }
 
-        newsFeedService.createOrUpdateNewsFeed(
+        final NewsFeedDTO savedNewsFeedDTO = newsFeedService.createOrUpdateNewsFeed(
                 user.getId(),
                 NewsFeedDTO.builder()
                         .subject(response.getSubject())
@@ -270,6 +275,20 @@ public class NewsFeedServiceImpl implements NewsFeedService {
                         .generationSource(NewsFeedGenerationSource.AI)
                         .build()
         );
+
+        final MultipartFile multipartFile = openAIService.generateImageAsMultipartFile(
+                ImageGenerationRequestDTO.builder()
+                        .quality("standard")
+                        .number(1)
+                        .height(1024)
+                        .width(1024)
+                        .prompt(response.getSubject())
+                        .build()
+        );
+
+        log.info("Image has been generated for AI drive news feed...");
+
+        newsFeedService.addAttachment(savedNewsFeedDTO.getId(), true, multipartFile);
 
         log.info("Finish of generation AI driven news feed...");
     }
@@ -357,7 +376,6 @@ public class NewsFeedServiceImpl implements NewsFeedService {
                 .logo(attachment.isLogo())
                 .filename(attachment.getFilename())
                 .s3Link(attachment.getS3Link())
-                .content(s3Service.downloadFile(awsProperties.getReportBucketName(), attachment.getS3Link()))
                 .build();
     }
 }

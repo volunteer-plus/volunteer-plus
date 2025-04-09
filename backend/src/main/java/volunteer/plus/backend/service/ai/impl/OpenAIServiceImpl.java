@@ -37,12 +37,14 @@ import volunteer.plus.backend.service.ai.AIModerationService;
 import volunteer.plus.backend.service.ai.OpenAIService;
 import volunteer.plus.backend.service.websocket.WebSocketService;
 import volunteer.plus.backend.util.AIClientProviderUtil;
+import volunteer.plus.backend.domain.dto.ByteArrayMultipartFile;
 
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import static volunteer.plus.backend.config.websocket.WebSocketConfig.*;
@@ -54,6 +56,7 @@ import static volunteer.plus.backend.util.AIUtil.getAIMediaList;
 public class OpenAIServiceImpl implements OpenAIService {
 
     private static final String RESPONSE = "\nResponse:\n";
+    private static final String OPEN_AI_REQUEST_IMAGE_GENERATION = "OpenAI request image generation:\n";
 
     private final AIClientProviderUtil aiClientProviderUtil;
     private final OpenAiImageModel imageModel;
@@ -130,29 +133,58 @@ public class OpenAIServiceImpl implements OpenAIService {
     @SneakyThrows
     @Override
     public ResponseEntity<byte[]> generateImage(final ImageGenerationRequestDTO imageGenerationRequestDTO) {
+        final Image image = getImage(imageGenerationRequestDTO);
+
+        webSocketService.sendNotification(OPENAI_IMAGE_CLIENT_TARGET, OPEN_AI_REQUEST_IMAGE_GENERATION + imageGenerationRequestDTO.getPrompt() + RESPONSE + image.getUrl());
+
+        try {
+            final URL specUrl = URI.create(image.getUrl()).toURL();
+            try (final InputStream is = specUrl.openStream()) {
+                return ResponseEntity.ok()
+                        .header("content-disposition", "attachment; filename=output.png")
+                        .body(is.readAllBytes());
+            }
+        } catch (Exception e) {
+            throw new ApiException(ErrorCode.CANNOT_DOWNLOAD_OUTPUT_FILE);
+        }
+    }
+
+    @SneakyThrows
+    @Override
+    public MultipartFile generateImageAsMultipartFile(final ImageGenerationRequestDTO imageGenerationRequestDTO) {
+        final Image image = getImage(imageGenerationRequestDTO);
+
+        webSocketService.sendNotification(OPENAI_IMAGE_CLIENT_TARGET,
+                OPEN_AI_REQUEST_IMAGE_GENERATION +
+                        imageGenerationRequestDTO.getPrompt() +
+                        RESPONSE +
+                        image.getUrl()
+        );
+
+        try {
+            final URL specUrl = URI.create(image.getUrl()).toURL();
+            try (final InputStream is = specUrl.openStream()) {
+                byte[] fileBytes = is.readAllBytes();
+                return new ByteArrayMultipartFile("file", "output.png", "image/png", fileBytes);
+            }
+        } catch (Exception e) {
+            throw new ApiException(ErrorCode.CANNOT_DOWNLOAD_OUTPUT_FILE);
+        }
+    }
+
+    private Image getImage(final ImageGenerationRequestDTO imageGenerationRequestDTO) throws InterruptedException, ExecutionException {
         log.info("Asking GPT to generate an image: {}", imageGenerationRequestDTO.getPrompt());
 
         final ImageResponse response = openAIService.getImageResponse(imageGenerationRequestDTO, 1).get();
-
         final Image image = response.getResult().getOutput();
 
         if (image == null || image.getUrl() == null) {
             throw new ApiException(ErrorCode.EMPTY_FILE);
         }
 
-        webSocketService.sendNotification(OPENAI_IMAGE_CLIENT_TARGET, "OpenAI request image generation:\n" + imageGenerationRequestDTO.getPrompt() + RESPONSE + image.getUrl());
-
-        try {
-            final URL specUrl = URI.create(image.getUrl()).toURL();
-            final InputStream is = specUrl.openStream();
-
-            return ResponseEntity.ok()
-                    .header("content-disposition", "attachment; filename=output.png")
-                    .body(is.readAllBytes());
-        } catch (Exception e) {
-            throw new ApiException(ErrorCode.CANNOT_DOWNLOAD_OUTPUT_FILE);
-        }
+        return image;
     }
+
 
     @SneakyThrows
     @Override
@@ -172,7 +204,7 @@ public class OpenAIServiceImpl implements OpenAIService {
                         .filter(Objects::nonNull)
                         .toList();
 
-        urls.forEach(url -> webSocketService.sendNotification(OPENAI_IMAGE_CLIENT_TARGET, "OpenAI request image generation:\n" + imageGenerationRequestDTO.getPrompt() + RESPONSE + url));
+        urls.forEach(url -> webSocketService.sendNotification(OPENAI_IMAGE_CLIENT_TARGET, OPEN_AI_REQUEST_IMAGE_GENERATION + imageGenerationRequestDTO.getPrompt() + RESPONSE + url));
 
         return urls;
     }
