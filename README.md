@@ -41,3 +41,15 @@ triggers after restart would be saved!!!
 # in order to initialize schema on first run please switch it to 'always'
 spring.quartz.jdbc.initialize-schema=never
 ```
+
+
+**NOTE!**
+In case you want to run FE locally you should take a look at this config: 
+
+```javascript
+const volunteerPlusApiService = new VolunteerPlusApiService({
+  basePath: import.meta.env.VITE_VOLUNTEER_PLUS_API_BASE_URL,
+  // uncomment for local testing
+  // basePath: 'http://localhost:8080/api',
+});
+```
