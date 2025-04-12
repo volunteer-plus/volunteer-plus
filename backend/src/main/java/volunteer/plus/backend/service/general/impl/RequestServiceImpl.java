@@ -114,7 +114,6 @@ public class RequestServiceImpl implements RequestService {
             requestFromDB.setDeadline(requestDTO.getDeadline());
             requestFromDB.setAmount(requestDTO.getAmount());
             requestFromDB.setCategory(requestDTO.getCategory());
-            requestFromDB.setStatus(requestDTO.getStatus());
 
             requestsToSave.add(requestFromDB);
         }
