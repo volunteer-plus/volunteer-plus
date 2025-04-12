@@ -1,5 +1,6 @@
 import { User } from '@/types/common';
 import { volunteerPlusApiService } from '../volunteer-plus-api';
+import { UserRole } from '@/enums/common';
 
 class UserService {
   public async getMe(): Promise<User> {
@@ -7,7 +8,9 @@ class UserService {
       path: 'user-info',
     });
 
-    user.email = 'brigade.admin@example.com';
+    const urlParams = new URLSearchParams(window.location.search);
+
+    user.role = user.role ?? urlParams.get('userRole') ?? UserRole.VOLUNTEER;
 
     return user;
   }

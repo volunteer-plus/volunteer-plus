@@ -1,7 +1,8 @@
+import { UserRole } from '@/enums/common';
 import { User } from '@/types/common';
 
-const isVolunteer = (user: User): boolean => {
-  return user.email === 'volunteer@example.com';
+const isVolunteer = (user: Pick<User, 'role'>): boolean => {
+  return user.role === UserRole.VOLUNTEER;
 };
 
 export { isVolunteer };

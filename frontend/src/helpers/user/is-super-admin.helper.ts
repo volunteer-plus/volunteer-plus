@@ -1,7 +1,8 @@
+import { UserRole } from '@/enums/common';
 import { User } from '@/types/common';
 
-const isSuperAdmin = (user: User): boolean => {
-  return user.email === 'super.admin@example.com';
+const isSuperAdmin = (user: Pick<User, 'role'>): boolean => {
+  return user.role === UserRole.SUPER_ADMIN;
 };
 
 export { isSuperAdmin };
