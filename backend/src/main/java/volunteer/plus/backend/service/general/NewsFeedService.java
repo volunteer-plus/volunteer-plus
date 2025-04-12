@@ -15,6 +15,8 @@ public interface NewsFeedService {
 
     NewsFeedDTO createOrUpdateNewsFeed(Long userId, NewsFeedDTO newsFeedDTO);
 
+    NewsFeedDTO selectNewsFeedLogo(Long attachmentId, boolean isLogo);
+
     NewsFeedDTO createOrUpdateNewsFeedComment(Long userId, Long newsFeedId, NewsFeedCommentDTO newsFeedCommentDTO);
 
     void deleteNewsFeed(Long newsFeedId);

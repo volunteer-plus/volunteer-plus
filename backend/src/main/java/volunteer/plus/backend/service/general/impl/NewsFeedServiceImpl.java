@@ -122,6 +122,24 @@ public class NewsFeedServiceImpl implements NewsFeedService {
 
     @Override
     @Transactional
+    public NewsFeedDTO selectNewsFeedLogo(final Long attachmentId,
+                                          final boolean isLogo) {
+        final NewsFeedAttachment foundAttachment = newsFeedAttachmentRepository.findById(attachmentId)
+                .orElseThrow(() -> new ApiException(ErrorCode.NEWS_FEED_ATTACHMENT_NOT_FOUND));
+
+        final NewsFeed newsFeed = foundAttachment.getNewsFeed();
+
+        if (isLogo) {
+            newsFeed.getAttachments().forEach(attach -> attach.setLogo(false));
+        }
+
+        foundAttachment.setLogo(isLogo);
+
+        return saveAndReturnDTO(newsFeed);
+    }
+
+    @Override
+    @Transactional
     public NewsFeedDTO createOrUpdateNewsFeedComment(final Long userId,
                                                      final Long newsFeedId,
                                                      final NewsFeedCommentDTO newsFeedCommentDTO) {
