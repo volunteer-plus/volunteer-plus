@@ -2,7 +2,7 @@ import Logo from '@/assets/logo.svg?react';
 
 import styles from './styles.module.scss';
 import { useAdminPageSidebarContext } from '@/hooks/admin';
-import { SessionUserBlock } from '@/components/common/session-user-block';
+import { SessionUserBlock, MaterialSymbol } from '@/components/common';
 
 const AdminPageHeader: React.FC = () => {
   const { toggle: toggleSidebar } = useAdminPageSidebarContext();
@@ -16,7 +16,7 @@ const AdminPageHeader: React.FC = () => {
             className={styles.burgerButton}
             onClick={toggleSidebar}
           >
-            <span className='material-symbols-outlined'>menu</span>
+            <MaterialSymbol>menu</MaterialSymbol>
           </button>
         </div>
         <Logo className={styles.logo} />

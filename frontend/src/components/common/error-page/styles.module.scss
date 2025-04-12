@@ -1,0 +1,36 @@
+.button {
+  max-width: max-content;
+}
+
+.icon {
+  color: var(--color-failure);
+  font-size: 240px;
+  font-weight: 100;
+}
+
+.root {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 48px;
+  row-gap: 10px;
+  flex-wrap: wrap-reverse;
+  align-content: center;
+
+  height: 100vh;
+
+  box-sizing: border-box;
+  padding: min(5%, 64px);
+}
+
+.title {
+  margin-bottom: 16px;
+}
+
+.text {
+  margin-bottom: 32px;
+}
+
+.content {
+  max-width: 480px;
+}

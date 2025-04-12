@@ -1,6 +1,7 @@
-@use '@/assets/columns' as columns;
-
 .content {
   padding: 50px;
   flex-grow: 1;
+
+  min-height: 0;
+  overflow: auto;
 }

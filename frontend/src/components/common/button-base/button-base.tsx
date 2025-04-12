@@ -28,6 +28,8 @@ const ButtonBase = React.forwardRef<HTMLElement, Props>(
       elementProps = {},
       variant = 'filled',
       colorSchema = 'olive',
+      leftIcon,
+      rightIcon,
     },
     ref
   ) => {
@@ -38,7 +40,18 @@ const ButtonBase = React.forwardRef<HTMLElement, Props>(
         elementProps.className,
         styles.button,
         getClassNameForColorSchema(colorSchema),
-        getClassNameForVariant(variant)
+        getClassNameForVariant(variant),
+        {
+          [styles.withLeftIcon]: Boolean(leftIcon),
+          [styles.withRightIcon]: Boolean(rightIcon),
+        }
+      ),
+      children: (
+        <>
+          {leftIcon}
+          {elementProps.children}
+          {rightIcon}
+        </>
       ),
     });
   }

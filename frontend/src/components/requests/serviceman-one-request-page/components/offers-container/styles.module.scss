@@ -1,0 +1,18 @@
+.titleLineMargin {
+  margin-bottom: 16px;
+}
+
+.titleLine {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.root {
+  display: flex;
+  flex-direction: column;
+}
+
+.chat, .offersList {
+  flex-grow: 1;
+}

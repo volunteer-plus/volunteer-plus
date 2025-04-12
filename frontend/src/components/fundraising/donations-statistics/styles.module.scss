@@ -1,0 +1,21 @@
+@use '@/assets/columns' as columns;
+
+.container {
+  padding: 32px columns.get-spacing(4);
+
+  background: var(--color-gray-50);
+}
+
+.heading {
+  color: var(--color-gray-900);
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.counters {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  column-gap: 16px;
+}

@@ -1,0 +1,15 @@
+.root {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.name {
+  font-weight: 500;
+  color: var(--color-gray-900);
+}
+
+.role {
+  color: var(--color-gray-500);
+  font-size: 12px;
+}

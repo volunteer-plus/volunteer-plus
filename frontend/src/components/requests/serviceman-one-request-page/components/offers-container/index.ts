@@ -1,0 +1,1 @@
+export { OffersContainer } from './offers-container';

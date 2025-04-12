@@ -3,7 +3,7 @@ interface SidebarItemConfig {
   label: string;
   path: string;
   key: string;
-  subPaths?: string[];
+  subPaths?: (string | RegExp)[];
 }
 
 export type { SidebarItemConfig };

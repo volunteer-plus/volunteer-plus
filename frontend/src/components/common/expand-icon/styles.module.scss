@@ -1,4 +1,6 @@
 .icon {
+  transform-origin: center;
+
   &.expanded {
     transform: rotate(-90deg);
   }

@@ -2,11 +2,33 @@ import classNames from 'classnames';
 
 import styles from './styles.module.scss';
 
-const Tag: React.FC<React.ComponentPropsWithoutRef<'span'>> = ({
+interface Props extends React.ComponentPropsWithoutRef<'div'> {
+  size: 'small' | 'medium';
+  color?: string;
+  textColor?: string;
+}
+
+const Tag: React.FC<Props> = ({
   className,
+  size,
+  color = 'var(--color-olive-300)',
+  textColor = 'var(--color-white)',
+  style,
   ...props
 }) => {
-  return <span {...props} className={classNames(styles.tag, className)} />;
+  return (
+    <div
+      {...props}
+      className={classNames(styles.tag, styles[`${size}Size`], className)}
+      style={
+        {
+          ...style,
+          '--tag-color': color,
+          '--tag-text-color': textColor,
+        } as React.CSSProperties
+      }
+    />
+  );
 };
 
 export { Tag };

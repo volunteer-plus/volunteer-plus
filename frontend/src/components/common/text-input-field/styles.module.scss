@@ -12,7 +12,11 @@
 }
 
 .input,
-input:active {
+.input:active {
   border: none;
   outline: none;
+}
+
+.label {
+  margin-bottom: 4px;
 }

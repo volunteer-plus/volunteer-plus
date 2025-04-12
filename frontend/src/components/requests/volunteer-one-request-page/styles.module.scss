@@ -1,0 +1,52 @@
+.root {
+  display: flex;
+  flex-direction: column;
+}
+
+.content {
+  flex-grow: 1;
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  column-gap: 64px;
+
+  margin-top: 32px;
+}
+
+.chatTitle {
+  margin-bottom: 16px;
+}
+
+.chatSide {
+  display: flex;
+  flex-direction: column;
+}
+
+.chat {
+  flex-grow: 1;
+}
+
+.requestTitleLine {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  margin-bottom: 8px;
+}
+
+.requestBrigade {
+  color: var(--color-olive-500);
+
+  margin-bottom: 16px;
+}
+
+.brigadeName {
+  font-weight: 600;
+}
+
+.requestDescription {
+  margin-bottom: 16px;
+}
+
+.fields > *:not(:last-child) {
+  margin-bottom: 32px;
+}

@@ -1,27 +1,70 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
-import { Button } from '@/components/common';
-
-import { AdminPageContent, AdminPageTitle } from '@/components/admin';
+import {
+  BarsLoader,
+  Button,
+  Pagination,
+  TextInputField,
+  PageTitle,
+} from '@/components/common';
 import { Authenticated } from '@/components/auth';
+import { AdminPageContent } from '@/components/admin';
+import { AddBrigadeModal, BrigadeListItem } from '@/components/brigades';
+import { useAppDispatch, useAppSelector } from '@/hooks/store';
+import { loadBrigades } from '@/slices/brigades';
 
 import styles from './styles.module.scss';
-import { AddBrigadeModal } from '../add-brigade-modal';
 
 const BareBrigadesPage: React.FC = () => {
+  const dispatch = useAppDispatch();
+
+  const { data, isLoading } = useAppSelector((state) => state.brigades);
   const [isAddBrigadeModalOpen, setIsAddBrigadeModalOpen] = useState(false);
 
+  useEffect(() => {
+    dispatch(loadBrigades());
+  }, [dispatch]);
+
   return (
-    <AdminPageContent>
-      <div className={styles.header}>
-        <AdminPageTitle>Бригади</AdminPageTitle>
-        <Button onClick={() => setIsAddBrigadeModalOpen(true)}>
-          Додати бригаду
-        </Button>
+    <AdminPageContent className={styles.content}>
+      <div className={styles.internalContent}>
+        <div className={styles.header}>
+          <PageTitle>Бригади</PageTitle>
+          <Button onClick={() => setIsAddBrigadeModalOpen(true)}>
+            Додати бригаду
+          </Button>
+        </div>
+        <div className={styles.brigadesListAndSearch}>
+          <TextInputField placeholder='Пошук' />
+          {isLoading || !data ? (
+            <div className={styles.loaderContainer}>
+              <BarsLoader size='50px' />
+            </div>
+          ) : (
+            <>
+              <div className={styles.brigadesList}>
+                {data.value.map((brigade) => (
+                  <BrigadeListItem
+                    key={brigade.id}
+                    brigadeId={brigade.id}
+                    brigadeName={brigade.name}
+                  />
+                ))}
+              </div>
+              <Pagination
+                currentPage={1}
+                totalPages={10}
+                getPageUrl={() => '/'}
+                className={styles.pagination}
+              />
+            </>
+          )}
+        </div>
       </div>
       <AddBrigadeModal
         isOpen={isAddBrigadeModalOpen}
         onClose={() => setIsAddBrigadeModalOpen(false)}
+        onAfterSubmit={() => setIsAddBrigadeModalOpen(false)}
       />
     </AdminPageContent>
   );

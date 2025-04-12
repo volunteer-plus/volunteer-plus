@@ -1,0 +1,1 @@
+export { OneFundraisingActivityPage } from './one-fundraising-activity-page';

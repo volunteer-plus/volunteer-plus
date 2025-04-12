@@ -1,0 +1,53 @@
+.root {
+  display: flex;
+  justify-content: center;
+}
+
+.content {
+  display: flex;
+  gap: 32px;
+}
+
+.form {
+  width: 385px;
+}
+
+.pageTitle {
+  margin-bottom: 32px;
+}
+
+.fields > *:not(:last-child) {
+  margin-bottom: 16px;
+}
+
+.saveButton {
+  margin-top: 32px;
+  width: 100%;
+}
+
+.editAvatarButton {
+  width: 38px;
+  height: 38px;
+  color: var(--color-white);
+  background: var(--color-olive-300);
+  border: 1px solid var(--color-olive-500);
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.editAvatarIcon {
+  font-size: 18px;
+}
+
+.avatarWrapper {
+  position: relative;
+  align-self: flex-start;
+}

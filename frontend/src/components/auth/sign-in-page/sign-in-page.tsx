@@ -18,7 +18,7 @@ import { getUserHomepage } from '@/helpers/user';
 import { PublicOnly } from '@/components/auth/public-only';
 
 import styles from './styles.module.scss';
-import { useAppDispatch } from '@/hooks/store';
+import { useAppDispatch, useAppSelector } from '@/hooks/store';
 import { login } from '@/slices/user';
 
 type FormValues = {
@@ -38,6 +38,8 @@ const FORM_VALIDATION_SCHEMA = Yup.object({
 
 const BareSignInPage: React.FC = () => {
   const dispatch = useAppDispatch();
+
+  const { isLoginFailed } = useAppSelector((state) => state.user);
 
   const onSubmit = async (values: FormValues) => {
     await dispatch(login(values));
@@ -60,6 +62,10 @@ const BareSignInPage: React.FC = () => {
                   label='Email'
                   isRequired
                   placeholder='example@example.ua'
+                  variant={isLoginFailed ? 'failure' : undefined}
+                  description={
+                    isLoginFailed ? 'Невірний email або пароль' : undefined
+                  }
                 />
                 <FormikPasswordInputField
                   name='password'

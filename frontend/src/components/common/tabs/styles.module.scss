@@ -1,0 +1,21 @@
+.container {
+  display: flex;
+  flex-direction: row;
+}
+
+.tab {
+  padding: 10px 32px;
+  border: none;
+  background: none;
+  font-family: inherit;
+  color: var(--color-gray-900);
+  font-weight: 500;
+
+  --tab-border-color: var(--color-white);
+
+  border-bottom: 2px solid var(--tab-border-color);
+
+  &.active {
+    --tab-border-color: var(--color-olive-300);
+  }
+}

@@ -1,0 +1,27 @@
+.table {
+  width: 100%;
+}
+
+.searchAndFilter {
+  display: flex;
+  gap: 16px;
+}
+
+.search {
+  width: 385px;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.pageTitle {
+  margin-bottom: 32px;
+}
+
+.pagination {
+  margin-top: 16px;
+}

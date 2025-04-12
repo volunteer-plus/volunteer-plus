@@ -1,0 +1,7 @@
+.root {
+  display: grid;
+  grid-template-columns: 1fr 3fr 4fr max-content;
+  grid-auto-rows: auto;
+  row-gap: 8px;
+  column-gap: 8px;
+}

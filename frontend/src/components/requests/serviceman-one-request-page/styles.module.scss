@@ -1,0 +1,15 @@
+@use '@/assets/columns' as columns;
+
+.content {
+  display: flex;
+  flex-direction: column;
+}
+
+.formAndOffers {
+  flex-grow: 1;
+  display: grid;
+  grid-template-columns: min(385px, 35%) 1fr;
+  column-gap: 64px;
+
+  margin-top: 32px;
+}

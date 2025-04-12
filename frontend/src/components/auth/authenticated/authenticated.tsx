@@ -2,11 +2,18 @@ import { Navigate } from 'react-router-dom';
 import { FullscreenLoader } from '@/components/common';
 import { useUser } from '@/hooks/auth';
 import { User } from '@/types/common';
-import { isBrigadeAdmin, isSuperAdmin } from '@/helpers/user';
+import {
+  isBrigadeAdmin,
+  isServiceman,
+  isSuperAdmin,
+  isVolunteer,
+} from '@/helpers/user';
 
 interface AllowedRoles {
   brigadeAdmin: boolean;
   superAdmin: boolean;
+  serviceman: boolean;
+  volunteer: boolean;
 }
 
 interface Options {
@@ -26,6 +33,14 @@ function checkAccessByAllowedRoles(
   }
 
   if (isBrigadeAdmin(user) && allowedRoles.brigadeAdmin) {
+    return true;
+  }
+
+  if (isServiceman(user) && allowedRoles.serviceman) {
+    return true;
+  }
+
+  if (isVolunteer(user) && allowedRoles.volunteer) {
     return true;
   }
 

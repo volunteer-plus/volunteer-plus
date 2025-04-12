@@ -1,0 +1,18 @@
+.searchField {
+  width: 385px;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.container > *:not(:last-child) {
+  margin-bottom: 16px;
+}
+
+.table {
+  width: 100%;
+}

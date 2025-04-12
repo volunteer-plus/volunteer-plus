@@ -1,0 +1,25 @@
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+
+  margin-bottom: 16px;
+}
+
+.searchAndFilter {
+  display: flex;
+  gap: 16px;
+}
+
+.search {
+  width: 385px;
+}
+
+.table {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.pageTitle {
+  margin-bottom: 32px;
+}

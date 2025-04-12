@@ -2,6 +2,7 @@
 
 $definitions: (
   'olive': (
+    '50': #eef0ea,
     '100': #dde1d5,
     '300': #829661,
     '500': #556b2f,
@@ -9,6 +10,7 @@ $definitions: (
     '900': #111509,
   ),
   'gray': (
+    '50': #f1f1f1,
     '100': #e3e3e3,
     '300': #aaaaaa,
     '500': #727272,
@@ -16,7 +18,7 @@ $definitions: (
     '900': #171717,
   ),
   'white': #ffffff,
-  'failure': #dd5726,
-  'warning': #f3b24a,
-  'success': #a4d92a,
+  'failure': #aa4520,
+  'warning': #da9a33,
+  'success': #43711f,
 );

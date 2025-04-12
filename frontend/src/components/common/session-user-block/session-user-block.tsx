@@ -1,36 +1,73 @@
 import { useRef, useState } from 'react';
 import classNames from 'classnames';
-import { Avatar, ExpandIcon, Menu, MenuContainer } from '@/components/common';
+import {
+  Avatar,
+  ExpandIcon,
+  Menu,
+  MenuContainer,
+  MenuItem,
+  MenuItemIconMaterial,
+} from '@/components/common';
 
 import styles from './styles.module.scss';
+import { useClickOutside } from '@/hooks/common';
+import { useLogout } from '@/hooks/auth';
+import { useAppSelector } from '@/hooks/store';
+import { getFullName } from '@/helpers/user';
 
-type Props = React.ComponentPropsWithoutRef<'button'>;
+type Props = React.ComponentPropsWithoutRef<'button'> & {
+  menuItems?: React.ReactNode;
+};
 
-const SessionUserBlock: React.FC<Props> = ({ className, ...props }) => {
+const SessionUserBlock: React.FC<Props> = ({
+  className,
+  menuItems,
+  ...props
+}) => {
+  const logout = useLogout();
+  const { user } = useAppSelector((state) => state.user);
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const blockRef = useRef<HTMLButtonElement>(null);
 
+  const { handlers: clickOutsideHandlers } = useClickOutside({
+    callback: () => setIsMenuOpen(false),
+    isEnabled: isMenuOpen,
+  });
+
   return (
-    <button
-      {...props}
-      className={classNames(styles.userBlock, className)}
-      type='button'
-      onClick={() => setIsMenuOpen(!isMenuOpen)}
-      ref={blockRef}
-    >
-      <ExpandIcon isExpanded={isMenuOpen} />
-      <div>Васильченко В. І.</div>
-      <Avatar size='30px' />
+    <>
+      <button
+        {...props}
+        {...clickOutsideHandlers}
+        className={classNames(styles.userBlock, className)}
+        type='button'
+        onClick={() => setIsMenuOpen(!isMenuOpen)}
+        ref={blockRef}
+      >
+        <ExpandIcon isExpanded={isMenuOpen} />
+        {user && <div className={styles.name}>{getFullName(user)}</div>}
+
+        <Avatar size='30px' />
+      </button>
       <Menu
         isOpen={isMenuOpen}
         targetRef={blockRef}
         side='bottom'
         alignment='stretch'
       >
-        <MenuContainer>Вихід</MenuContainer>
+        <MenuContainer {...clickOutsideHandlers}>
+          {menuItems}
+          <MenuItem
+            leftIcon={<MenuItemIconMaterial>logout</MenuItemIconMaterial>}
+            onClick={() => logout()}
+          >
+            Вийти
+          </MenuItem>
+        </MenuContainer>
       </Menu>
-    </button>
+    </>
   );
 };
 

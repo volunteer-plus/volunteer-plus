@@ -1,6 +1,11 @@
 $transition: 0.2s linear;
 
 .button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
   padding: 10px 32px;
 
   border-radius: 4px;
@@ -15,6 +20,14 @@ $transition: 0.2s linear;
   }
 
   text-decoration: none;
+}
+
+.withLeftIcon {
+  padding-left: 24px;
+}
+
+.withRightIcon {
+  padding-right: 24px;
 }
 
 .outlinedVariant {

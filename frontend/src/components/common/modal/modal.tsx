@@ -9,9 +9,15 @@ interface Props {
   isOpen: boolean;
   onClose: () => void;
   children: React.ReactElement;
+  onOutAnimationEnd?: () => void;
 }
 
-const Modal: React.FC<Props> = ({ isOpen, onClose, children }) => {
+const Modal: React.FC<Props> = ({
+  isOpen,
+  onClose,
+  children,
+  onOutAnimationEnd,
+}) => {
   const [shouldRenderRoot, setShouldRenderRoot] = useState(isOpen);
 
   const activeExitTransitionsCountRef = useRef(0);
@@ -27,6 +33,8 @@ const Modal: React.FC<Props> = ({ isOpen, onClose, children }) => {
 
     if (activeExitTransitionsCountRef.current === 0 && !isOpen) {
       setShouldRenderRoot(false);
+
+      onOutAnimationEnd?.();
     }
   });
 
@@ -59,7 +67,10 @@ const Modal: React.FC<Props> = ({ isOpen, onClose, children }) => {
     []
   );
 
-  const modalClickOutsideHandlers = useClickOutside(onClose, isOpen);
+  const { handlers: modalClickOutsideHandlers } = useClickOutside({
+    callback: onClose,
+    isEnabled: isOpen,
+  });
 
   useEffect(() => {
     if (isOpen) {

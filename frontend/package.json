@@ -7,13 +7,16 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "create-component": "node bin/new-component"
   },
   "dependencies": {
     "@react-spring/web": "^9.7.5",
     "@reduxjs/toolkit": "^2.3.0",
     "classnames": "^2.5.1",
     "formik": "^2.4.6",
+    "jwt-decode": "^4.0.0",
+    "lodash": "^4.17.21",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-loader-spinner": "^6.1.6",
@@ -23,6 +26,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.11.1",
+    "@types/lodash": "^4.17.16",
     "@types/node": "^22.7.5",
     "@types/react": "^18.3.10",
     "@types/react-dom": "^18.3.0",

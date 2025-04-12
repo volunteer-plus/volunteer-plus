@@ -1,5 +1,9 @@
 import { useState } from 'react';
-import { makeFormikField, TextInputField } from '@/components/common';
+import {
+  makeFormikField,
+  MaterialSymbol,
+  TextInputField,
+} from '@/components/common';
 
 import styles from './styles.module.scss';
 
@@ -25,9 +29,9 @@ const PasswordInputField: React.FC<Props> = (props) => {
           onClick={togglePasswordVisibility}
           className={styles.visibilityButton}
         >
-          <span className='material-symbols-outlined'>
+          <MaterialSymbol>
             {isPasswordVisible ? 'visibility_off' : 'visibility'}
-          </span>
+          </MaterialSymbol>
         </button>
       }
     />

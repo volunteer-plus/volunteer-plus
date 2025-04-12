@@ -11,7 +11,8 @@ type Props = {
   description?: React.ReactNode;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
-  type?: 'text' | 'password' | 'number' | 'email';
+  type?: 'text' | 'password' | 'number' | 'email' | 'date';
+  units?: React.ReactNode;
 } & Omit<React.ComponentPropsWithoutRef<'input'>, 'type'>;
 
 const TextInputField: React.FC<Props> = ({
@@ -25,17 +26,24 @@ const TextInputField: React.FC<Props> = ({
   onBlur: onBlurProp,
   leftIcon,
   rightIcon,
+  className,
+  units,
   ...props
 }) => {
   return (
-    <div>
-      {label && <FieldLabel isRequired={isRequired}>{label}</FieldLabel>}
+    <div className={className}>
+      {label && (
+        <FieldLabel isRequired={isRequired} className={styles.label}>
+          {label}
+        </FieldLabel>
+      )}
       <FieldBody
         variant={variant}
         isDisabled={disabled}
         description={description}
         leftIcon={leftIcon}
         rightIcon={rightIcon}
+        units={units}
       >
         {({ onFocus, onBlur, className }) => {
           return (

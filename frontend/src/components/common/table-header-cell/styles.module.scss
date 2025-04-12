@@ -1,0 +1,16 @@
+.cell {
+  color: var(--color-gray-900);
+  font-weight: 600;
+  font-size: 16px;
+  text-align: left;
+
+  padding: 8px;
+
+  &:first-child {
+    padding-left: 16px;
+  }
+
+  &:last-child {
+    padding-right: 16px;
+  }
+}
