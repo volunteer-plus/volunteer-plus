@@ -81,9 +81,10 @@ const BareSignInPage: React.FC = () => {
                 >
                   Увійти
                 </Button>
-                <Link to='/sign-up' className={styles.signUpLink}>
-                  Зареєструватися
-                </Link>
+                <div className={styles.links}>
+                  <Link to='/sign-up'>Зареєструватися</Link>
+                  <Link to='/'>На головну</Link>
+                </div>
               </AuthFormActions>
             </AuthForm>
           );
