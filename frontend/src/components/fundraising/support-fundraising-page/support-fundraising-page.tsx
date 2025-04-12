@@ -1,9 +1,10 @@
 import { Formik } from 'formik';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { NarrowPageContent, PageTitle, Tag } from '@/components/common';
 import {
   DonationsStatistics,
   FundraisingProgressBar,
+  SupportFundraisingModal,
 } from '@/components/fundraising';
 
 import styles from './styles.module.scss';
@@ -11,6 +12,8 @@ import { SupportForm } from './components';
 import { Yup } from '@/yup';
 
 const SupportFundraisingPage: React.FC = () => {
+  const [amount, setAmount] = useState<number | null>(null);
+
   const formInitialValues = useMemo(() => {
     return {
       email: '',
@@ -55,12 +58,19 @@ const SupportFundraisingPage: React.FC = () => {
         </div>
         <Formik
           initialValues={formInitialValues}
-          onSubmit={async () => null}
+          onSubmit={async (values) => {
+            setAmount(Number(values.amount));
+          }}
           validationSchema={formValidationSchema}
         >
           <SupportForm className={styles.form} />
         </Formik>
       </NarrowPageContent>
+      <SupportFundraisingModal
+        isOpen={!!amount}
+        onClose={() => setAmount(null)}
+        amount={amount}
+      />
       <DonationsStatistics />
     </>
   );

@@ -1,6 +1,5 @@
 import {
-  Button,
-  FormikTextInputField,
+  BarsLoader,
   Modal,
   ModalCloseButton,
   ModalContainer,
@@ -8,39 +7,34 @@ import {
 } from '@/components/common';
 import { fundraisingService } from '@/services/fundraising';
 import { LiqpayCheckoutButtonVariables } from '@/types/fundraising';
-import { Yup } from '@/yup';
-import { Form, Formik } from 'formik';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { LiqpayCheckoutButton } from '../liqpay-checkout-button';
+import styles from './styles.module.scss';
 
-type Props = Pick<React.ComponentProps<typeof Modal>, 'isOpen' | 'onClose'>;
-
-interface FormValues {
-  amount: string;
-}
-
-const FORM_INITIAL_VALUES: FormValues = {
-  amount: '',
+type Props = Pick<React.ComponentProps<typeof Modal>, 'isOpen' | 'onClose'> & {
+  amount?: number | null;
 };
 
-const FORM_VALIDATION_SCHEMA = Yup.object().shape({
-  amount: Yup.number().positive().required().label('Сума'),
-});
-
-const SupportFundraisingModal = ({ isOpen, onClose }: Props) => {
+const SupportFundraisingModal = ({ isOpen, onClose, amount }: Props) => {
   const [liqpayCheckoutButtonVariables, setLiqpayCheckoutButtonVariables] =
     useState<LiqpayCheckoutButtonVariables | null>(null);
 
-  const onFormSubmit = async (values: FormValues) => {
+  const createPayOrder = useCallback(async (_amount: number) => {
     const receivedLiqpayCheckoutButtonVariables =
       await fundraisingService.createDonationLiqPayOrder({
-        amount: Number(values.amount),
+        amount: _amount,
       });
 
     setLiqpayCheckoutButtonVariables(receivedLiqpayCheckoutButtonVariables);
-  };
+  }, []);
 
-  const isFormDisabled = !!liqpayCheckoutButtonVariables;
+  useEffect(() => {
+    if (!amount) {
+      return;
+    }
+
+    createPayOrder(amount);
+  }, [amount, createPayOrder]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -53,35 +47,13 @@ const SupportFundraisingModal = ({ isOpen, onClose }: Props) => {
       <ModalContainer>
         <ModalCloseButton onClick={onClose} />
         <ModalTitle>Підтримати збір</ModalTitle>
-        <Formik
-          initialValues={FORM_INITIAL_VALUES}
-          onSubmit={onFormSubmit}
-          validationSchema={FORM_VALIDATION_SCHEMA}
-        >
-          {({ isValid, isSubmitting }) => {
-            return (
-              <Form>
-                <FormikTextInputField
-                  name='amount'
-                  label='Сума'
-                  placeholder='Сума'
-                  type='number'
-                  isRequired
-                  min={1}
-                  readOnly={isFormDisabled}
-                />
-                <Button
-                  type='submit'
-                  disabled={!isValid || isSubmitting || isFormDisabled}
-                >
-                  Підтримати
-                </Button>
-              </Form>
-            );
-          }}
-        </Formik>
         {liqpayCheckoutButtonVariables && (
           <LiqpayCheckoutButton {...liqpayCheckoutButtonVariables} />
+        )}
+        {!liqpayCheckoutButtonVariables && (
+          <div className={styles.loaderContainer}>
+            <BarsLoader size='36px' />
+          </div>
         )}
       </ModalContainer>
     </Modal>
