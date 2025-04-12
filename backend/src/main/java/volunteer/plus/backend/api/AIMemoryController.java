@@ -21,7 +21,7 @@ public class AIMemoryController {
     }
 
     @GetMapping("/memories")
-    public ResponseEntity<List<Message>> getMessages(@RequestParam final int size,
+    public ResponseEntity<List<Message>> getMessages(@RequestParam(defaultValue = "100") final int size,
                                                      @RequestParam(defaultValue = DEFAULT_CHAT_MEMORY_CONVERSATION_ID) final String conversationId) {
         return ResponseEntity.ok(chatMemory.get(conversationId, size));
     }

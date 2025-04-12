@@ -28,4 +28,6 @@ public class RequestDTO {
 
     @NotNull
     private BigDecimal amount;
+
+    private BigDecimal accumulated;
 }

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import volunteer.plus.backend.domain.dto.RequestCreationRequestDTO;
 import volunteer.plus.backend.domain.dto.RequestDTO;
+import volunteer.plus.backend.domain.entity.Levy;
 import volunteer.plus.backend.domain.entity.Request;
 import volunteer.plus.backend.exceptions.ApiException;
 import volunteer.plus.backend.exceptions.ErrorCode;
@@ -16,8 +17,10 @@ import volunteer.plus.backend.repository.RequestRepository;
 import volunteer.plus.backend.repository.UserRepository;
 import volunteer.plus.backend.service.general.RequestService;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -39,7 +42,18 @@ public class RequestServiceImpl implements RequestService {
                                 .description(request.getDescription())
                                 .deadline(request.getDeadline())
                                 .amount(request.getAmount())
+                                .accumulated(getAccumulated(request))
                                 .build());
+    }
+
+    private BigDecimal getAccumulated(final Request request) {
+        return request.getLevies() == null ?
+                BigDecimal.ZERO :
+                request.getLevies()
+                        .stream()
+                        .map(Levy::getAccumulated)
+                        .filter(Objects::nonNull)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     /**
@@ -93,6 +107,7 @@ public class RequestServiceImpl implements RequestService {
                                 .description(request.getDescription())
                                 .deadline(request.getDeadline())
                                 .amount(request.getAmount())
+                                .accumulated(getAccumulated(request))
                                 .build())
                 .toList();
     }

@@ -8,5 +8,6 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties("aws-s3")
 public class AWSProperties {
+    // default bucket for app (created one only for economy purposes)
     private String reportBucketName;
 }
