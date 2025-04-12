@@ -178,6 +178,8 @@ class VolunteerPlusApiService extends EventTarget {
 
 const volunteerPlusApiService = new VolunteerPlusApiService({
   basePath: import.meta.env.VITE_VOLUNTEER_PLUS_API_BASE_URL,
+  // uncomment for local testing
+  // basePath: 'http://localhost:8080/api',
 });
 
 export { volunteerPlusApiService, VolunteerPlusApiError };
