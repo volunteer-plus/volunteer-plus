@@ -10,6 +10,7 @@ import volunteer.plus.backend.domain.dto.RequestCreationRequestDTO;
 import volunteer.plus.backend.domain.dto.RequestDTO;
 import volunteer.plus.backend.domain.entity.Levy;
 import volunteer.plus.backend.domain.entity.Request;
+import volunteer.plus.backend.domain.enums.RequestStatus;
 import volunteer.plus.backend.exceptions.ApiException;
 import volunteer.plus.backend.exceptions.ErrorCode;
 import volunteer.plus.backend.repository.MilitaryPersonnelRepository;
@@ -18,9 +19,9 @@ import volunteer.plus.backend.repository.UserRepository;
 import volunteer.plus.backend.service.general.RequestService;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -34,26 +35,7 @@ public class RequestServiceImpl implements RequestService {
     public Page<RequestDTO> getRequests(final Pageable pageable) {
         log.info("Retrieve all requests by page: {}, and size: {}", pageable.getPageNumber(), pageable.getPageSize());
         return requestRepository.findAll(pageable)
-                .map(request ->
-                        RequestDTO.builder()
-                                .id(request.getId())
-                                .createDate(request.getCreateDate())
-                                .updateDate(request.getUpdateDate())
-                                .description(request.getDescription())
-                                .deadline(request.getDeadline())
-                                .amount(request.getAmount())
-                                .accumulated(getAccumulated(request))
-                                .build());
-    }
-
-    private BigDecimal getAccumulated(final Request request) {
-        return request.getLevies() == null ?
-                BigDecimal.ZERO :
-                request.getLevies()
-                        .stream()
-                        .map(Levy::getAccumulated)
-                        .filter(Objects::nonNull)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .map(this::getRequestDTO);
     }
 
     /**
@@ -65,9 +47,9 @@ public class RequestServiceImpl implements RequestService {
      */
     @Override
     @Transactional
-    public List<RequestDTO> createOrUpdateRequests(final String userEmail,
-                                                   final Long militaryPersonnelId,
-                                                   final RequestCreationRequestDTO requestCreationRequestDTO) {
+    public List<RequestDTO> createRequests(final String userEmail,
+                                           final Long militaryPersonnelId,
+                                           final RequestCreationRequestDTO requestCreationRequestDTO) {
         if ((userEmail == null && militaryPersonnelId == null) || (userEmail != null && militaryPersonnelId != null)) {
             throw new ApiException(ErrorCode.ONLY_ONE_CREATOR_FOR_REQUESTS);
         }
@@ -78,6 +60,8 @@ public class RequestServiceImpl implements RequestService {
                         .description(r.getDescription())
                         .deadline(r.getDeadline())
                         .amount(r.getAmount())
+                        .category(r.getCategory())
+                        .status(RequestStatus.IN_PROGRESS)
                         .levies(new ArrayList<>())
                         .build())
                 .toList();
@@ -99,16 +83,77 @@ public class RequestServiceImpl implements RequestService {
         }
 
         return savedRequests.stream()
-                .map(request ->
-                        RequestDTO.builder()
-                                .id(request.getId())
-                                .createDate(request.getCreateDate())
-                                .updateDate(request.getUpdateDate())
-                                .description(request.getDescription())
-                                .deadline(request.getDeadline())
-                                .amount(request.getAmount())
-                                .accumulated(getAccumulated(request))
-                                .build())
+                .map(this::getRequestDTO)
                 .toList();
+    }
+
+    @Override
+    @Transactional
+    public List<RequestDTO> updateRequests(final RequestCreationRequestDTO requestCreationRequestDTO) {
+
+        final Set<Long> requestIds = requestCreationRequestDTO.getRequests()
+                .stream()
+                .map(RequestDTO::getId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        final Map<Long, Request> requestMap = requestRepository.findAllById(requestIds)
+                .stream()
+                .collect(Collectors.toMap(Request::getId, Function.identity()));
+
+        final List<Request> requestsToSave = new ArrayList<>();
+
+        for (final RequestDTO requestDTO : requestCreationRequestDTO.getRequests()) {
+            final Request requestFromDB = requestMap.get(requestDTO.getId());
+
+            if (requestFromDB == null) {
+                continue;
+            }
+
+            requestFromDB.setDescription(requestDTO.getDescription());
+            requestFromDB.setDeadline(requestDTO.getDeadline());
+            requestFromDB.setAmount(requestDTO.getAmount());
+            requestFromDB.setCategory(requestDTO.getCategory());
+            requestFromDB.setStatus(requestDTO.getStatus());
+
+            requestsToSave.add(requestFromDB);
+        }
+
+        return requestRepository.saveAllAndFlush(requestsToSave)
+                .stream()
+                .map(this::getRequestDTO)
+                .toList();
+    }
+
+    private RequestDTO getRequestDTO(final Request request) {
+        return RequestDTO.builder()
+                .id(request.getId())
+                .createDate(request.getCreateDate())
+                .updateDate(request.getUpdateDate())
+                .description(request.getDescription())
+                .deadline(request.getDeadline())
+                .amount(request.getAmount())
+                .category(request.getCategory())
+                .accumulated(getAccumulated(request))
+                .brigade(getBrigade(request))
+                .status(request.getStatus())
+                .build();
+    }
+
+    private String getBrigade(final Request request) {
+        if (request.getMilitaryPersonnel() == null || request.getMilitaryPersonnel().getBrigade() == null) {
+            return null;
+        }
+        return request.getMilitaryPersonnel().getBrigade().getName();
+    }
+
+    private BigDecimal getAccumulated(final Request request) {
+        return request.getLevies() == null ?
+                BigDecimal.ZERO :
+                request.getLevies()
+                        .stream()
+                        .map(Levy::getAccumulated)
+                        .filter(Objects::nonNull)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

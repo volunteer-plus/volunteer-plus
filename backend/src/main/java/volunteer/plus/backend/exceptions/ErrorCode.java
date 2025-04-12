@@ -39,7 +39,8 @@ public enum ErrorCode {
     USER_CANNOT_UPDATE_NEWS_FEED_COMMENT_OF_ANOTHER_USER("User cannot update news feed comment of another user"),
     NEWS_FEED_COMMENT_NOT_FOUND("News feed comment not found"),
     AI_RESPONSE_IS_EMPTY("AI response is empty"),
-    NEWS_FEED_ATTACHMENT_NOT_FOUND("News feed attachment not found");
+    NEWS_FEED_ATTACHMENT_NOT_FOUND("News feed attachment not found"),
+    LEVY_IS_NOT_FINISHED("Levy i not finished");
 
     private final String description;
 }

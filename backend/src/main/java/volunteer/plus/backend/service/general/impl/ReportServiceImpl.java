@@ -12,6 +12,7 @@ import volunteer.plus.backend.domain.dto.ReportDTO;
 import volunteer.plus.backend.domain.entity.Attachment;
 import volunteer.plus.backend.domain.entity.Report;
 import volunteer.plus.backend.domain.enums.AIChatClient;
+import volunteer.plus.backend.domain.enums.LevyStatus;
 import volunteer.plus.backend.exceptions.ApiException;
 import volunteer.plus.backend.exceptions.ErrorCode;
 import volunteer.plus.backend.repository.AttachmentRepository;
@@ -56,7 +57,9 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     @Transactional
-    public ReportDTO createOrUpdate(final Long reportId, final Long levyId, final String data) {
+    public ReportDTO createOrUpdate(final Long reportId,
+                                    final Long levyId,
+                                    final String data) {
         if (reportId == null && levyId == null) {
             throw new ApiException(ErrorCode.NO_DATA_FOR_REPORT_OPERATION);
         }
@@ -70,6 +73,10 @@ public class ReportServiceImpl implements ReportService {
             final var levy = levyRepository.findById(levyId)
                     .orElseThrow(() -> new ApiException(ErrorCode.LEVY_NOT_FOUND));
 
+            if (levy.getStatus() != LevyStatus.FINISHED) {
+                throw new ApiException(ErrorCode.LEVY_IS_NOT_FINISHED);
+            }
+
             if (levy.getReport() != null) {
                 throw new ApiException(ErrorCode.LEVY_ALREADY_HAS_A_REPORT);
             }
@@ -81,6 +88,9 @@ public class ReportServiceImpl implements ReportService {
 
             levy.setReport(report);
             report.setLevy(levy);
+
+            // when we create a report we should update Levy status
+            levy.setStatus(LevyStatus.REPORT_PRESENT);
 
             final var updatedLevy = levyRepository.save(levy);
 
@@ -112,7 +122,8 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     @Transactional
-    public ReportDTO addAttachment(final Long reportId, final MultipartFile file) {
+    public ReportDTO addAttachment(final Long reportId,
+                                   final MultipartFile file) {
         log.info("Add attachment to report");
 
         final var report = reportRepository.findById(reportId)
@@ -134,7 +145,8 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     @Transactional
-    public ReportDTO removeAttachment(final Long reportId, final Long attachmentId) {
+    public ReportDTO removeAttachment(final Long reportId,
+                                      final Long attachmentId) {
         log.info("Remove attachment from report");
 
         final var report = reportRepository.findById(reportId)

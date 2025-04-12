@@ -2,6 +2,7 @@ package volunteer.plus.backend.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import volunteer.plus.backend.domain.enums.LevyStatus;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -17,12 +18,21 @@ import java.util.List;
 @Table(name = "levy")
 public class Levy extends BaseEntity {
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "request_id")
-    private Request request;
-
-    @Column(nullable = false)
+    @Column(name = "accumulated", nullable = false)
     private BigDecimal accumulated;
+
+    @Column(name = "goal_amount", nullable = false)
+    private BigDecimal goalAmount;
+
+    @Column(name = "category")
+    private String category;
+
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    private LevyStatus status;
+
+    @Column(name = "description", columnDefinition = "LONGTEXT")
+    private String description;
 
     @Column(name = "trophy_description", columnDefinition = "LONGTEXT")
     private String trophyDescription;
@@ -32,6 +42,10 @@ public class Levy extends BaseEntity {
 
     @OneToOne(mappedBy = "levy", cascade = CascadeType.ALL)
     private Report report;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "request_id")
+    private Request request;
 
     public void addVolunteer(Volunteer volunteer) {
         if (this.volunteers == null) {

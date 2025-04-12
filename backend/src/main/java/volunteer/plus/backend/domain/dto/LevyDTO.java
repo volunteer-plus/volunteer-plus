@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import volunteer.plus.backend.domain.enums.LevyStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -22,4 +23,12 @@ public class LevyDTO {
     private BigDecimal accumulated;
 
     private String trophyDescription;
+
+    private String description;
+
+    private BigDecimal goalAmount;
+
+    private String category;
+
+    private LevyStatus status;
 }

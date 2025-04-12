@@ -5,10 +5,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import volunteer.plus.backend.domain.dto.LiqPayCreationDTO;
 import volunteer.plus.backend.domain.dto.LiqPayResponseDTO;
+import volunteer.plus.backend.domain.entity.Levy;
 import volunteer.plus.backend.domain.entity.User;
 import volunteer.plus.backend.domain.enums.CurrencyName;
+import volunteer.plus.backend.domain.enums.LevyStatus;
+import volunteer.plus.backend.exceptions.ApiException;
+import volunteer.plus.backend.exceptions.ErrorCode;
+import volunteer.plus.backend.repository.LevyRepository;
 import volunteer.plus.backend.service.email.EmailNotificationBuilderService;
 import volunteer.plus.backend.service.liqpay.LiqPayApi;
 
@@ -30,13 +36,17 @@ public class LiqPayService implements LiqPayApi {
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     private final EmailNotificationBuilderService emailNotificationBuilderService;
+    private final LevyRepository levyRepository;
 
-    public LiqPayService(final EmailNotificationBuilderService emailNotificationBuilderService) {
+    public LiqPayService(final EmailNotificationBuilderService emailNotificationBuilderService,
+                         final LevyRepository levyRepository) {
         this.emailNotificationBuilderService = emailNotificationBuilderService;
+        this.levyRepository = levyRepository;
     }
 
 
     @Override
+    @Transactional
     public LiqPayResponseDTO createLiqPayPayload(final User user,
                                                  final LiqPayCreationDTO liqPayCreationDTO) throws JsonProcessingException {
         TreeMap<String, String> params = new TreeMap<>();
@@ -51,10 +61,31 @@ public class LiqPayService implements LiqPayApi {
             emailNotificationBuilderService.createUserPaymentEmail(liqPayCreationDTO, user);
         }
 
+        if (liqPayCreationDTO.getLevyId() != null) {
+            handleLevy(liqPayCreationDTO);
+        }
+
         return LiqPayResponseDTO.builder()
                 .data(data)
                 .signature(signature)
                 .build();
+    }
+
+    private void handleLevy(final LiqPayCreationDTO liqPayCreationDTO) {
+        final Levy levy = levyRepository.findById(liqPayCreationDTO.getLevyId())
+                .orElseThrow(() -> new ApiException(ErrorCode.LEVY_NOT_FOUND));
+
+        levy.setAccumulated(
+                levy.getAccumulated() == null ?
+                        liqPayCreationDTO.getAmount() :
+                        levy.getAccumulated().add(liqPayCreationDTO.getAmount())
+        );
+
+        if (levy.getAccumulated().compareTo(levy.getGoalAmount()) >= 0) {
+            levy.setStatus(LevyStatus.FINISHED);
+        }
+
+        levyRepository.save(levy);
     }
 
     protected void checkCnbParams(Map<String, String> params) {
@@ -63,10 +94,10 @@ public class LiqPayService implements LiqPayApi {
     }
 
     protected String createSignature(String base64EncodedData) {
-        return str_to_sign(privateKey + base64EncodedData + privateKey);
+        return stringToSign(privateKey + base64EncodedData + privateKey);
     }
 
-    protected String str_to_sign(String str) {
+    protected String stringToSign(String str) {
         return base64_encode(sha1(str));
     }
 
@@ -79,15 +110,6 @@ public class LiqPayService implements LiqPayApi {
         tm.put("order_id", UUID.randomUUID().toString());
 
         return tm;
-    }
-
-    private void checkRequired() {
-        if (this.publicKey == null || this.publicKey.isEmpty()) {
-            throw new IllegalArgumentException("publicKey is empty");
-        }
-        if (this.privateKey == null || this.privateKey.isEmpty()) {
-            throw new IllegalArgumentException("privateKey is empty");
-        }
     }
 
     protected TreeMap<String, String> withSandboxParam(TreeMap<String, String> params) {
