@@ -16,7 +16,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class NewsFeedDTO {
+public class  NewsFeedDTO {
     private Long id;
     private LocalDateTime createDate;
     private LocalDateTime updateDate;

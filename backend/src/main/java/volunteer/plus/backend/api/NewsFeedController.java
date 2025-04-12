@@ -41,6 +41,13 @@ public class NewsFeedController {
         return ResponseEntity.ok(newsFeedService.createOrUpdateNewsFeed(userId, newsFeedDTO));
     }
 
+    @PostMapping("/news-feed/select-logo")
+    @Operation(description = "Select logo for news feed")
+    public ResponseEntity<NewsFeedDTO> selectNewsFeedLogo(@RequestParam final Long attachmentId,
+                                                          @RequestParam final boolean isLogo) {
+        return ResponseEntity.ok(newsFeedService.selectNewsFeedLogo(attachmentId, isLogo));
+    }
+
     @PostMapping("/news-feed-comment/create-or-update")
     @Operation(description = "Create or update news feed comment")
     public ResponseEntity<NewsFeedDTO> createOrUpdateNewsFeedComment(@RequestParam final Long userId,
