@@ -26,11 +26,11 @@ public class AuthServiceImpl implements AuthService {
     private final EmailSenderService emailSender;
     private static final int DEFAULT_TOKEN_LENGTH = 30;
     private static final long DEFAULT_TOKEN_EXPIRATION_TIME = 432000L;
-    private final static SecureRandom RANDOM = new SecureRandom();
+    private static final SecureRandom RANDOM = new SecureRandom();
 
     @Override
     @Transactional
-    public void registerUser(RegistrationData registrationData) {
+    public void registerUser(final RegistrationData registrationData) {
         var user = User
                 .builder()
                 .enabled(true)
@@ -41,6 +41,9 @@ public class AuthServiceImpl implements AuthService {
                 .password(encodePassword(registrationData.getPassword()))
                 .firstName(registrationData.getFirstName())
                 .lastName(registrationData.getLastName())
+                .middleName(registrationData.getMiddleName())
+                .phoneNumber(registrationData.getPhoneNumber())
+                .dateOfBirth(registrationData.getDateOfBirth())
                 .build();
 
         userService.createUser(user);

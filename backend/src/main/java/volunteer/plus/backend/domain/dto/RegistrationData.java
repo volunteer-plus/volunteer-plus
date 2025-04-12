@@ -5,15 +5,23 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class RegistrationData {
 
-    private String firstName;
-    private String lastName;
+    // fields which should not be updated cia standard API
     private String email;
     private String password;
+
+    // general info fields
+    private String firstName;
+    private String lastName;
+    private String middleName;
+    private String phoneNumber;
+    private LocalDate dateOfBirth;
 
 }

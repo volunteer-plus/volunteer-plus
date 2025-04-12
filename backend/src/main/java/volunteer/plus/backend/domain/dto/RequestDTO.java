@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import volunteer.plus.backend.domain.enums.RequestStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -28,4 +29,12 @@ public class RequestDTO {
 
     @NotNull
     private BigDecimal amount;
+
+    private BigDecimal accumulated;
+
+    private String brigade;
+
+    private String category;
+
+    private RequestStatus status;
 }

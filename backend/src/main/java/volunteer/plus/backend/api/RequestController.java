@@ -29,10 +29,16 @@ public class RequestController {
     }
 
     @PostMapping("/request-create")
-    @Operation(description = "Create or update requests with creators")
+    @Operation(description = "Create requests with creators")
     public ResponseEntity<List<RequestDTO>> createRequests(@RequestParam(required = false) final String userEmail,
                                                            @RequestParam(required = false) final Long militaryPersonnelId,
                                                            @RequestBody @Valid final RequestCreationRequestDTO requestCreationRequestDTO) {
-        return ResponseEntity.ok(requestService.createOrUpdateRequests(userEmail, militaryPersonnelId, requestCreationRequestDTO));
+        return ResponseEntity.ok(requestService.createRequests(userEmail, militaryPersonnelId, requestCreationRequestDTO));
+    }
+
+    @PostMapping("/request-update")
+    @Operation(description = "Update requests with creators")
+    public ResponseEntity<List<RequestDTO>> updateRequests(@RequestBody @Valid final RequestCreationRequestDTO requestCreationRequestDTO) {
+        return ResponseEntity.ok(requestService.updateRequests(requestCreationRequestDTO));
     }
 }

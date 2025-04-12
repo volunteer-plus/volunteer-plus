@@ -2,6 +2,7 @@ package volunteer.plus.backend.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import volunteer.plus.backend.domain.enums.RequestStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -22,6 +23,12 @@ public class Request extends BaseEntity {
     private String description;
 
     private LocalDateTime deadline;
+
+    private String category;
+
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    private RequestStatus status;
 
     private BigDecimal amount;
 

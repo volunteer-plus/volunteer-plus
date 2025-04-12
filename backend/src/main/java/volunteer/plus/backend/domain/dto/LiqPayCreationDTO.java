@@ -15,4 +15,7 @@ import java.math.BigDecimal;
 public class LiqPayCreationDTO {
     @NotNull
     private BigDecimal amount;
+
+    // is used to update levy accumulated amount
+    private Long levyId;
 }

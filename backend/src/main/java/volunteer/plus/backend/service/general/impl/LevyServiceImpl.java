@@ -11,12 +11,14 @@ import volunteer.plus.backend.domain.dto.LevyCreationRequestDTO;
 import volunteer.plus.backend.domain.dto.LevyDTO;
 import volunteer.plus.backend.domain.entity.Levy;
 import volunteer.plus.backend.domain.entity.Volunteer;
+import volunteer.plus.backend.domain.enums.LevyStatus;
 import volunteer.plus.backend.exceptions.ApiException;
 import volunteer.plus.backend.exceptions.ErrorCode;
 import volunteer.plus.backend.repository.LevyRepository;
 import volunteer.plus.backend.repository.VolunteerRepository;
 import volunteer.plus.backend.service.general.LevyService;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -30,7 +32,8 @@ public class LevyServiceImpl implements LevyService {
     private final VolunteerRepository volunteerRepository;
 
     @Override
-    public Page<LevyDTO> getLevies(final Pageable pageable, final Set<Long> requestIds) {
+    public Page<LevyDTO> getLevies(final Pageable pageable,
+                                   final Set<Long> requestIds) {
         log.info("Retrieve all levies by page: {}, and size: {}", pageable.getPageNumber(), pageable.getPageSize());
 
         final Page<Levy> levies;
@@ -40,15 +43,7 @@ public class LevyServiceImpl implements LevyService {
             levies = levyRepository.findAllByRequestIdIn(requestIds, pageable);
         }
 
-        return levies
-                .map(levy ->
-                        LevyDTO.builder()
-                                .id(levy.getId())
-                                .createDate(levy.getCreateDate())
-                                .updateDate(levy.getUpdateDate())
-                                .accumulated(levy.getAccumulated())
-                                .trophyDescription(levy.getTrophyDescription())
-                                .build());
+        return levies.map(this::getLevyDTO);
     }
 
     @Override
@@ -90,24 +85,38 @@ public class LevyServiceImpl implements LevyService {
 
         return levyRepository.saveAll(levies)
                 .stream()
-                .map(levy ->
-                        LevyDTO.builder()
-                                .id(levy.getId())
-                                .createDate(levy.getCreateDate())
-                                .updateDate(levy.getUpdateDate())
-                                .accumulated(levy.getAccumulated())
-                                .trophyDescription(levy.getTrophyDescription())
-                                .build())
+                .map(this::getLevyDTO)
                 .toList();
     }
 
-    private void handleLevyDTOS(LevyCreationRequestDTO levyCreationRequestDTO, List<Volunteer> volunteers, Map<Long, Levy> leviesMapFromDB, List<Levy> levies) {
+    private LevyDTO getLevyDTO(final Levy levy) {
+        return LevyDTO.builder()
+                .id(levy.getId())
+                .createDate(levy.getCreateDate())
+                .updateDate(levy.getUpdateDate())
+                .accumulated(levy.getAccumulated())
+                .trophyDescription(levy.getTrophyDescription())
+                .description(levy.getDescription())
+                .goalAmount(levy.getGoalAmount())
+                .category(levy.getCategory())
+                .status(levy.getStatus())
+                .build();
+    }
+
+    private void handleLevyDTOS(final LevyCreationRequestDTO levyCreationRequestDTO,
+                                final List<Volunteer> volunteers,
+                                final Map<Long, Levy> leviesMapFromDB,
+                                final List<Levy> levies) {
         levyCreationRequestDTO.getLevies().forEach(levyDTO -> {
             final Levy levy;
             if (levyDTO.getId() == null) {
                 levy = Levy.builder()
-                        .accumulated(levyDTO.getAccumulated())
+                        .accumulated(BigDecimal.ZERO)
+                        .goalAmount(levyDTO.getGoalAmount())
                         .trophyDescription(levyDTO.getTrophyDescription())
+                        .description(levyDTO.getDescription())
+                        .category(levyDTO.getCategory())
+                        .status(LevyStatus.IN_PROGRESS)
                         .volunteers(new ArrayList<>())
                         .build();
 
@@ -117,9 +126,13 @@ public class LevyServiceImpl implements LevyService {
 
                 vols.forEach(levy::addVolunteer);
             } else {
+                // we don't need to update status
                 levy = leviesMapFromDB.get(levyDTO.getId());
                 levy.setTrophyDescription(levyDTO.getTrophyDescription());
                 levy.setAccumulated(levyDTO.getAccumulated());
+                levy.setGoalAmount(levyDTO.getGoalAmount());
+                levy.setDescription(levyDTO.getDescription());
+                levy.setCategory(levyDTO.getCategory());
 
                 final var vols = volunteers.stream()
                         .filter(v -> levyDTO.getVolunteerIds() != null && levy.getVolunteers().stream().noneMatch(el -> Objects.equals(el.getId(), v.getId())))
