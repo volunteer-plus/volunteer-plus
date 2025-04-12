@@ -9,12 +9,15 @@ import org.springframework.transaction.annotation.Transactional;
 import volunteer.plus.backend.domain.dto.LiqPayCreationDTO;
 import volunteer.plus.backend.domain.dto.LiqPayResponseDTO;
 import volunteer.plus.backend.domain.entity.Levy;
+import volunteer.plus.backend.domain.entity.Request;
 import volunteer.plus.backend.domain.entity.User;
 import volunteer.plus.backend.domain.enums.CurrencyName;
 import volunteer.plus.backend.domain.enums.LevyStatus;
+import volunteer.plus.backend.domain.enums.RequestStatus;
 import volunteer.plus.backend.exceptions.ApiException;
 import volunteer.plus.backend.exceptions.ErrorCode;
 import volunteer.plus.backend.repository.LevyRepository;
+import volunteer.plus.backend.repository.RequestRepository;
 import volunteer.plus.backend.service.email.EmailNotificationBuilderService;
 import volunteer.plus.backend.service.liqpay.LiqPayApi;
 
@@ -37,11 +40,14 @@ public class LiqPayService implements LiqPayApi {
 
     private final EmailNotificationBuilderService emailNotificationBuilderService;
     private final LevyRepository levyRepository;
+    private final RequestRepository requestRepository;
 
     public LiqPayService(final EmailNotificationBuilderService emailNotificationBuilderService,
-                         final LevyRepository levyRepository) {
+                         final LevyRepository levyRepository,
+                         final RequestRepository requestRepository) {
         this.emailNotificationBuilderService = emailNotificationBuilderService;
         this.levyRepository = levyRepository;
+        this.requestRepository = requestRepository;
     }
 
 
@@ -82,7 +88,19 @@ public class LiqPayService implements LiqPayApi {
         );
 
         if (levy.getAccumulated().compareTo(levy.getGoalAmount()) >= 0) {
+
             levy.setStatus(LevyStatus.FINISHED);
+            final Request request = levy.getRequest();
+
+            // check levies statuses in request
+            final boolean allRequestLeviesCompleted = request.getLevies()
+                    .stream()
+                    .allMatch(el -> el.getStatus() == LevyStatus.FINISHED || el.getStatus() == LevyStatus.REPORT_PRESENT);
+
+            if (allRequestLeviesCompleted) {
+                request.setStatus(RequestStatus.DONE);
+                requestRepository.save(request);
+            }
         }
 
         levyRepository.save(levy);
