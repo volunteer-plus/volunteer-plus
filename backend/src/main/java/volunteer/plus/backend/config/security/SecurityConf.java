@@ -31,6 +31,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static volunteer.plus.backend.config.websocket.WebSocketConfig.WS_DESTINATION_PREFIX;
+import static volunteer.plus.backend.config.websocket.WebSocketConfig.WS_ENDPOINT;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -51,6 +54,12 @@ public class SecurityConf {
     public static final String SWAGGER_UI_ENTRY_POINT = "/swagger-ui/**";
     public static final String API_DOCS_ENTRY_POINT = "/api-docs*/**";
     public static final String ACTUATOR_ENTRY_POINT = "/actuator/**";
+    public static final String WS_ENDPOINT_ENTRY_POINT = WS_ENDPOINT + "/**";
+    public static final String APP_ENTRY_POINT = "/app/**";
+    public static final String TOPIC_ENTRY_POINT = WS_DESTINATION_PREFIX +"/**";
+    public static final String OPENAI_ENTRY_POINT = "/openai**";
+    public static final String OLLAMA_ENTRY_POINT = "/ollama**";
+    public static final String CHAT_ENTRY_POINT = "/chat/**";
 
     @Bean
     public DaoAuthenticationProvider buildRestAuthenticationProvider() {
@@ -110,7 +119,13 @@ public class SecurityConf {
                                 FORM_BASED_NO_AUTH_ENTRY_POINT,
                                 SWAGGER_UI_ENTRY_POINT,
                                 API_DOCS_ENTRY_POINT,
-                                ACTUATOR_ENTRY_POINT
+                                ACTUATOR_ENTRY_POINT,
+                                WS_ENDPOINT_ENTRY_POINT,
+                                APP_ENTRY_POINT,
+                                TOPIC_ENTRY_POINT,
+                                OPENAI_ENTRY_POINT,
+                                OLLAMA_ENTRY_POINT,
+                                CHAT_ENTRY_POINT
                         )
                         .permitAll()
                         .requestMatchers(TOKEN_BASED_AUTH_ENTRY_POINT)
@@ -133,7 +148,13 @@ public class SecurityConf {
                         SWAGGER_UI_ENTRY_POINT,
                         API_DOCS_ENTRY_POINT,
                         ACTUATOR_ENTRY_POINT,
-                        FORM_BASED_NO_AUTH_ENTRY_POINT
+                        FORM_BASED_NO_AUTH_ENTRY_POINT,
+                        WS_ENDPOINT_ENTRY_POINT,
+                        APP_ENTRY_POINT,
+                        TOPIC_ENTRY_POINT,
+                        OPENAI_ENTRY_POINT,
+                        OLLAMA_ENTRY_POINT,
+                        CHAT_ENTRY_POINT
                 )
                 .map(AntPathRequestMatcher::new)
                 .collect(Collectors.toList());
