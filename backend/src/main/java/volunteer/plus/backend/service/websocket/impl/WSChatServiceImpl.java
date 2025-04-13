@@ -8,13 +8,19 @@ import volunteer.plus.backend.domain.dto.WSChatMessageDTO;
 import volunteer.plus.backend.domain.entity.ConversationRoom;
 import volunteer.plus.backend.domain.entity.User;
 import volunteer.plus.backend.domain.entity.WSMessage;
+import volunteer.plus.backend.domain.enums.AIChatClient;
+import volunteer.plus.backend.domain.enums.OllamaAIModel;
 import volunteer.plus.backend.exceptions.ApiException;
 import volunteer.plus.backend.exceptions.ErrorCode;
 import volunteer.plus.backend.repository.ConversationRoomRepository;
 import volunteer.plus.backend.repository.UserRepository;
 import volunteer.plus.backend.repository.WSMessageRepository;
+import volunteer.plus.backend.service.ai.OllamaAIService;
+import volunteer.plus.backend.service.ai.OpenAIService;
 import volunteer.plus.backend.service.websocket.WSChatService;
 import volunteer.plus.backend.service.websocket.WebSocketService;
+
+import java.util.List;
 
 import static volunteer.plus.backend.config.websocket.WebSocketConfig.*;
 
@@ -23,9 +29,8 @@ import static volunteer.plus.backend.config.websocket.WebSocketConfig.*;
 @Service
 @RequiredArgsConstructor
 public class WSChatServiceImpl implements WSChatService {
-    public static final String OLLAMA_USER_EMAIL = "ollamaai@test.com";
-    public static final String OPEN_AI_USER_EMAIL = "openai@test.com";
-
+    private final OllamaAIService ollamaAIService;
+    private final OpenAIService openAIService;
     private final WebSocketService webSocketService;
     private final WSMessageRepository wsMessageRepository;
     private final UserRepository userRepository;
@@ -52,10 +57,17 @@ public class WSChatServiceImpl implements WSChatService {
 
         conversationRoomRepository.save(conversationRoom);
 
-        switch (userDetails.getEmail()) {
-            case OLLAMA_USER_EMAIL -> webSocketService.sendNotification(APP_MAPPING_PREFIX + OLLAMA_MESSAGE_MAPPING, savedMessage);
-            case OPEN_AI_USER_EMAIL -> webSocketService.sendNotification(APP_MAPPING_PREFIX + OPENAI_MESSAGE_MAPPING, savedMessage);
-            case null, default -> webSocketService.sendNotification(WS_DESTINATION_PREFIX + "/" + conversationRoomId, savedMessage);
+        switch (chatMessage.getAiChat()) {
+            case OLLAMA -> {
+                final String result = ollamaAIService.chat(AIChatClient.OLLAMA_DEFAULT, OllamaAIModel.TINY_LLAMA, chatMessage.getContent(), List.of()).getChatResponse();
+                webSocketService.sendNotification(OLLAMA_RESPONSE_TARGET, result);
+            }
+            case OPENAI -> {
+                final String result = openAIService.chat(AIChatClient.OPENAI_DEFAULT, chatMessage.getContent(), List.of()).getChatResponse();
+                webSocketService.sendNotification(OPENAI_RESPONSE_TARGET, result);
+            }
+            case null, default -> webSocketService.sendNotification(WS_DESTINATION_PREFIX + "/" + conversationRoomId, chatMessage.getContent());
         }
+
     }
 }

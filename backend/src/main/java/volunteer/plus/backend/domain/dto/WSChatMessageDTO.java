@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import volunteer.plus.backend.domain.enums.AIChat;
 
 @Data
 @Builder
@@ -17,4 +18,6 @@ public class WSChatMessageDTO {
 
     @NotNull
     private Long senderId;
+
+    private AIChat aiChat;
 }
