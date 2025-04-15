@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>Dual Chat Client + Dynamic Chat</title>
     <style>
         body {
@@ -57,7 +57,7 @@
             width: 80px;
         }
         .chat-input select {
-            width: 100px;
+            width: 180px;
         }
         .chat-input button {
             padding: 8px 12px;
@@ -85,7 +85,7 @@
         <div class="chat-container" id="ollama-chat"></div>
         <div class="chat-input">
             <div class="chat-input-row">
-                <input type="text" id="ollama-input" placeholder="Type your message...">
+                <input type="text" id="ollama-input" placeholder="Type your message..." />
                 <button id="ollama-send">Send</button>
             </div>
         </div>
@@ -97,7 +97,7 @@
         <div class="chat-container" id="openai-chat"></div>
         <div class="chat-input">
             <div class="chat-input-row">
-                <input type="text" id="openai-input" placeholder="Type your message...">
+                <input type="text" id="openai-input" placeholder="Type your message..." />
                 <button id="openai-send">Send</button>
             </div>
         </div>
@@ -105,17 +105,25 @@
 
     <!-- Dynamic Chat Panel -->
     <div class="chat-panel" id="dynamic-panel">
-        <div class="chat-header">Dynamic Chat (with room ID + optional AIChat)</div>
+        <div class="chat-header">Dynamic Chat (with room ID + full AIChatClient)</div>
         <div class="chat-container" id="dynamic-chat"></div>
         <div class="chat-input">
             <div class="chat-input-row">
-                <input type="number" id="dynamic-room" placeholder="Room ID">
+                <input type="number" id="dynamic-room" placeholder="Room ID" />
                 <select id="dynamic-aiChat">
                     <option value="">None</option>
-                    <option value="OPENAI">OpenAI</option>
-                    <option value="OLLAMA">Ollama</option>
+                    <optgroup label="OpenAI">
+                        <option value="OPENAI_DEFAULT">OPENAI_DEFAULT</option>
+                        <option value="OPENAI_IN_MEMORY">OPENAI_IN_MEMORY</option>
+                        <option value="OPENAI_MILITARY">OPENAI_MILITARY</option>
+                    </optgroup>
+                    <optgroup label="Ollama">
+                        <option value="OLLAMA_DEFAULT">OLLAMA_DEFAULT</option>
+                        <option value="OLLAMA_IN_MEMORY">OLLAMA_IN_MEMORY</option>
+                        <option value="OLLAMA_MILITARY">OLLAMA_MILITARY</option>
+                    </optgroup>
                 </select>
-                <input type="text" id="dynamic-input" placeholder="Type your message...">
+                <input type="text" id="dynamic-input" placeholder="Type your message..." />
                 <button id="dynamic-send">Send</button>
             </div>
         </div>
@@ -127,24 +135,20 @@
 <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 
 <script>
-    // UI Elements for Ollama
     const ollamaChatContainer = document.getElementById('ollama-chat');
     const ollamaInput = document.getElementById('ollama-input');
     const ollamaSendButton = document.getElementById('ollama-send');
 
-    // UI Elements for OpenAI
     const openaiChatContainer = document.getElementById('openai-chat');
     const openaiInput = document.getElementById('openai-input');
     const openaiSendButton = document.getElementById('openai-send');
 
-    // UI Elements for Dynamic Chat
     const dynamicChatContainer = document.getElementById('dynamic-chat');
     const dynamicInput = document.getElementById('dynamic-input');
     const dynamicSendButton = document.getElementById('dynamic-send');
     const dynamicRoomInput = document.getElementById('dynamic-room');
     const dynamicAIChatSelect = document.getElementById('dynamic-aiChat');
 
-    // WebSocket
     const socket = new SockJS('http://localhost:8080/ws-endpoint');
     const stompClient = Stomp.over(socket);
 
@@ -153,7 +157,6 @@
     stompClient.connect({}, () => {
         console.log('Connected to WebSocket');
 
-        // Subscribe to fixed topics
         stompClient.subscribe('/topic/ollama-response', (response) => {
             displayMessage(response.body, 'received', ollamaChatContainer);
         });
@@ -204,7 +207,7 @@
         };
 
         if (aiChatValue) {
-            payload.aiChat = aiChatValue;
+            payload.aiChat = aiChatValue; // Sends string like "OLLAMA_DEFAULT"
         }
 
         const destination = `/app/chat/sendMessage/${roomId}`;
@@ -214,7 +217,6 @@
         dynamicInput.value = '';
         dynamicInput.focus();
 
-        // Subscribe once per room
         if (subscribedRoomId !== roomId) {
             subscribedRoomId = roomId;
             stompClient.subscribe(`/topic/${roomId}`, (response) => {
@@ -224,7 +226,6 @@
         }
     }
 
-    // Event listeners
     ollamaSendButton.addEventListener('click', sendOllamaMessage);
     ollamaInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendOllamaMessage(); });
 
