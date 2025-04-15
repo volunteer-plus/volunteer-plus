@@ -273,7 +273,7 @@ public class NewsFeedServiceImpl implements NewsFeedService {
         final ChatClient chatClient = aiClientProviderUtil.getChatClient(aiChatClient);
 
         final User user = userRepository.findUserByEmail(aiChatClient.getUserEmail())
-                        .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
 
         log.info("Start of generation AI driven news feed...");
 
