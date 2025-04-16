@@ -18,11 +18,15 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import volunteer.plus.backend.domain.dto.stats.WarStatsRangeResponseDTO;
 import volunteer.plus.backend.domain.enums.AIProvider;
 import volunteer.plus.backend.exceptions.ApiException;
 import volunteer.plus.backend.exceptions.ErrorCode;
 import volunteer.plus.backend.service.ai.VectorStoreAIService;
+import volunteer.plus.backend.service.military.WarStatsService;
+import volunteer.plus.backend.util.JacksonUtil;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -39,15 +43,18 @@ public class VectorStoreAIServiceImpl implements VectorStoreAIService {
     private final TextSplitter textSplitter;
     private final Map<AIProvider, RedisVectorStore> redisVectorStoreMap;
     private final ResourcePatternResolver resourcePatternResolver;
+    private final WarStatsService warStatsService;
 
     public VectorStoreAIServiceImpl(final TextSplitter textSplitter,
                                     final ResourcePatternResolver resourcePatternResolver,
                                     final @Value("${spring.ai.allow.prompt.pre-upload}") boolean allowAIPromptPreUpload,
-                                    final @Qualifier("redisVectorStoreMap") Map<AIProvider, RedisVectorStore> redisVectorStoreMap) {
+                                    final @Qualifier("redisVectorStoreMap") Map<AIProvider, RedisVectorStore> redisVectorStoreMap,
+                                    final WarStatsService warStatsService) {
         this.textSplitter = textSplitter;
         this.resourcePatternResolver = resourcePatternResolver;
         this.allowAIPromptPreUpload = allowAIPromptPreUpload;
         this.redisVectorStoreMap = redisVectorStoreMap;
+        this.warStatsService = warStatsService;
     }
 
 
@@ -94,6 +101,25 @@ public class VectorStoreAIServiceImpl implements VectorStoreAIService {
             throw new ApiException(ErrorCode.EMPTY_FILE);
         }
         injectFileToVectorStore(aiProvider, multipartFile.getResource());
+    }
+
+    @Override
+    public void injectWarStatisticsData(final AIProvider aiProvider,
+                                        final LocalDate dateFrom,
+                                        final LocalDate dateTo) {
+        log.info("Started getting war statistics range from {} to {}", dateFrom, dateTo);
+        final WarStatsRangeResponseDTO responseDTO = warStatsService.getWarStatsRange(dateFrom, dateTo);
+
+        final List<Document> documents = responseDTO
+                .getData()
+                .getRecords()
+                .stream()
+                .map(data -> new Document(JacksonUtil.serialize(data), Map.of("source", "russianwarship.rip")))
+                .toList();
+
+        redisVectorStoreMap.get(aiProvider).write(documents);
+
+        log.info("Finished injecting war statistics to vector store");
     }
 
     @Override

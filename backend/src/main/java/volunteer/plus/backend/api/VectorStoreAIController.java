@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import volunteer.plus.backend.domain.enums.AIProvider;
 import volunteer.plus.backend.service.ai.VectorStoreAIService;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Validated
@@ -34,6 +35,15 @@ public class VectorStoreAIController {
     public ResponseEntity<Void> injectData(@RequestParam final AIProvider aiProvider,
                                            @RequestBody final MultipartFile file) {
         vectorStoreAIService.injectData(aiProvider, file);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/inject-war-statistics")
+    @Operation(description = "Inject war statistics data to vector store")
+    public ResponseEntity<Void> injectWarStatisticsData(@RequestParam final AIProvider aiProvider,
+                                                        @RequestParam final LocalDate dateFrom,
+                                                        @RequestParam final LocalDate dateTo) {
+        vectorStoreAIService.injectWarStatisticsData(aiProvider, dateFrom, dateTo);
         return ResponseEntity.ok().build();
     }
 
