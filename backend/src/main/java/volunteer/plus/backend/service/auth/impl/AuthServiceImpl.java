@@ -11,6 +11,7 @@ import volunteer.plus.backend.domain.dto.ResetPasswordEmailRequest;
 import volunteer.plus.backend.domain.dto.ResetPasswordRequest;
 import volunteer.plus.backend.domain.entity.User;
 import volunteer.plus.backend.service.auth.AuthService;
+import volunteer.plus.backend.service.email.EmailNotificationBuilderService;
 import volunteer.plus.backend.service.email.EmailSenderService;
 import volunteer.plus.backend.service.general.UserService;
 
@@ -24,6 +25,8 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final UserService userService;
     private final EmailSenderService emailSender;
+    private final EmailNotificationBuilderService emailNotificationBuilderService;
+
     private static final int DEFAULT_TOKEN_LENGTH = 30;
     private static final long DEFAULT_TOKEN_EXPIRATION_TIME = 432000L;
     private static final SecureRandom RANDOM = new SecureRandom();
@@ -47,6 +50,8 @@ public class AuthServiceImpl implements AuthService {
                 .build();
 
         userService.createUser(user);
+
+        emailNotificationBuilderService.createUserRegistrationEmail(user);
     }
 
     @Override
