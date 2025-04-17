@@ -83,8 +83,10 @@ services:
     networks:
       - otel-network
 
-  networks:
-    ollama-local:
-    redisinsight_db:
-    otel-network:
-      driver: bridge
+volumes:
+  redisinsight_db:
+  ollama-local:
+
+networks:
+  otel-network:
+    driver: bridge
