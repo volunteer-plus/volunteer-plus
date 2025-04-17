@@ -7,6 +7,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import volunteer.plus.backend.domain.dto.LiqPayCreationDTO;
+import volunteer.plus.backend.domain.dto.NewsFeedAttachmentDTO;
+import volunteer.plus.backend.domain.dto.NewsFeedDTO;
 import volunteer.plus.backend.domain.entity.*;
 import volunteer.plus.backend.domain.enums.EmailMessageTag;
 import volunteer.plus.backend.domain.enums.EmailStatus;
@@ -18,13 +20,11 @@ import volunteer.plus.backend.service.email.EmailNotificationBuilderService;
 import volunteer.plus.backend.util.JacksonUtil;
 
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 public class EmailNotificationBuilderServiceImpl implements EmailNotificationBuilderService {
+    public static final String USER_NAME = "userName";
     private final Resource reportAnalysisResource;
     private final UserRepository userRepository;
     private final EmailTemplateRepository emailTemplateRepository;
@@ -49,7 +49,7 @@ public class EmailNotificationBuilderServiceImpl implements EmailNotificationBui
             final EmailNotification emailNotification = new EmailNotification();
             emailNotification.setSubjectData("");
             emailNotification.setTemplateData(JacksonUtil.serialize(
-                    Map.of("userName", getFullName(user),
+                    Map.of(USER_NAME, getFullName(user),
                             "data", report.getData())
             ));
             emailNotification.setDeleted(false);
@@ -110,7 +110,7 @@ public class EmailNotificationBuilderServiceImpl implements EmailNotificationBui
             emailNotification.setSubjectData("");
             emailNotification.setTemplateData(JacksonUtil.serialize(
                     Map.of(
-                            "userName", getFullName(user),
+                            USER_NAME, getFullName(user),
                             "data", response
                     )
             ));
@@ -201,6 +201,52 @@ public class EmailNotificationBuilderServiceImpl implements EmailNotificationBui
         updateEmailNotification(emailNotification, getFullName(user), user.getEmail());
 
         emailTemplate.addNotification(emailNotification);
+
+        emailTemplateRepository.save(emailTemplate);
+    }
+
+    @Override
+    @Transactional
+    public void createGeneralStaffEmailNotification(final NewsFeedDTO newsFeedDTO) {
+        final var emailTemplate = emailTemplateRepository.findByEmailMessageTag(EmailMessageTag.EMAIL_MESSAGE_TAG_6)
+                .orElseThrow(() -> new ApiException(ErrorCode.EMAIL_TEMPLATE_NOT_FOUND));
+
+        final var users = userRepository.findAllByEmailNotNullAndPasswordNotNull();
+
+        if (newsFeedDTO == null) {
+            return;
+        }
+
+        // in this case we need to generate for each user separate notification
+        for (final UserRepository.UserMainDataProjection user : users) {
+            final EmailNotification emailNotification = new EmailNotification();
+            emailNotification.setSubjectData(JacksonUtil.serialize(Map.of("subject", newsFeedDTO.getSubject())));
+            emailNotification.setTemplateData(JacksonUtil.serialize(
+                    Map.of(
+                            USER_NAME, getFullName(user),
+                            "data", newsFeedDTO.getBody()
+                    )
+            ));
+
+            updateEmailNotification(emailNotification, getFullName(user), user.getEmail());
+
+            final Optional<NewsFeedAttachmentDTO> newsFeedAttachmentDTO = newsFeedDTO.getAttachments() == null ?
+                    Optional.empty() :
+                    newsFeedDTO.getAttachments()
+                            .stream()
+                            .filter(newsFeed -> newsFeed.isLogo() && newsFeed.getFilename() != null && newsFeed.getS3Link() != null)
+                            .findFirst();
+
+            newsFeedAttachmentDTO.ifPresent(newsFeedAttachment -> {
+                final EmailAttachment emailAttachment = EmailAttachment.builder()
+                        .filename(newsFeedAttachment.getFilename())
+                        .s3Link(newsFeedAttachment.getS3Link())
+                        .build();
+                emailNotification.addAttachment(emailAttachment);
+            });
+
+            emailTemplate.addNotification(emailNotification);
+        }
 
         emailTemplateRepository.save(emailTemplate);
     }
