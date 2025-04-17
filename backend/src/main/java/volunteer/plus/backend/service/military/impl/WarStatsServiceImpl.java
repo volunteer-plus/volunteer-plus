@@ -10,6 +10,7 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
+import volunteer.plus.backend.domain.dto.NewsFeedDTO;
 import volunteer.plus.backend.domain.dto.ai.news.AINewsFeedResponse;
 import volunteer.plus.backend.domain.dto.stats.WarStatsRangeResponseDTO;
 import volunteer.plus.backend.domain.dto.stats.WarStatsResponseDTO;
@@ -19,6 +20,7 @@ import volunteer.plus.backend.exceptions.ApiException;
 import volunteer.plus.backend.exceptions.ErrorCode;
 import volunteer.plus.backend.repository.UserRepository;
 import volunteer.plus.backend.service.ai.OpenAIService;
+import volunteer.plus.backend.service.email.EmailNotificationBuilderService;
 import volunteer.plus.backend.service.general.NewsFeedService;
 import volunteer.plus.backend.service.military.WarStatsService;
 import volunteer.plus.backend.util.AIClientProviderUtil;
@@ -36,19 +38,22 @@ public class WarStatsServiceImpl implements WarStatsService {
     private final OpenAIService openAIService;
     private final NewsFeedService newsFeedService;
     private final Resource warStatsNewsFeed;
+    private final EmailNotificationBuilderService emailNotificationBuilderService;
 
     public WarStatsServiceImpl(final @Qualifier("warStatsRestClient") RestClient warStatsRestClient,
                                final AIClientProviderUtil aiClientProviderUtil,
                                final UserRepository userRepository,
                                final OpenAIService openAIService,
                                final NewsFeedService newsFeedService,
-                               final @Value("classpath:/prompts/war_stats_news_feed.txt") Resource warStatsNewsFeed) {
+                               final @Value("classpath:/prompts/war_stats_news_feed.txt") Resource warStatsNewsFeed,
+                               final EmailNotificationBuilderService emailNotificationBuilderService) {
         this.warStatsRestClient = warStatsRestClient;
         this.aiClientProviderUtil = aiClientProviderUtil;
         this.userRepository = userRepository;
         this.openAIService = openAIService;
         this.newsFeedService = newsFeedService;
         this.warStatsNewsFeed = warStatsNewsFeed;
+        this.emailNotificationBuilderService = emailNotificationBuilderService;
     }
 
     @Override
@@ -104,6 +109,8 @@ public class WarStatsServiceImpl implements WarStatsService {
                 .call()
                 .entity(AINewsFeedResponse.class);
 
-        newsFeedService.generateNewsAINewsFeed(user, response, newsFeedService, openAIService);
+        final NewsFeedDTO newsFeedDTO = newsFeedService.generateNewsAINewsFeed(user, response, newsFeedService, openAIService);
+
+        emailNotificationBuilderService.createGeneralStaffEmailNotification(newsFeedDTO);
     }
 }

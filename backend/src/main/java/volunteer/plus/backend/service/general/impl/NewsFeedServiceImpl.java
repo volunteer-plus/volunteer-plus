@@ -287,10 +287,10 @@ public class NewsFeedServiceImpl implements NewsFeedService {
 
     @Override
     @Transactional
-    public void generateNewsAINewsFeed(final User user,
-                                       final AINewsFeedResponse response,
-                                       final NewsFeedService newsFeedService,
-                                       final OpenAIService openAIService) {
+    public NewsFeedDTO generateNewsAINewsFeed(final User user,
+                                              final AINewsFeedResponse response,
+                                              final NewsFeedService newsFeedService,
+                                              final OpenAIService openAIService) {
         if (response.getSubject() == null || response.getBody() == null) {
             throw new ApiException(ErrorCode.AI_RESPONSE_IS_EMPTY);
         }
@@ -316,9 +316,7 @@ public class NewsFeedServiceImpl implements NewsFeedService {
 
         log.info("Image has been generated for AI drive news feed...");
 
-        newsFeedService.addAttachment(savedNewsFeedDTO.getId(), true, multipartFile);
-
-        log.info("Finish of generation AI driven news feed...");
+        return newsFeedService.addAttachment(savedNewsFeedDTO.getId(), true, multipartFile);
     }
 
     private NewsFeedDTO saveAndReturnDTO(final NewsFeed newsFeed) {

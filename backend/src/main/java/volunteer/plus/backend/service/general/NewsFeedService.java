@@ -34,8 +34,8 @@ public interface NewsFeedService {
 
     void generateAINewsFeed(AIChatClient aiChatClient);
 
-    void generateNewsAINewsFeed(final User user,
-                                final AINewsFeedResponse response,
-                                final NewsFeedService newsFeedService,
-                                final OpenAIService openAIService);
+    NewsFeedDTO generateNewsAINewsFeed(final User user,
+                                       final AINewsFeedResponse response,
+                                       final NewsFeedService newsFeedService,
+                                       final OpenAIService openAIService);
 }
