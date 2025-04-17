@@ -23,10 +23,11 @@ public class UserInfo {
     private String logoFilename;
     private String phoneNumber;
     private String email;
+    private String role;
 
     public UserInfo(final User user) {
         this(user.getId(), user.getFirstName(), user.getMiddleName(),
                 user.getLastName(), user.getDateOfBirth(), user.getLogoS3Link(),
-                user.getLogoFilename(), user.getPhoneNumber(), user.getEmail());
+                user.getLogoFilename(), user.getPhoneNumber(), user.getEmail(), user.getRole().getAuthority());
     }
 }

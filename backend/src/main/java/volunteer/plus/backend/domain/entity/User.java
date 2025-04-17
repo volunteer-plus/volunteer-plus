@@ -4,10 +4,12 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import volunteer.plus.backend.domain.enums.Role;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 @Getter
@@ -35,9 +37,6 @@ public class User extends BaseEntity implements UserDetails {
 
     @Column(length = 100)
     private String status;
-
-    @Column(name = "user_role", length = 100)
-    private String userRole;
 
     @Column(name = "first_name")
     private String firstName;
@@ -84,6 +83,10 @@ public class User extends BaseEntity implements UserDetails {
     @ManyToMany(mappedBy = "users")
     private List<ConversationRoom> conversationRooms = new ArrayList<>();
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "user_role", nullable = false)
+    private Role role;
+
     private boolean enabled;
     private boolean accountNonExpired;
     private boolean accountNonLocked;
@@ -107,7 +110,7 @@ public class User extends BaseEntity implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return Collections.singleton(role);
     }
 
     @Override
@@ -139,4 +142,5 @@ public class User extends BaseEntity implements UserDetails {
     public boolean isEnabled() {
         return enabled;
     }
+
 }

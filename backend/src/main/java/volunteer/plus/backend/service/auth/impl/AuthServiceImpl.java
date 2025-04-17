@@ -10,6 +10,7 @@ import volunteer.plus.backend.domain.dto.RegistrationData;
 import volunteer.plus.backend.domain.dto.ResetPasswordEmailRequest;
 import volunteer.plus.backend.domain.dto.ResetPasswordRequest;
 import volunteer.plus.backend.domain.entity.User;
+import volunteer.plus.backend.domain.enums.Role;
 import volunteer.plus.backend.service.auth.AuthService;
 import volunteer.plus.backend.service.email.EmailNotificationBuilderService;
 import volunteer.plus.backend.service.email.EmailSenderService;
@@ -47,6 +48,7 @@ public class AuthServiceImpl implements AuthService {
                 .middleName(registrationData.getMiddleName())
                 .phoneNumber(registrationData.getPhoneNumber())
                 .dateOfBirth(registrationData.getDateOfBirth())
+                .role(Role.VOLUNTEER)
                 .build();
 
         userService.createUser(user);
