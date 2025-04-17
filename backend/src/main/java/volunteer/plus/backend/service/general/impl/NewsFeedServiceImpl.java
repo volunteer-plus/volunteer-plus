@@ -18,6 +18,7 @@ import volunteer.plus.backend.domain.dto.ImageGenerationRequestDTO;
 import volunteer.plus.backend.domain.dto.NewsFeedAttachmentDTO;
 import volunteer.plus.backend.domain.dto.NewsFeedCommentDTO;
 import volunteer.plus.backend.domain.dto.NewsFeedDTO;
+import volunteer.plus.backend.domain.dto.ai.news.AINewsFeedResponse;
 import volunteer.plus.backend.domain.entity.*;
 import volunteer.plus.backend.domain.enums.AIChatClient;
 import volunteer.plus.backend.domain.enums.NewsFeedGenerationSource;
@@ -281,6 +282,15 @@ public class NewsFeedServiceImpl implements NewsFeedService {
                 .call()
                 .entity(AINewsFeedResponse.class);
 
+        newsFeedService.generateNewsAINewsFeed(user, response, newsFeedService, openAIService);
+    }
+
+    @Override
+    @Transactional
+    public void generateNewsAINewsFeed(final User user,
+                                       final AINewsFeedResponse response,
+                                       final NewsFeedService newsFeedService,
+                                       final OpenAIService openAIService) {
         if (response.getSubject() == null || response.getBody() == null) {
             throw new ApiException(ErrorCode.AI_RESPONSE_IS_EMPTY);
         }
@@ -309,15 +319,6 @@ public class NewsFeedServiceImpl implements NewsFeedService {
         newsFeedService.addAttachment(savedNewsFeedDTO.getId(), true, multipartFile);
 
         log.info("Finish of generation AI driven news feed...");
-    }
-
-    @Data
-    @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static final class AINewsFeedResponse {
-        private String subject;
-        private String body;
     }
 
     private NewsFeedDTO saveAndReturnDTO(final NewsFeed newsFeed) {

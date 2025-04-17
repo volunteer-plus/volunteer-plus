@@ -6,7 +6,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 import volunteer.plus.backend.domain.dto.NewsFeedCommentDTO;
 import volunteer.plus.backend.domain.dto.NewsFeedDTO;
+import volunteer.plus.backend.domain.dto.ai.news.AINewsFeedResponse;
+import volunteer.plus.backend.domain.entity.User;
 import volunteer.plus.backend.domain.enums.AIChatClient;
+import volunteer.plus.backend.service.ai.OpenAIService;
 
 public interface NewsFeedService {
     Page<NewsFeedDTO> getNewsFeeds(Pageable pageable);
@@ -30,4 +33,9 @@ public interface NewsFeedService {
     ResponseEntity<byte[]> downloadAttachment(Long attachmentId);
 
     void generateAINewsFeed(AIChatClient aiChatClient);
+
+    void generateNewsAINewsFeed(final User user,
+                                final AINewsFeedResponse response,
+                                final NewsFeedService newsFeedService,
+                                final OpenAIService openAIService);
 }
