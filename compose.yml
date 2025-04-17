@@ -25,14 +25,12 @@ services:
   redis:
     image: redislabs/redismod
     container_name: redislabs_container
-    restart: always
     ports:
       - ${REDIS_PORT}:${REDIS_PORT}
 
   redis-insight:
     image: redis/redisinsight:latest
     container_name: redis_insight_container
-    restart: always
     ports:
       - ${REDIS_INSIGHT_PORT}:${REDIS_INSIGHT_PORT}
     volumes:
@@ -48,7 +46,6 @@ services:
   otel-collector:
     container_name: otel-collector
     image: otel/opentelemetry-collector-contrib:latest
-    restart: always
     command:
       - --config=/etc/otelcol-contrib/otel-collector.yml
     volumes:
@@ -76,7 +73,6 @@ services:
   jaeger:
     container_name: jaeger
     image: jaegertracing/all-in-one:latest
-    restart: always
     environment:
       - COLLECTOR_OTLP_ENABLED=true
     ports:
@@ -125,7 +121,7 @@ services:
       MAIL_PORT: ${MAIL_PORT}
       MAIL_USERNAME: ${MAIL_USERNAME}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
-      LIQPAY_PUBLIC_KEY:  ${LIQPAY_PUBLIC_KEY}
+      LIQPAY_PUBLIC_KEY: ${LIQPAY_PUBLIC_KEY}
       LIQPAY_PRIVATE_KEY: ${LIQPAY_PRIVATE_KEY}
       SPRING_AI_OPENAI_API_KEY: ${SPRING_AI_OPENAI_API_KEY}
       REDIS_HOST: redis
