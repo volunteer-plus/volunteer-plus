@@ -1,0 +1,1 @@
+UPDATE `user` SET user_role = 'SUPER_ADMIN' WHERE user_role IS NULL;
