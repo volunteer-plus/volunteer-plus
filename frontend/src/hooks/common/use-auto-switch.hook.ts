@@ -13,7 +13,6 @@ function useAutoSwitch<T>({ duration, frames }: Params<T>) {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      console.log(indexRef.current);
       setIndex((indexRef.current + 1) % frames.length);
     }, duration);
 

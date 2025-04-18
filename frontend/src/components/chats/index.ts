@@ -11,3 +11,4 @@ export * from './message-sender-avatar';
 export * from './inbound-message';
 export * from './outbound-message';
 export * from './typing-indicator';
+export * from './no-chats-label';

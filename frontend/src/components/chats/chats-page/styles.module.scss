@@ -38,3 +38,12 @@
 .chat {
   flex-grow: 1;
 }
+
+.chatsListPlaceholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 50%;
+
+  padding: 24px;
+}

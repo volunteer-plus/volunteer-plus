@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { StrictMode, useEffect } from 'react';
 import { RouterProvider } from 'react-router-dom';
 
 import { useAppDispatch } from '@/hooks/store';
@@ -34,7 +34,11 @@ const App: React.FC = () => {
     };
   }, [dispatch]);
 
-  return <RouterProvider router={router} />;
+  return (
+    <StrictMode>
+      <RouterProvider router={router} />
+    </StrictMode>
+  );
 };
 
 export { App };

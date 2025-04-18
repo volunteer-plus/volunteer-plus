@@ -76,6 +76,10 @@ const router = createBrowserRouter([
             element: <ChatsPage />,
           },
           {
+            path: 'chats/:id',
+            element: <ChatsPage />,
+          },
+          {
             path: 'profile',
             element: <ProfilePage />,
           },

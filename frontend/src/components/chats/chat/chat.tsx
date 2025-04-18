@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import classNames from 'classnames';
 import {
   Button,
@@ -11,62 +11,52 @@ import {
   OutboundMessage,
   TypingIndicator,
 } from '@/components/chats';
+import { useAsyncMemo } from '@/hooks/common';
+import { chatsService } from '@/services/chats/chats';
+import { useUserForAuthenticated } from '@/hooks/auth';
 
 import styles from './styles.module.scss';
-import { sleep } from '@/helpers/common';
-import { useStateRef } from '@/hooks/common';
 
 interface Props extends React.ComponentPropsWithoutRef<typeof GrayContainer> {
-  userId?: string;
+  roomId?: number;
 }
 
-const Chat: React.FC<Props> = ({ className, ...props }) => {
+const Chat: React.FC<Props> = ({ className, roomId, ...props }) => {
+  const user = useUserForAuthenticated();
+
   const messageListRef = useRef<HTMLDivElement>(null);
   const messagesListWrapperRef = useRef<HTMLDivElement>(null);
 
+  const [isSending, setIsSending] = useState(false);
+
+  const { value: room, isLoading: isRoomLoading } = useAsyncMemo(
+    async () => {
+      if (!roomId) {
+        return null;
+      }
+
+      return await chatsService.getRoom({
+        roomId,
+      });
+    },
+    [roomId],
+    null
+  );
+
+  const messages = useMemo(() => {
+    if (!room) {
+      return [];
+    }
+
+    return room.messages;
+  }, [room]);
+
   const [messageText, setMessageText] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
-  const [messages, setMessages] = useState<
-    {
-      text: string;
-      date: Date;
-      isInbound: boolean;
-    }[]
-  >([]);
 
-  const messagesRef = useStateRef(messages);
+  const sendMessage = async () => {
+    setIsSending(true);
 
-  const sendMessage = () => {
-    setMessages([
-      ...messages,
-      {
-        date: new Date(),
-        isInbound: false,
-        text: messageText,
-      },
-    ]);
-    setMessageText('');
-
-    (async () => {
-      await sleep(1000);
-
-      setIsTyping(true);
-
-      await sleep(3000);
-
-      setIsTyping(false);
-
-      await sleep(500);
-
-      setMessages([
-        ...messagesRef.current,
-        {
-          date: new Date(),
-          isInbound: true,
-          text: 'Не пиши мені більше',
-        },
-      ]);
-    })();
+    setIsSending(false);
   };
 
   const isMessageEmpty = messageText.length === 0;
@@ -98,7 +88,7 @@ const Chat: React.FC<Props> = ({ className, ...props }) => {
     return () => {
       resizeObserver.disconnect();
     };
-  }, [messages, isTyping]);
+  }, [messages]);
 
   return (
     <GrayContainer
@@ -116,16 +106,22 @@ const Chat: React.FC<Props> = ({ className, ...props }) => {
         )}
         <div className={styles.messagesList} ref={messageListRef}>
           {messages.map((message, index) => {
-            if (message.isInbound) {
+            if (message.fromUser === user.id) {
               return (
-                <InboundMessage sentAt={message.date} key={index}>
-                  {message.text}
+                <InboundMessage
+                  sentAt={new Date(message.createDate)}
+                  key={index}
+                >
+                  {message.content}
                 </InboundMessage>
               );
             } else {
               return (
-                <OutboundMessage sentAt={message.date} key={index}>
-                  {message.text}
+                <OutboundMessage
+                  sentAt={new Date(message.createDate)}
+                  key={index}
+                >
+                  {message.content}
                 </OutboundMessage>
               );
             }
@@ -133,7 +129,7 @@ const Chat: React.FC<Props> = ({ className, ...props }) => {
         </div>
         {messages.length > 0 && (
           <TypingIndicator
-            isTyping={isTyping}
+            isTyping={false}
             className={styles.typingIndicator}
           />
         )}
@@ -150,7 +146,7 @@ const Chat: React.FC<Props> = ({ className, ...props }) => {
         />
         <Button
           className={styles.sendButton}
-          disabled={!messageText}
+          disabled={!messageText || isSending || isRoomLoading}
           onClick={() => sendMessage()}
         >
           <MaterialSymbol className={styles.sendIcon}>send</MaterialSymbol>

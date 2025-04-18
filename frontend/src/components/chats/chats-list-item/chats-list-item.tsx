@@ -9,7 +9,7 @@ import styles from './styles.module.scss';
 interface Props
   extends Omit<React.ComponentPropsWithoutRef<typeof Link>, 'to'> {
   userFullName: React.ReactNode;
-  userRole: React.ReactNode;
+  userRole?: React.ReactNode;
   userAvatarImageSrc?: string;
   isUserOnline?: boolean;
   newMessagesCount?: number;
@@ -46,9 +46,9 @@ const ChatsListItem: React.FC<Props> = ({
       </div>
       <div className={styles.userInfo}>
         <div className={styles.name}>{userFullName}</div>
-        <div className={styles.role}>{userRole}</div>
+        {userRole && <div className={styles.role}>{userRole}</div>}
       </div>
-      {newMessagesCount && (
+      {Boolean(newMessagesCount) && (
         <div className={styles.newMessagesCount}>{newMessagesCount}</div>
       )}
     </Link>

@@ -9,8 +9,8 @@ interface Props extends Omit<React.ComponentPropsWithRef<'div'>, 'children'> {
 const MessageText: React.FC<Props> = ({ children, className }) => {
   return (
     <div className={classNames(styles.text, className)}>
-      {children.split('\n').map((line) => (
-        <p>{line}</p>
+      {children.split('\n').map((line, index) => (
+        <p key={index}>{line}</p>
       ))}
     </div>
   );

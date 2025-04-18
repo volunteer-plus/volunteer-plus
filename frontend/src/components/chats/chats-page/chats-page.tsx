@@ -1,27 +1,39 @@
-import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+
 import { Authenticated } from '@/components/auth';
-import { PageTitle } from '@/components/common';
+import { BarsLoader, PageTitle } from '@/components/common';
 import {
   Chat,
   ChatNotSelectedPlaceholder,
   ChatsList,
   ChatsListItem,
+  NoChatsLabel,
 } from '@/components/chats';
+import { chatsService } from '@/services/chats/chats';
+import { useAsyncMemo } from '@/hooks/common';
+import { getFullName } from '@/helpers/user';
+import { useUserForAuthenticated } from '@/hooks/auth';
 
 import styles from './styles.module.scss';
 
 const BareChatsPage: React.FC = () => {
-  const [isChatSelected, setIsChatSelected] = useState(false);
+  const user = useUserForAuthenticated();
 
-  const [isUserOnline, setIsUserOnline] = useState(false);
+  const { id: selectedRoomId } = useParams();
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setIsUserOnline((prev) => !prev);
-    }, 3000);
+  const isChatSelected = Boolean(selectedRoomId);
 
-    return () => clearInterval(interval);
-  }, []);
+  const { value: rooms, isLoading: areRoomsLoading } = useAsyncMemo(
+    async () => {
+      return await chatsService.getDirectMessagesRooms({
+        userId: user.id,
+      });
+    },
+    [user.id],
+    null
+  );
+
+  const doRoomsExist = rooms && rooms.length > 0;
 
   return (
     <main className={styles.main}>
@@ -29,34 +41,33 @@ const BareChatsPage: React.FC = () => {
         <div className={styles.titleWrapper}>
           <PageTitle>Чати</PageTitle>
         </div>
-        <ChatsList className={styles.chatsList}>
-          <ChatsListItem
-            path='#'
-            userFullName='Петренко Петро Петрович'
-            userRole='Волонтер'
-            newMessagesCount={3}
-            userAvatarImageSrc='https://i.pinimg.com/474x/98/51/1e/98511ee98a1930b8938e42caf0904d2d.jpg'
-            onClick={() => setIsChatSelected(!isChatSelected)}
-            isActive={isChatSelected}
-            isUserOnline={isUserOnline}
-          />
-          <ChatsListItem
-            path='#'
-            userFullName='Петренко Петро Петрович'
-            userRole='Волонтер'
-            newMessagesCount={3}
-          />
-          <ChatsListItem
-            path='#'
-            userFullName='Петренко Петро Петрович'
-            userRole='Адміністратор'
-          />
-        </ChatsList>
+        {!doRoomsExist && (
+          <div className={styles.chatsListPlaceholder}>
+            {areRoomsLoading && <BarsLoader size='50px' />}
+            {!areRoomsLoading && <NoChatsLabel />}
+          </div>
+        )}
+        {doRoomsExist && (
+          <ChatsList className={styles.chatsList}>
+            {rooms?.map((room) => {
+              return (
+                <ChatsListItem
+                  key={room.id}
+                  path={`/chats/${room.id}`}
+                  userFullName={getFullName(room.user)}
+                  newMessagesCount={room.newMessagesCount}
+                  isActive={room.id === Number(selectedRoomId)}
+                />
+              );
+            })}
+          </ChatsList>
+        )}
       </div>
       <div className={styles.rightSide}>
-        {isChatSelected ? (
-          <Chat className={styles.chat} />
-        ) : (
+        {selectedRoomId && (
+          <Chat className={styles.chat} roomId={Number(selectedRoomId)} />
+        )}
+        {!isChatSelected && doRoomsExist && (
           <ChatNotSelectedPlaceholder className={styles.chatPlaceholder} />
         )}
       </div>
