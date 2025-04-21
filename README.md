@@ -53,3 +53,7 @@ const volunteerPlusApiService = new VolunteerPlusApiService({
   // basePath: 'http://localhost:8080/api',
 });
 ```
+
+## *Qualification work links:*
+
+[Ходаков Максим](https://1drv.ms/w/c/3e16880802f568e1/EbbHDUjhrIREltFyA_RS76EBSOJXvjmghFp1JzPhcQFzTg)
