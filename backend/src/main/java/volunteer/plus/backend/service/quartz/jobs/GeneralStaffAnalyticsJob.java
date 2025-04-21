@@ -7,20 +7,20 @@ import org.quartz.JobExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import volunteer.plus.backend.domain.enums.AIChatClient;
-import volunteer.plus.backend.service.military.WarStatsService;
+import volunteer.plus.backend.service.military.WarStatsNotificationService;
 
 @Slf4j
 @Component
 @DisallowConcurrentExecution
 public class GeneralStaffAnalyticsJob implements Job {
     @Autowired
-    private WarStatsService warStatsService;
+    private WarStatsNotificationService warStatsNotificationService;
 
     @Override
     public void execute(JobExecutionContext context) {
         log.info("Executing scheduled job: {}", this.getClass().getSimpleName());
         try {
-            warStatsService.processStatsNotification(AIChatClient.OPENAI_MILITARY);
+            warStatsNotificationService.processStatsNotification(AIChatClient.OPENAI_MILITARY);
             log.info("Executing scheduled job: {} is finished", this.getClass().getSimpleName());
         } catch (Exception e) {
             log.error("Error executing scheduled job", e);
