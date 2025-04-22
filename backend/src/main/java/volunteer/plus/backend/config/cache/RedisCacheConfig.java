@@ -9,11 +9,12 @@ import org.springframework.data.redis.cache.CacheKeyPrefix;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializationContext;
 
 import java.time.Duration;
 
-import static volunteer.plus.backend.util.CacheUtil.BRIGADES_CACHE;
-import static volunteer.plus.backend.util.CacheUtil.BRIGADE_CODES_CACHE;
+import static volunteer.plus.backend.util.CacheUtil.*;
 
 @Configuration
 @ConditionalOnProperty(value = "spring.redis.disabled", havingValue = "false")
@@ -34,6 +35,7 @@ public class RedisCacheConfig {
                 .fromConnectionFactory(connectionFactory)
                 .withCacheConfiguration(BRIGADE_CODES_CACHE, buildCacheConfiguration(brokerCodesTtl))
                 .withCacheConfiguration(BRIGADES_CACHE, buildCacheConfiguration(brigadesTtl))
+                .withCacheConfiguration(RATE_LIMIT_CACHE, buildRedisBucketConfig())
                 .build();
     }
 
@@ -42,4 +44,14 @@ public class RedisCacheConfig {
                 .entryTtl(Duration.ofMinutes(ttl))
                 .computePrefixWith(CacheKeyPrefix.simple());
     }
+
+    private RedisCacheConfiguration buildRedisBucketConfig() {
+        return RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofMinutes(60))
+                .serializeValuesWith(
+                        RedisSerializationContext.SerializationPair
+                                .fromSerializer(new GenericJackson2JsonRedisSerializer())
+                );
+    }
+
 }
