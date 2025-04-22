@@ -25,6 +25,7 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.cors.CorsConfigurationSource;
 import volunteer.plus.backend.service.general.UserService;
 import volunteer.plus.backend.service.security.JwtTokenExtractor;
+import volunteer.plus.backend.service.security.impl.RateLimitCacheFilter;
 
 import java.util.Arrays;
 import java.util.List;
@@ -46,6 +47,7 @@ public class SecurityConf {
     private final JwtAuthenticationProvider jwtAuthenticationProvider;
     private final RefreshTokenAuthenticationProvider refreshTokenAuthenticationProvider;
     private final JwtTokenExtractor jwtTokenExtractor;
+    private final RateLimitCacheFilter rateLimitCacheFilter;
     private final CorsConfigurationSource corsConfigurationSource;
     public static final String FORM_BASED_LOGIN_ENTRY_POINT = "/api/login";
     public static final String FORM_BASED_NO_AUTH_ENTRY_POINT = "/api/no-auth/**";
@@ -134,6 +136,7 @@ public class SecurityConf {
                 .sessionManagement(
                         session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
+                .addFilterBefore(rateLimitCacheFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(buildRestLoginProcessingFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(buildJwtTokenAuthenticationProcessingFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(buildRefreshTokenProcessingFilter(), UsernamePasswordAuthenticationFilter.class);
