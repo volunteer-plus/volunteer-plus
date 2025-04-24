@@ -133,6 +133,7 @@ services:
       OTEL_COLLECTOR_HOST: otel-collector
       OTEL_COLLECTOR_PORT: ${OTEL_COLLECTOR_PORT}
       TRACING_ENDPOINT: ${TRACING_ENDPOINT}
+      UKRAINE_ALARM_API_KEY: ${UKRAINE_ALARM_API_KEY}
 
 volumes:
   ollama-local:

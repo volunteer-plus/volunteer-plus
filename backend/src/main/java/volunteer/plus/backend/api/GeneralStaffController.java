@@ -15,7 +15,7 @@ import java.time.LocalDate;
 
 @Validated
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/no-auth")
 @RequiredArgsConstructor
 public class GeneralStaffController {
     private final WarStatsService warStatsService;
