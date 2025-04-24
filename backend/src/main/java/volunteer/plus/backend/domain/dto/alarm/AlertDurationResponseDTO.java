@@ -1,12 +1,13 @@
-package volunteer.plus.backend.domain.dto;
+package volunteer.plus.backend.domain.dto.alarm;
+
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import volunteer.plus.backend.domain.dto.TimeSpanDTO;
 import volunteer.plus.backend.domain.enums.AlertType;
-import volunteer.plus.backend.domain.enums.RegionType;
 
 import java.time.LocalDateTime;
 
@@ -15,9 +16,12 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class AlertDTO {
+public class AlertDurationResponseDTO {
     private String regionId;
-    private RegionType regionType;
-    private AlertType type;
-    private LocalDateTime lastUpdate;
+    private String regionName;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
+    private TimeSpanDTO duration;
+    private AlertType alertType;
+    private boolean isContinue;
 }

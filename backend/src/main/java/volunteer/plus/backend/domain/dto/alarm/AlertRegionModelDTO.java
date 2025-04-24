@@ -1,4 +1,4 @@
-package volunteer.plus.backend.domain.dto;
+package volunteer.plus.backend.domain.dto.alarm;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import volunteer.plus.backend.domain.enums.RegionType;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -14,9 +15,11 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class RegionViewModelDTO {
+public class AlertRegionModelDTO {
     private String regionId;
-    private String regionName;
     private RegionType regionType;
-    private List<RegionViewModelDTO> regionChildIds;
+    private String regionName;
+    private String regionEngName;
+    private LocalDateTime lastUpdate;
+    private List<AlertDTO> activeAlerts;
 }

@@ -10,9 +10,11 @@ import volunteer.plus.backend.exceptions.ErrorCode;
 import java.io.IOException;
 
 public class JacksonUtil {
-    public static final ObjectMapper objectMapper = new ObjectMapper();
+    public static final ObjectMapper objectMapper = new ObjectMapper()
+            .findAndRegisterModules();
 
     public static final ObjectMapper polymorphicObjectMapper = new ObjectMapper()
+            .findAndRegisterModules()
             .addMixIn(AbstractMessage.class, AIMessageMixin.class);
 
 

@@ -1,4 +1,4 @@
-package volunteer.plus.backend.domain.dto;
+package volunteer.plus.backend.domain.dto.alarm;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;

@@ -1,9 +1,6 @@
 package volunteer.plus.backend.service.alerts;
 
-import volunteer.plus.backend.domain.dto.AlertDurationResponseDTO;
-import volunteer.plus.backend.domain.dto.AlertRegionModelDTO;
-import volunteer.plus.backend.domain.dto.RegionAlarmsHistoryDTO;
-import volunteer.plus.backend.domain.dto.RegionsViewModelDTO;
+import volunteer.plus.backend.domain.dto.alarm.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -17,4 +14,11 @@ public interface AlarmService {
 
     List<RegionAlarmsHistoryDTO> getRegionHistoryAlerts(String regionId);
 
+    void subscribeToWebhook(WebHookModelDTO webHookModelDTO);
+
+    void updateSubscriptionToWebhook(WebHookModelDTO webHookModelDTO);
+
+    void unsubscribeFromWebhook(WebHookModelDTO webHookModelDTO);
+
+    void handleAlert(AlertRegionModelDTO alert);
 }
