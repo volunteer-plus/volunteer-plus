@@ -60,7 +60,7 @@ public class NewsFeedServiceImpl implements NewsFeedService {
                                final UserRepository userRepository,
                                final AIClientProviderUtil aiClientProviderUtil,
                                final @Lazy NewsFeedService newsFeedService,
-                               final @Value("classpath:/prompts/news_geed_generation.txt") Resource newsFeedGenerationPrompt,
+                               final @Value("classpath:/prompts/news_feed_generation.txt") Resource newsFeedGenerationPrompt,
                                final OpenAIService openAIService) {
         this.newsFeedRepository = newsFeedRepository;
         this.newsFeedCommentRepository = newsFeedCommentRepository;

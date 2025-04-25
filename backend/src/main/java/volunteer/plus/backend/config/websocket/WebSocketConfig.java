@@ -23,6 +23,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public static final String CHAT_MESSAGE_MAPPING = "/chat/sendMessage/{conversationRoomId}";
 
     public static final String ALARM_TARGET = WS_DESTINATION_PREFIX + "/alarm";
+    public static final String ALARM_HISTORY_TARGET = WS_DESTINATION_PREFIX + "/alarm-history";
 
     public static final String OLLAMA_RESPONSE_TARGET = WS_DESTINATION_PREFIX + "/ollama-response";
     public static final String OLLAMA_CHAT_CLIENT_TARGET = WS_DESTINATION_PREFIX + "/ollama-chat-client";

@@ -6,6 +6,7 @@ import volunteer.plus.backend.domain.dto.NewsFeedDTO;
 import volunteer.plus.backend.domain.entity.Report;
 import volunteer.plus.backend.domain.entity.User;
 import volunteer.plus.backend.domain.entity.VolunteerFeedback;
+import volunteer.plus.backend.domain.enums.EmailMessageTag;
 
 import java.util.List;
 
@@ -20,5 +21,5 @@ public interface EmailNotificationBuilderService {
 
     void createUserPaymentEmail(LiqPayCreationDTO liqPayCreationDTO, User user);
 
-    void createGeneralStaffEmailNotification(NewsFeedDTO newsFeedDTO);
+    void createNewsFeedAIEmailNotification(NewsFeedDTO newsFeedDTO, final EmailMessageTag messageTag);
 }

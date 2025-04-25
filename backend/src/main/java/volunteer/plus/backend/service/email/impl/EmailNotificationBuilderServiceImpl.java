@@ -207,8 +207,9 @@ public class EmailNotificationBuilderServiceImpl implements EmailNotificationBui
 
     @Override
     @Transactional
-    public void createGeneralStaffEmailNotification(final NewsFeedDTO newsFeedDTO) {
-        final var emailTemplate = emailTemplateRepository.findByEmailMessageTag(EmailMessageTag.EMAIL_MESSAGE_TAG_6)
+    public void createNewsFeedAIEmailNotification(final NewsFeedDTO newsFeedDTO,
+                                                  final EmailMessageTag messageTag) {
+        final var emailTemplate = emailTemplateRepository.findByEmailMessageTag(messageTag)
                 .orElseThrow(() -> new ApiException(ErrorCode.EMAIL_TEMPLATE_NOT_FOUND));
 
         final var users = userRepository.findAllByEmailNotNullAndPasswordNotNull();

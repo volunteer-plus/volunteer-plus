@@ -160,9 +160,7 @@ public class AlarmServiceImpl implements AlarmService {
 
     @Override
     public void handleAlert(final AlertRegionModelDTO alert) {
-        log.info("Received alert update for region {}: {} active alerts",
-                alert.getRegionName(),
-                alert.getActiveAlerts().size());
+        log.info("Received alert update for region Id {}", alert.getRegionId());
         webSocketService.sendNotification(ALARM_TARGET, alert);
     }
 }
