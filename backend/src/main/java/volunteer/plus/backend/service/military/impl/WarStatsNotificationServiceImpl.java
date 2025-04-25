@@ -11,6 +11,7 @@ import volunteer.plus.backend.domain.dto.ai.news.AINewsFeedResponse;
 import volunteer.plus.backend.domain.dto.stats.WarStatsResponseDTO;
 import volunteer.plus.backend.domain.entity.User;
 import volunteer.plus.backend.domain.enums.AIChatClient;
+import volunteer.plus.backend.domain.enums.EmailMessageTag;
 import volunteer.plus.backend.exceptions.ApiException;
 import volunteer.plus.backend.exceptions.ErrorCode;
 import volunteer.plus.backend.repository.UserRepository;
@@ -69,6 +70,6 @@ public class WarStatsNotificationServiceImpl implements WarStatsNotificationServ
 
         final NewsFeedDTO newsFeedDTO = newsFeedService.generateNewsAINewsFeed(user, response, newsFeedService, openAIService);
 
-        emailNotificationBuilderService.createGeneralStaffEmailNotification(newsFeedDTO);
+        emailNotificationBuilderService.createNewsFeedAIEmailNotification(newsFeedDTO, EmailMessageTag.EMAIL_MESSAGE_TAG_6);
     }
 }
