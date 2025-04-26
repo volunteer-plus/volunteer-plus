@@ -62,4 +62,4 @@ npx localtunnel --port 8080
 
 ## *Qualification work links:*
 
-[Ходаков Максим](https://1drv.ms/w/c/3e16880802f568e1/EbbHDUjhrIREltFyA_RS76EBSOJXvjmghFp1JzPhcQFzTg)
+[Ходаков Максим](https://drive.google.com/drive/folders/1vw2np4rMqk95Q2Qt_F13yuh4A5n-_u-C?usp=drive_link)
