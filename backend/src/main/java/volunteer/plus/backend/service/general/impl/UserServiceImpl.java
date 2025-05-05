@@ -12,23 +12,33 @@ import org.springframework.web.multipart.MultipartFile;
 import volunteer.plus.backend.config.storage.AWSProperties;
 import volunteer.plus.backend.domain.dto.RegistrationData;
 import volunteer.plus.backend.domain.dto.UserInfo;
+import volunteer.plus.backend.domain.entity.PasswordResetToken;
 import volunteer.plus.backend.domain.entity.User;
 import volunteer.plus.backend.exceptions.ApiException;
+import volunteer.plus.backend.repository.PasswordResetTokenRepository;
 import volunteer.plus.backend.repository.UserRepository;
 import volunteer.plus.backend.service.general.S3Service;
 import volunteer.plus.backend.service.general.UserService;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final AWSProperties awsProperties;
     private final S3Service s3Service;
+    private static final long DEFAULT_TOKEN_EXPIRATION_TIME = 432000L;
 
-    public UserServiceImpl(final UserRepository userRepository,
+    public UserServiceImpl(final UserRepository userRepository, PasswordResetTokenRepository passwordResetTokenRepository,
                            final AWSProperties awsProperties,
                            final S3Service s3Service) {
         this.userRepository = userRepository;
+        this.passwordResetTokenRepository = passwordResetTokenRepository;
         this.awsProperties = awsProperties;
         this.s3Service = s3Service;
     }
@@ -109,13 +119,54 @@ public class UserServiceImpl implements UserService {
             throw new ApiException("User with email " + email + " was not found");
         }
 
+
         userRepository.saveAndFlush(user);
     }
 
     @Override
+    @Transactional
     public User getUserByResetToken(String resetToken) {
-        return userRepository.findUserByResetToken(resetToken)
-                .orElse(null);
+        var resetPasswordToken = getResetToken(resetToken);
+        var user = resetPasswordToken.getUser();
+
+        if(user == null) {
+            throw new ApiException("User with token " + resetToken + " was not found");
+        }
+
+        return user;
+    }
+
+    @Override
+    public PasswordResetToken getResetToken(String token) {
+        return passwordResetTokenRepository.findByToken(token)
+                .orElseThrow(() -> new ApiException("Token with token " + token + " was not found"));
+    }
+
+    @Override
+    public void setPasswordResetToken(User user, String token) {
+        var passwordResetToken = new PasswordResetToken();
+        passwordResetToken.setUser(user);
+        passwordResetToken.setToken(token);
+
+        Instant expiryInstant = Instant.ofEpochMilli(
+                System.currentTimeMillis() + DEFAULT_TOKEN_EXPIRATION_TIME
+        );
+        LocalDateTime expiryDate = LocalDateTime.ofInstant(
+                expiryInstant, ZoneId.systemDefault()
+        );
+        passwordResetToken.setExpiryDate(expiryDate);
+
+        passwordResetTokenRepository.save(passwordResetToken);
+    }
+
+    @Override
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    @Override
+    public void deleteUser(User user) {
+        userRepository.delete(user);
     }
 
 }

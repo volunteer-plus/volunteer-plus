@@ -6,7 +6,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.multipart.MultipartFile;
 import volunteer.plus.backend.domain.dto.RegistrationData;
 import volunteer.plus.backend.domain.dto.UserInfo;
+import volunteer.plus.backend.domain.entity.PasswordResetToken;
 import volunteer.plus.backend.domain.entity.User;
+
+import java.util.Optional;
 
 public interface UserService extends UserDetailsService {
 
@@ -23,5 +26,13 @@ public interface UserService extends UserDetailsService {
     void createUser(User user);
 
     User getUserByResetToken(String resetToken);
+
+    PasswordResetToken getResetToken(String token);
+
+    void setPasswordResetToken(User user, String token);
+
+    Optional<User> findByEmail(String email);
+
+    void deleteUser(User user);
 
 }

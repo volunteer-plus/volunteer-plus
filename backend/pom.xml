@@ -170,6 +170,11 @@
             <artifactId>caffeine</artifactId>
             <version>${caffeine.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.twilio.sdk</groupId>
+            <artifactId>twilio</artifactId>
+            <version>8.33.0</version>
+        </dependency>
     </dependencies>
 
     <build>

@@ -9,6 +9,7 @@ import volunteer.plus.backend.domain.dto.RegistrationData;
 import volunteer.plus.backend.domain.dto.ResetPasswordEmailRequest;
 import volunteer.plus.backend.domain.dto.ResetPasswordRequest;
 import volunteer.plus.backend.service.auth.AuthService;
+import volunteer.plus.backend.service.general.impl.VerificationTokenService;
 
 import java.net.URI;
 
@@ -18,6 +19,7 @@ import java.net.URI;
 public class AuthController {
 
     private final AuthService authService;
+    private final VerificationTokenService verificationTokenService;
 
     @PostMapping(value = "/registration")
     public ResponseEntity<Void> registration(@RequestBody RegistrationData registrationData) {
@@ -57,6 +59,12 @@ public class AuthController {
         } else {
             return ResponseEntity.badRequest().build();
         }
+    }
+
+    @GetMapping("/verify")
+    public ResponseEntity<String> confirmUserAccount(@RequestParam("token") String token) {
+        verificationTokenService.confirmToken(token);
+        return ResponseEntity.ok("Ваш акаунт успішно підтверджено!");
     }
 
 }

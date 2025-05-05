@@ -4,9 +4,11 @@ import groovy.transform.builder.Builder;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
 import volunteer.plus.backend.domain.entity.User;
 
 import java.time.LocalDate;
+import java.util.stream.Collectors;
 
 @Builder
 @Data
@@ -28,6 +30,7 @@ public class UserInfo {
     public UserInfo(final User user) {
         this(user.getId(), user.getFirstName(), user.getMiddleName(),
                 user.getLastName(), user.getDateOfBirth(), user.getLogoS3Link(),
-                user.getLogoFilename(), user.getPhoneNumber(), user.getEmail(), user.getRole().getAuthority());
+                user.getLogoFilename(), user.getPhoneNumber(), user.getEmail(), user.getAuthorities().stream()
+                        .map(GrantedAuthority::getAuthority).collect(Collectors.joining(",")));
     }
 }

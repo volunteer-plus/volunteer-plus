@@ -10,13 +10,15 @@ import volunteer.plus.backend.domain.dto.RegistrationData;
 import volunteer.plus.backend.domain.dto.ResetPasswordEmailRequest;
 import volunteer.plus.backend.domain.dto.ResetPasswordRequest;
 import volunteer.plus.backend.domain.entity.User;
-import volunteer.plus.backend.domain.enums.Role;
+import volunteer.plus.backend.domain.entity.VerificationToken;
+import volunteer.plus.backend.exceptions.ApiException;
 import volunteer.plus.backend.service.auth.AuthService;
-import volunteer.plus.backend.service.email.EmailNotificationBuilderService;
 import volunteer.plus.backend.service.email.EmailSenderService;
 import volunteer.plus.backend.service.general.UserService;
+import volunteer.plus.backend.service.general.impl.VerificationTokenService;
 
 import java.security.SecureRandom;
+import java.time.ZoneId;
 import java.util.*;
 
 @Service
@@ -25,19 +27,27 @@ public class AuthServiceImpl implements AuthService {
 
     private final PasswordEncoder passwordEncoder;
     private final UserService userService;
+    private final VerificationTokenService tokenService;
     private final EmailSenderService emailSender;
-    private final EmailNotificationBuilderService emailNotificationBuilderService;
 
     private static final int DEFAULT_TOKEN_LENGTH = 30;
-    private static final long DEFAULT_TOKEN_EXPIRATION_TIME = 432000L;
     private static final SecureRandom RANDOM = new SecureRandom();
 
     @Override
     @Transactional
     public void registerUser(final RegistrationData registrationData) {
+        Optional<User> existingOpt = userService.findByEmail(registrationData.getEmail());
+        if (existingOpt.isPresent()) {
+            User existing = existingOpt.get();
+            if (!existing.isEnabled()) {
+                userService.deleteUser(existing);
+            }
+            throw new ApiException("Користувач з таким e-mail вже існує");
+        }
+
         var user = User
                 .builder()
-                .enabled(true)
+                .enabled(false)
                 .accountNonExpired(true)
                 .accountNonLocked(true)
                 .credentialsNonExpired(true)
@@ -48,12 +58,12 @@ public class AuthServiceImpl implements AuthService {
                 .middleName(registrationData.getMiddleName())
                 .phoneNumber(registrationData.getPhoneNumber())
                 .dateOfBirth(registrationData.getDateOfBirth())
-                .role(Role.VOLUNTEER)
                 .build();
 
         userService.createUser(user);
 
-        emailNotificationBuilderService.createUserRegistrationEmail(user);
+        VerificationToken token = tokenService.createTokenForUser(user);
+        tokenService.sendConfirmationEmail(user, token);
     }
 
     @Override
@@ -63,8 +73,8 @@ public class AuthServiceImpl implements AuthService {
         User user = (User) userService.loadUserByUsername(email);
 
         String resetToken = generateSafeToken(DEFAULT_TOKEN_LENGTH);
-        user.setResetToken(resetToken);
-        user.setResetTokenExpTime(System.currentTimeMillis() + DEFAULT_TOKEN_EXPIRATION_TIME);
+
+        userService.setPasswordResetToken(user, resetToken);
 
         String baseUrl = getBaseUrl(request);
         String resetUrl = String.format("%s/api/no-auth/resetPassword?resetToken=%s", baseUrl,
@@ -91,16 +101,18 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional
     public boolean checkResetToken(String resetToken) {
-        var user = userService.getUserByResetToken(resetToken);
-        return user != null && user.getResetTokenExpTime() >= System.currentTimeMillis();
+        var passwordResetToken = userService.getResetToken(resetToken);
+
+        return passwordResetToken.getUser() != null && passwordResetToken.getExpiryDate().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() >= System.currentTimeMillis();
     }
 
     @Override
     @Transactional
     public boolean changePassword(ResetPasswordRequest resetPasswordRequest) {
         var user = userService.getUserByResetToken(resetPasswordRequest.getResetToken());
-        if (user == null || user.getResetTokenExpTime() < System.currentTimeMillis()) {
+        if (user == null ) {
             return false;
         }
 
