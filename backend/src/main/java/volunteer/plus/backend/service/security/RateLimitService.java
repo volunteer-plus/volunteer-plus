@@ -1,4 +1,4 @@
-package volunteer.plus.backend.service.general;
+package volunteer.plus.backend.service.security;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

@@ -15,7 +15,7 @@ import volunteer.plus.backend.exceptions.ApiException;
 import volunteer.plus.backend.service.auth.AuthService;
 import volunteer.plus.backend.service.email.EmailSenderService;
 import volunteer.plus.backend.service.general.UserService;
-import volunteer.plus.backend.service.general.impl.VerificationTokenService;
+import volunteer.plus.backend.service.security.impl.VerificationTokenService;
 
 import java.security.SecureRandom;
 import java.time.ZoneId;

@@ -37,4 +37,26 @@ public class User2fa extends BaseEntity {
     @Column(nullable = false)
     private boolean used;
 
+    @Column(nullable = false)
+    private boolean enabled = false;
+
+    @Column(name = "total_allowed_time_sec", nullable = false)
+    private long totalAllowedTimeSec = 3600;
+
+    @Column(name = "retry_period_sec", nullable = false)
+    private long retryPeriodSec = 30;
+
+    @Column(name = "max_failures", nullable = false)
+    private int maxFailures = 5;
+
+    @Column(name = "attempts_count", nullable = false)
+    private int attemptsCount = 0;
+
+    @Column(name = "last_code_sent_at")
+    private LocalDateTime lastCodeSentAt;
+
+    // --- нове поле ---
+    @Column(name = "verification_id", nullable = false, unique = true, length = 36)
+    private String verificationId;
+
 }

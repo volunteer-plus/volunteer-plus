@@ -10,7 +10,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import volunteer.plus.backend.service.general.RateLimitService;
+import volunteer.plus.backend.service.security.RateLimitService;
 
 import java.io.IOException;
 import java.time.Duration;

@@ -1,4 +1,4 @@
-package volunteer.plus.backend.service.general.impl;
+package volunteer.plus.backend.service.security.impl;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import volunteer.plus.backend.service.general.CookieService;
-import volunteer.plus.backend.service.general.RateLimitService;
+import volunteer.plus.backend.service.security.RateLimitService;
 import volunteer.plus.backend.service.general.UserService;
 import volunteer.plus.backend.service.security.JwtTokenExtractor;
 import volunteer.plus.backend.service.security.TokenFactoryService;

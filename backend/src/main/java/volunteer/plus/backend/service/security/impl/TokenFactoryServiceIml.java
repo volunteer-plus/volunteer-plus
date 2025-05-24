@@ -67,7 +67,7 @@ public class TokenFactoryServiceIml implements TokenFactoryService {
 
     private String generateRefreshToken(UserDetails userDetails) {
         HashMap<String, Object> claims = new HashMap<>();
-        return generateToken(claims, userDetails, System.currentTimeMillis() + REFRESH_TOKEN_EXPIRATION_TIME);
+        return generateToken(claims, userDetails, System.currentTimeMillis() +  REFRESH_TOKEN_EXPIRATION_TIME);
     }
 
     @Override

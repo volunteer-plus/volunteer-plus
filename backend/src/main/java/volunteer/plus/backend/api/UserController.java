@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.apache.tomcat.websocket.AuthenticationException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -11,6 +12,8 @@ import volunteer.plus.backend.domain.dto.RegistrationData;
 import volunteer.plus.backend.domain.dto.UserInfo;
 import volunteer.plus.backend.domain.entity.User;
 import volunteer.plus.backend.service.general.UserService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api")
@@ -42,6 +45,12 @@ public class UserController {
     @Operation(description = "Download user logo")
     public ResponseEntity<byte[]> downloadLogo(@AuthenticationPrincipal final User user) {
         return userService.downloadLogo(user);
+    }
+
+    @GetMapping
+    @PreAuthorize("hasAuthority('CAN_READ_ALL_USERS')")
+    public ResponseEntity<List<User>> getAllUsers() {
+        return ResponseEntity.ok(userService.findAllUsers());
     }
 
 }

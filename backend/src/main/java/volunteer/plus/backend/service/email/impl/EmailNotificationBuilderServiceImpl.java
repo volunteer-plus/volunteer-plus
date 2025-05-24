@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import volunteer.plus.backend.domain.dto.LiqPayCreationDTO;
+import volunteer.plus.backend.domain.dto.PaymentCreationDTO;
 import volunteer.plus.backend.domain.dto.NewsFeedAttachmentDTO;
 import volunteer.plus.backend.domain.dto.NewsFeedDTO;
 import volunteer.plus.backend.domain.entity.*;
@@ -190,14 +190,14 @@ public class EmailNotificationBuilderServiceImpl implements EmailNotificationBui
 
     @Override
     @Transactional
-    public void createUserPaymentEmail(final LiqPayCreationDTO liqPayCreationDTO,
+    public void createUserPaymentEmail(final PaymentCreationDTO paymentCreationDTO,
                                        final User user) {
         final var emailTemplate = emailTemplateRepository.findByEmailMessageTag(EmailMessageTag.EMAIL_MESSAGE_TAG_4)
                 .orElseThrow(() -> new ApiException(ErrorCode.EMAIL_TEMPLATE_NOT_FOUND));
 
         final EmailNotification emailNotification = new EmailNotification();
         emailNotification.setSubjectData(JacksonUtil.serialize(Map.of("name", getFullName(user))));
-        emailNotification.setTemplateData(JacksonUtil.serialize(Map.of("amount", liqPayCreationDTO.getAmount())));
+        emailNotification.setTemplateData(JacksonUtil.serialize(Map.of("amount", paymentCreationDTO.getAmount())));
         updateEmailNotification(emailNotification, getFullName(user), user.getEmail());
 
         emailTemplate.addNotification(emailNotification);

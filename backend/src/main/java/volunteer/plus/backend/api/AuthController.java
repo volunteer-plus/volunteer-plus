@@ -9,7 +9,7 @@ import volunteer.plus.backend.domain.dto.RegistrationData;
 import volunteer.plus.backend.domain.dto.ResetPasswordEmailRequest;
 import volunteer.plus.backend.domain.dto.ResetPasswordRequest;
 import volunteer.plus.backend.service.auth.AuthService;
-import volunteer.plus.backend.service.general.impl.VerificationTokenService;
+import volunteer.plus.backend.service.security.impl.VerificationTokenService;
 
 import java.net.URI;
 

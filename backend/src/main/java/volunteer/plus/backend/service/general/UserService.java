@@ -9,6 +9,7 @@ import volunteer.plus.backend.domain.dto.UserInfo;
 import volunteer.plus.backend.domain.entity.PasswordResetToken;
 import volunteer.plus.backend.domain.entity.User;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserService extends UserDetailsService {
@@ -35,4 +36,5 @@ public interface UserService extends UserDetailsService {
 
     void deleteUser(User user);
 
+    List<User> findAllUsers();
 }

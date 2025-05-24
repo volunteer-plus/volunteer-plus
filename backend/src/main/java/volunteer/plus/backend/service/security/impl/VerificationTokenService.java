@@ -1,4 +1,4 @@
-package volunteer.plus.backend.service.general.impl;
+package volunteer.plus.backend.service.security.impl;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -43,7 +43,7 @@ public class VerificationTokenService {
     }
 
     public void sendConfirmationEmail(User user, VerificationToken token) {
-        String link = appUrl + "/auth/verify?token=" + token.getToken();
+        String link = appUrl + "/api/no-auth/verify?token=" + token.getToken();
         String subject = "Підтвердження реєстрації";
         String body = String.format(
                 "Привіт, %s!\n\n" +

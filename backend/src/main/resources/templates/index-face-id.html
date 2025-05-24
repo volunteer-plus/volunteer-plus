@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Face ID Auth</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 1rem; }
+        video { display: block; margin-bottom: 1rem; }
+        #gallery img { margin: 0.2rem; }
+        button { margin-right: 0.5rem; }
+    </style>
+</head>
+<body>
+<h1>Реєстрація та Логін по обличчю</h1>
+<label>Username: <input id="username" placeholder="Ваш логін" /></label>
+<br/><br/>
+<button id="startEnroll">Зареєструвати обличчя</button>
+<button id="startAuth">Увійти по обличчю</button>
+<div id="status"></div>
+<div id="gallery"></div>
+
+<video id="video" width="320" height="240" autoplay></video>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const video = document.getElementById('video');
+    const startEnroll = document.getElementById('startEnroll');
+    const startAuth   = document.getElementById('startAuth');
+    const usernameIn  = document.getElementById('username');
+    const statusEl    = document.getElementById('status');
+    const gallery     = document.getElementById('gallery');
+
+    const enrollUrl = /*[[@{/api/no-auth/face/enroll}]]*/ '/api/no-auth/face/enroll';
+    const authUrl   = /*[[@{/api/no-auth/face/authenticate}]]*/ '/api/no-auth/face/authenticate';
+
+    async function initCamera() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            video.srcObject = stream;
+            await video.play();
+        } catch (e) {
+            statusEl.textContent = 'Камера недоступна: ' + e.message;
+        }
+    }
+    initCamera();
+
+    function captureBlob() {
+        const canvas = document.createElement('canvas');
+        canvas.width  = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+        return new Promise(res => canvas.toBlob(res, 'image/png'));
+    }
+
+    startEnroll.onclick = async () => {
+        const user = usernameIn.value.trim();
+        if (!user) return alert('Введіть логін');
+        statusEl.textContent = 'Реєстрація: збір кадрів...';
+        gallery.innerHTML = '';
+        const blobs = [];
+        for (let i = 0; i < 12; i++) {
+            statusEl.textContent = `Реєстрація: кадр ${i+1}/12`;
+            const blob = await captureBlob();
+            blobs.push(blob);
+            const img = document.createElement('img');
+            img.src = URL.createObjectURL(blob);
+            img.width = 60; img.height = 45;
+            gallery.append(img);
+            await new Promise(r => setTimeout(r, 700));
+        }
+        statusEl.textContent = 'Відправляємо на сервер...';
+        const form = new FormData();
+        form.append('username', user);
+        blobs.forEach(b => form.append('files', b, 'snap.png'));
+        const resp = await fetch(enrollUrl, { method: 'POST', body: form });
+        const json = await resp.json();
+        statusEl.textContent = resp.ok ? 'Зареєстровано успішно!' : 'Помилка: ' + (json.error || JSON.stringify(json));
+    };
+
+    startAuth.onclick = async () => {
+        const user = usernameIn.value.trim();
+        if (!user) return alert('Введіть логін');
+        statusEl.textContent = 'Увійти: захоплення кадру...';
+        const blob = await captureBlob();
+        statusEl.textContent = 'Увійти: відправка на сервер...';
+        const form = new FormData();
+        form.append('username', user);
+        form.append('file', blob, 'snap.png');
+        const resp = await fetch(authUrl, { method: 'POST', body: form });
+        const json = await resp.json();
+        if (resp.ok) {
+            localStorage.setItem('jwt', json.token);
+            statusEl.textContent = 'Логін успішний! Токен збережено.';
+        } else {
+            statusEl.textContent = 'Не вдалося розпізнати обличчя.';
+        }
+    };
+    /*]]>*/
+</script>
+</body>
+</html>
+

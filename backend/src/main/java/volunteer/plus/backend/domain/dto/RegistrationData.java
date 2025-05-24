@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import volunteer.plus.backend.service.security.impl.ValidPassword;
 
 import java.time.LocalDate;
 
@@ -15,6 +16,8 @@ public class RegistrationData {
 
     // fields which should not be updated cia standard API
     private String email;
+
+    @ValidPassword
     private String password;
 
     // general info fields

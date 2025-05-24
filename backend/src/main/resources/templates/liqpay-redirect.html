@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><title>Redirect to LiqPay</title></head>
+<body>
+<form id="liqpayForm" th:action="@{'https://www.liqpay.ua/api/3/checkout'}" method="post">
+    <input type="hidden" name="data" th:value="${data}" />
+    <input type="hidden" name="signature" th:value="${signature}" />
+</form>
+<script>document.getElementById('liqpayForm').submit();</script>
+</body>
+</html>

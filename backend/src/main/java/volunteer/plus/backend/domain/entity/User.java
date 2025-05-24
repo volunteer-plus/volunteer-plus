@@ -2,11 +2,20 @@ package volunteer.plus.backend.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.oidc.OidcIdToken;
+import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+import volunteer.plus.backend.config.security.EmailAttributeConverter;
+import volunteer.plus.backend.service.general.impl.CryptoConverter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Getter
@@ -24,9 +33,14 @@ import java.util.*;
 })
 @Entity
 @Table(name = "user")
-public class User extends BaseEntity implements UserDetails {
+public class User implements UserDetails, OidcUser {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    protected Long id;
 
     @Column(nullable = false, unique = true)
+    @Convert(converter = EmailAttributeConverter.class)
     private String email;
 
     @Column
@@ -36,15 +50,18 @@ public class User extends BaseEntity implements UserDetails {
     private String status;
 
     @Column(name = "first_name")
+    @Convert(converter = CryptoConverter.class)
     private String firstName;
 
     @Column(name = "middle_name")
+    @Convert(converter = CryptoConverter.class)
     private String middleName;
 
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
 
     @Column(name = "last_name")
+    @Convert(converter = CryptoConverter.class)
     private String lastName;
 
     @Column(name = "phone_number")
@@ -55,6 +72,9 @@ public class User extends BaseEntity implements UserDetails {
 
     @Column(name = "logo_filename")
     private String logoFilename;
+
+    @Column(name = "email_hash", nullable = false, unique = true, updatable = false)
+    private String emailHash;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Volunteer volunteer;
@@ -69,7 +89,7 @@ public class User extends BaseEntity implements UserDetails {
     private List<VolunteerFeedback> volunteerFeedbacks = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<LiqPayOrder> liqPayOrders = new ArrayList<>();
+    private List<PaymentOrder> paymentOrders = new ArrayList<>();
 
     @ManyToMany(mappedBy = "users")
     private List<ConversationRoom> conversationRooms = new ArrayList<>();
@@ -94,11 +114,21 @@ public class User extends BaseEntity implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<TrustedDevice> trustedDevices = new ArrayList<>();
 
+    @Lob
+    @Column(nullable = false)
+    private byte[] centroid;
+
+    @Column(nullable = false)
+    private double threshold;
+
+    @Lob
+    @Column(nullable = false)
+    private byte[] embeddings;
+
     private boolean enabled;
     private boolean accountNonExpired;
     private boolean accountNonLocked;
     private boolean credentialsNonExpired;
-    private boolean isTwoFactorEnabled;
 
     public void addFeedback(VolunteerFeedback volunteerFeedback) {
         if (this.volunteerFeedbacks == null) {
@@ -114,6 +144,39 @@ public class User extends BaseEntity implements UserDetails {
         }
         this.requests.add(request);
         request.setUser(this);
+    }
+
+    @CreationTimestamp
+    protected LocalDateTime createDate;
+
+    @UpdateTimestamp
+    protected LocalDateTime updateDate;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createDate = LocalDateTime.now();
+
+        if (email != null) {
+            this.emailHash = DigestUtils.sha256Hex(email.trim().toLowerCase());
+        }
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updateDate = LocalDateTime.now();
+
+        if (email != null) {
+            this.emailHash = DigestUtils.sha256Hex(email.trim().toLowerCase());
+        }
+    }
+
+    public void setUpdateDate() {
+        this.updateDate = LocalDateTime.now();
+    }
+
+    @Override
+    public Map<String, Object> getAttributes() {
+        return Map.of("user", email);
     }
 
     @Override
@@ -158,4 +221,23 @@ public class User extends BaseEntity implements UserDetails {
         return enabled;
     }
 
+    @Override
+    public String getName() {
+        return email;
+    }
+
+    @Override
+    public Map<String, Object> getClaims() {
+        return Map.of();
+    }
+
+    @Override
+    public OidcUserInfo getUserInfo() {
+        return null;
+    }
+
+    @Override
+    public OidcIdToken getIdToken() {
+        return null;
+    }
 }

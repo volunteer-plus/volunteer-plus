@@ -1,7 +1,7 @@
 package volunteer.plus.backend.service.email;
 
 import org.springframework.ai.chat.client.ChatClient;
-import volunteer.plus.backend.domain.dto.LiqPayCreationDTO;
+import volunteer.plus.backend.domain.dto.PaymentCreationDTO;
 import volunteer.plus.backend.domain.dto.NewsFeedDTO;
 import volunteer.plus.backend.domain.entity.Report;
 import volunteer.plus.backend.domain.entity.User;
@@ -19,7 +19,7 @@ public interface EmailNotificationBuilderService {
 
     void createUserRegistrationEmail(User user);
 
-    void createUserPaymentEmail(LiqPayCreationDTO liqPayCreationDTO, User user);
+    void createUserPaymentEmail(PaymentCreationDTO paymentCreationDTO, User user);
 
     void createNewsFeedAIEmailNotification(NewsFeedDTO newsFeedDTO, final EmailMessageTag messageTag);
 }

@@ -1,4 +1,4 @@
-package volunteer.plus.backend.service.general.impl;
+package volunteer.plus.backend.service.security.impl;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;

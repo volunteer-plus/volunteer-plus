@@ -1,6 +1,8 @@
 package volunteer.plus.backend.config.security;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,6 +25,8 @@ import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.cors.CorsConfigurationSource;
+import volunteer.plus.backend.service.auth.impl.CustomOAuth2UserService;
+import volunteer.plus.backend.service.auth.impl.HttpCookieOAuth2AuthorizationRequestRepository;
 import volunteer.plus.backend.service.general.UserService;
 import volunteer.plus.backend.service.security.JwtTokenExtractor;
 import volunteer.plus.backend.service.security.impl.RateLimitCacheFilter;
@@ -42,7 +46,12 @@ import static volunteer.plus.backend.config.websocket.WebSocketConfig.WS_ENDPOIN
 public class SecurityConf {
 
     private final UserService userService;
-    private final AuthenticationSuccessHandler successHandler;
+    @Autowired
+    @Qualifier(value = "oauth2_seccess")
+    private AuthenticationSuccessHandler oauthAuthenticationSuccessHandler;
+    @Autowired
+    @Qualifier(value = "defaultAuthenticationSuccessHandler")
+    private AuthenticationSuccessHandler successHandler;
     private final AuthenticationFailureHandler failureHandler;
     private final JwtAuthenticationProvider jwtAuthenticationProvider;
     private final RefreshTokenAuthenticationProvider refreshTokenAuthenticationProvider;
@@ -58,10 +67,12 @@ public class SecurityConf {
     public static final String ACTUATOR_ENTRY_POINT = "/actuator/**";
     public static final String WS_ENDPOINT_ENTRY_POINT = WS_ENDPOINT + "/**";
     public static final String APP_ENTRY_POINT = "/app/**";
-    public static final String TOPIC_ENTRY_POINT = WS_DESTINATION_PREFIX +"/**";
+    public static final String TOPIC_ENTRY_POINT = WS_DESTINATION_PREFIX + "/**";
     public static final String OPENAI_ENTRY_POINT = "/openai**";
     public static final String OLLAMA_ENTRY_POINT = "/ollama**";
     public static final String CHAT_ENTRY_POINT = "/chat/**";
+    private final CustomOAuth2UserService customUserService;
+    private final HttpCookieOAuth2AuthorizationRequestRepository cookieRepo;
 
     @Bean
     public DaoAuthenticationProvider buildRestAuthenticationProvider() {
@@ -70,6 +81,7 @@ public class SecurityConf {
         user.setUserDetailsService(userService);
         return user;
     }
+
 
     @Bean
     public AuthenticationManager authenticationManager() {
@@ -115,6 +127,7 @@ public class SecurityConf {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(e -> e.configurationSource(corsConfigurationSource))
                 .authorizeHttpRequests(e -> e
+                        //.antMatchers("/", "/index.html", "/static/**", "/favicon.ico").permitAll()
                         .requestMatchers(
                                 FORM_BASED_LOGIN_ENTRY_POINT,
                                 TOKEN_REFRESH_ENTRY_POINT,
@@ -127,7 +140,10 @@ public class SecurityConf {
                                 TOPIC_ENTRY_POINT,
                                 OPENAI_ENTRY_POINT,
                                 OLLAMA_ENTRY_POINT,
-                                CHAT_ENTRY_POINT
+                                CHAT_ENTRY_POINT,
+                                "/oauth2/**",
+                                "/login/oauth2/**",
+                                "/api/face/**"
                         )
                         .permitAll()
                         .requestMatchers(TOKEN_BASED_AUTH_ENTRY_POINT)
@@ -135,6 +151,26 @@ public class SecurityConf {
                 )
                 .sessionManagement(
                         session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+                .oauth2Login(o -> o
+                        .loginPage("/api/no-auth/")
+                        .userInfoEndpoint(u -> u
+                                .oidcUserService(customUserService)
+                        )
+                        .authorizationEndpoint(auth -> auth
+                                .authorizationRequestRepository(cookieRepo)
+                        )
+                        .successHandler(oauthAuthenticationSuccessHandler)
+                )
+                .logout(l -> l
+                        .logoutUrl("/logout")
+                        .deleteCookies(
+                                "JSESSIONID",
+                                HttpCookieOAuth2AuthorizationRequestRepository.COOKIE_NAME,
+                                "access_token",
+                                "refresh_token"
+                        )
+                        .logoutSuccessUrl("/")
                 )
                 .addFilterBefore(rateLimitCacheFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(buildRestLoginProcessingFilter(), UsernamePasswordAuthenticationFilter.class)
@@ -157,7 +193,8 @@ public class SecurityConf {
                         TOPIC_ENTRY_POINT,
                         OPENAI_ENTRY_POINT,
                         OLLAMA_ENTRY_POINT,
-                        CHAT_ENTRY_POINT
+                        CHAT_ENTRY_POINT,
+                        "/oauth2/**"
                 )
                 .map(AntPathRequestMatcher::new)
                 .collect(Collectors.toList());

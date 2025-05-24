@@ -3,6 +3,8 @@ package volunteer.plus.backend.domain.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import volunteer.plus.backend.domain.enums.CurrencyName;
+import volunteer.plus.backend.domain.enums.PaymentProvider;
+import volunteer.plus.backend.domain.enums.PaymentStatus;
 
 import java.math.BigDecimal;
 
@@ -13,8 +15,8 @@ import java.math.BigDecimal;
 @Builder
 @EqualsAndHashCode(callSuper = true, exclude = "user")
 @Entity
-@Table(name = "liqpay_order")
-public class LiqPayOrder extends BaseEntity {
+@Table(name = "payment_order")
+public class PaymentOrder extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private CurrencyName currencyName;
@@ -26,4 +28,15 @@ public class LiqPayOrder extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    /** Хто обробляє платіж */
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private PaymentProvider provider;
+
+    /** Статус самого платежу */
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private PaymentStatus status;
+
 }
