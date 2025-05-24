@@ -2,20 +2,22 @@ name: Minute Dependencies Update
 
 on:
   schedule:
-    - cron: '*/1 * * * *'  # виконується щохвилини
-  workflow_dispatch:   # дозволяє запускати вручну
+    - cron: '*/1 * * * *'
+  workflow_dispatch:
 
 jobs:
   deps:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          distribution: 'adopt'
-          java-version: '11'
+          distribution: 'temurin'
+          java-version: '21'
 
       - name: Run Maven dependency updates
         run: mvn versions:use-latest-releases
