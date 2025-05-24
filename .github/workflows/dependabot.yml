@@ -19,8 +19,11 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
+      - name: Ensure working directory exists
+        run: mkdir -p ./volunteer-plus
+
       - name: Run Maven dependency updates
-        working-directory: backend
+        working-directory: ./volunteer-plus
         run: mvn versions:use-latest-releases
 
       - name: Commit updated dependencies
