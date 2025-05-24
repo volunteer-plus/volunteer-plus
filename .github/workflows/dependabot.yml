@@ -20,6 +20,7 @@ jobs:
           java-version: '21'
 
       - name: Run Maven dependency updates
+        working-directory: ./volunteer-plus
         run: mvn versions:use-latest-releases
 
       - name: Commit updated dependencies
