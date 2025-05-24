@@ -20,7 +20,7 @@ jobs:
           java-version: '21'
 
       - name: Run Maven dependency updates
-        working-directory: ../backend
+        working-directory: backend
         run: mvn versions:use-latest-releases
 
       - name: Commit updated dependencies
